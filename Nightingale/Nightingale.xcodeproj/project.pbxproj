@@ -1,0 +1,623 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		434A86222D53A5A3000C4AB5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 434A86212D53A5A3000C4AB5 /* FirebaseAnalytics */; };
+		434A86242D53A5A3000C4AB5 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = 434A86232D53A5A3000C4AB5 /* FirebaseAnalyticsOnDeviceConversion */; };
+		434A86262D53A5A3000C4AB5 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 434A86252D53A5A3000C4AB5 /* FirebaseAnalyticsWithoutAdIdSupport */; };
+		434A86282D53A5A3000C4AB5 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 434A86272D53A5A3000C4AB5 /* FirebaseAppCheck */; };
+		434A862A2D53A5A3000C4AB5 /* FirebaseAppDistribution-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 434A86292D53A5A3000C4AB5 /* FirebaseAppDistribution-Beta */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		434A85A72D535F29000C4AB5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 434A858E2D535F27000C4AB5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 434A85952D535F27000C4AB5;
+			remoteInfo = Nightingale;
+		};
+		434A85B12D535F29000C4AB5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 434A858E2D535F27000C4AB5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 434A85952D535F27000C4AB5;
+			remoteInfo = Nightingale;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		434A85962D535F27000C4AB5 /* Nightingale.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nightingale.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		434A85A62D535F29000C4AB5 /* NightingaleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NightingaleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		434A85B02D535F29000C4AB5 /* NightingaleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NightingaleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		434A85982D535F27000C4AB5 /* Nightingale */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Nightingale;
+			sourceTree = "<group>";
+		};
+		434A85A92D535F29000C4AB5 /* NightingaleTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = NightingaleTests;
+			sourceTree = "<group>";
+		};
+		434A85B32D535F29000C4AB5 /* NightingaleUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = NightingaleUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		434A85932D535F27000C4AB5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				434A86282D53A5A3000C4AB5 /* FirebaseAppCheck in Frameworks */,
+				434A86222D53A5A3000C4AB5 /* FirebaseAnalytics in Frameworks */,
+				434A862A2D53A5A3000C4AB5 /* FirebaseAppDistribution-Beta in Frameworks */,
+				434A86262D53A5A3000C4AB5 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
+				434A86242D53A5A3000C4AB5 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		434A85A32D535F29000C4AB5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		434A85AD2D535F29000C4AB5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		434A858D2D535F27000C4AB5 = {
+			isa = PBXGroup;
+			children = (
+				434A85982D535F27000C4AB5 /* Nightingale */,
+				434A85A92D535F29000C4AB5 /* NightingaleTests */,
+				434A85B32D535F29000C4AB5 /* NightingaleUITests */,
+				434A85972D535F27000C4AB5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		434A85972D535F27000C4AB5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				434A85962D535F27000C4AB5 /* Nightingale.app */,
+				434A85A62D535F29000C4AB5 /* NightingaleTests.xctest */,
+				434A85B02D535F29000C4AB5 /* NightingaleUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		434A85952D535F27000C4AB5 /* Nightingale */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 434A85BA2D535F29000C4AB5 /* Build configuration list for PBXNativeTarget "Nightingale" */;
+			buildPhases = (
+				434A85922D535F27000C4AB5 /* Sources */,
+				434A85932D535F27000C4AB5 /* Frameworks */,
+				434A85942D535F27000C4AB5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				434A85982D535F27000C4AB5 /* Nightingale */,
+			);
+			name = Nightingale;
+			packageProductDependencies = (
+				434A86212D53A5A3000C4AB5 /* FirebaseAnalytics */,
+				434A86232D53A5A3000C4AB5 /* FirebaseAnalyticsOnDeviceConversion */,
+				434A86252D53A5A3000C4AB5 /* FirebaseAnalyticsWithoutAdIdSupport */,
+				434A86272D53A5A3000C4AB5 /* FirebaseAppCheck */,
+				434A86292D53A5A3000C4AB5 /* FirebaseAppDistribution-Beta */,
+			);
+			productName = Nightingale;
+			productReference = 434A85962D535F27000C4AB5 /* Nightingale.app */;
+			productType = "com.apple.product-type.application";
+		};
+		434A85A52D535F29000C4AB5 /* NightingaleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 434A85BD2D535F29000C4AB5 /* Build configuration list for PBXNativeTarget "NightingaleTests" */;
+			buildPhases = (
+				434A85A22D535F29000C4AB5 /* Sources */,
+				434A85A32D535F29000C4AB5 /* Frameworks */,
+				434A85A42D535F29000C4AB5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				434A85A82D535F29000C4AB5 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				434A85A92D535F29000C4AB5 /* NightingaleTests */,
+			);
+			name = NightingaleTests;
+			packageProductDependencies = (
+			);
+			productName = NightingaleTests;
+			productReference = 434A85A62D535F29000C4AB5 /* NightingaleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		434A85AF2D535F29000C4AB5 /* NightingaleUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 434A85C02D535F29000C4AB5 /* Build configuration list for PBXNativeTarget "NightingaleUITests" */;
+			buildPhases = (
+				434A85AC2D535F29000C4AB5 /* Sources */,
+				434A85AD2D535F29000C4AB5 /* Frameworks */,
+				434A85AE2D535F29000C4AB5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				434A85B22D535F29000C4AB5 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				434A85B32D535F29000C4AB5 /* NightingaleUITests */,
+			);
+			name = NightingaleUITests;
+			packageProductDependencies = (
+			);
+			productName = NightingaleUITests;
+			productReference = 434A85B02D535F29000C4AB5 /* NightingaleUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		434A858E2D535F27000C4AB5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					434A85952D535F27000C4AB5 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					434A85A52D535F29000C4AB5 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 434A85952D535F27000C4AB5;
+					};
+					434A85AF2D535F29000C4AB5 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 434A85952D535F27000C4AB5;
+					};
+				};
+			};
+			buildConfigurationList = 434A85912D535F27000C4AB5 /* Build configuration list for PBXProject "Nightingale" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 434A858D2D535F27000C4AB5;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 434A85972D535F27000C4AB5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				434A85952D535F27000C4AB5 /* Nightingale */,
+				434A85A52D535F29000C4AB5 /* NightingaleTests */,
+				434A85AF2D535F29000C4AB5 /* NightingaleUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		434A85942D535F27000C4AB5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		434A85A42D535F29000C4AB5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		434A85AE2D535F29000C4AB5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		434A85922D535F27000C4AB5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		434A85A22D535F29000C4AB5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		434A85AC2D535F29000C4AB5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		434A85A82D535F29000C4AB5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 434A85952D535F27000C4AB5 /* Nightingale */;
+			targetProxy = 434A85A72D535F29000C4AB5 /* PBXContainerItemProxy */;
+		};
+		434A85B22D535F29000C4AB5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 434A85952D535F27000C4AB5 /* Nightingale */;
+			targetProxy = 434A85B12D535F29000C4AB5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		434A85B82D535F29000C4AB5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		434A85B92D535F29000C4AB5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		434A85BB2D535F29000C4AB5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Nightingale/Preview Content\"";
+				DEVELOPMENT_TEAM = RQ5QCPF6Z2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = myhre.simon.Nightingale;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		434A85BC2D535F29000C4AB5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Nightingale/Preview Content\"";
+				DEVELOPMENT_TEAM = RQ5QCPF6Z2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = myhre.simon.Nightingale;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		434A85BE2D535F29000C4AB5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 85ZGA22U5R;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = myhre.NightingaleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nightingale.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nightingale";
+			};
+			name = Debug;
+		};
+		434A85BF2D535F29000C4AB5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 85ZGA22U5R;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = myhre.NightingaleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nightingale.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nightingale";
+			};
+			name = Release;
+		};
+		434A85C12D535F29000C4AB5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 85ZGA22U5R;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = myhre.NightingaleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Nightingale;
+			};
+			name = Debug;
+		};
+		434A85C22D535F29000C4AB5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 85ZGA22U5R;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = myhre.NightingaleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Nightingale;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		434A85912D535F27000C4AB5 /* Build configuration list for PBXProject "Nightingale" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				434A85B82D535F29000C4AB5 /* Debug */,
+				434A85B92D535F29000C4AB5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		434A85BA2D535F29000C4AB5 /* Build configuration list for PBXNativeTarget "Nightingale" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				434A85BB2D535F29000C4AB5 /* Debug */,
+				434A85BC2D535F29000C4AB5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		434A85BD2D535F29000C4AB5 /* Build configuration list for PBXNativeTarget "NightingaleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				434A85BE2D535F29000C4AB5 /* Debug */,
+				434A85BF2D535F29000C4AB5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		434A85C02D535F29000C4AB5 /* Build configuration list for PBXNativeTarget "NightingaleUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				434A85C12D535F29000C4AB5 /* Debug */,
+				434A85C22D535F29000C4AB5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.8.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		434A86212D53A5A3000C4AB5 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		434A86232D53A5A3000C4AB5 /* FirebaseAnalyticsOnDeviceConversion */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsOnDeviceConversion;
+		};
+		434A86252D53A5A3000C4AB5 /* FirebaseAnalyticsWithoutAdIdSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsWithoutAdIdSupport;
+		};
+		434A86272D53A5A3000C4AB5 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
+		};
+		434A86292D53A5A3000C4AB5 /* FirebaseAppDistribution-Beta */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseAppDistribution-Beta";
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 434A858E2D535F27000C4AB5 /* Project object */;
+}
