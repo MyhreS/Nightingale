@@ -74,28 +74,6 @@
             ReferencedContainer = "container:Nightingale.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "FIREBASE_GCM_SENDER_ID = &quot;572438846456&quot;"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "FIREBASE_API_KEY = &quot;AIzaSyBYIYIkQp_jpPIGFygooDmfEEGWD-NA8Hk&quot;"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "FIREBASE_PROJECT_ID = &quot;nightingale-74dd8&quot; "
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "FIREBASE_STORAGE_BUCKET = &quot;nightingale-74dd8.firebasestorage.app&quot;"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "FIREBASE_APP_ID = &quot;1:572438846456:ios:bd7e189c1385d2a8e3940d&quot;"
-            isEnabled = "YES">
-         </CommandLineArgument>
-      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
