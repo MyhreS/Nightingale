@@ -6,7 +6,7 @@ struct AddMusic: View {
             Text("Add Music")
                 .font(.headline)
                 .fontWeight(.bold)
-
+            
             Button(action: {
                 // Action to add music
             }) {
@@ -25,5 +25,7 @@ struct AddMusic: View {
                 .cornerRadius(10)
             }
         }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

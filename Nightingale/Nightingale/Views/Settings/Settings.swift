@@ -12,12 +12,6 @@ struct Settings: View {
                         .background(Color.blue.opacity(0.3))
                         .cornerRadius(20)
                         .shadow(radius: 10)
-                    
-                    OtherSettings()
-                        .frame(maxWidth: .infinity, maxHeight: 150)
-                        .background(Color.blue.opacity(0.3))
-                        .cornerRadius(20)
-                        .shadow(radius: 10)
                 }
                 .padding()
                 .toolbar {
