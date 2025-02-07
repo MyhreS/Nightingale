@@ -17,7 +17,7 @@ struct MusicSelector: View {
                 MusicList()
             }
         }
-        .padding(10)
+        .padding(20)
         .background(Color.gray.opacity(0.05))
         .cornerRadius(20)
 
