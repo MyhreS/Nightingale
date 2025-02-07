@@ -10,7 +10,7 @@ struct MusicSelector: View {
                 .fontWeight(.bold)
 
             if musicLibrary.musicFiles.isEmpty {
-                Text("No music added yet.")
+                Text("No music added yet. Go to settings to add some!")
                     .font(.subheadline)
                     .foregroundColor(.gray)
             } else {
