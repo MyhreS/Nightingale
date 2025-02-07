@@ -1,24 +1,17 @@
 import Foundation
 
 struct MusicFile: Identifiable, Codable, Hashable {
-    let id: UUID // Unique identifier for each file
+    let id: UUID
     let url: URL
     let name: String
-    let tag: String
+    var tag: String
+    var played: Bool
 
-    init(url: String, tag: String = "") {
+    init(url: String, tag: String = "", played: Bool = false) {
         self.id = UUID()
-        self.url = URL(fileURLWithPath: url) // Convert string to URL
-        self.name = URL(fileURLWithPath: url).deletingPathExtension().lastPathComponent // Extract name from URL
+        self.url = URL(fileURLWithPath: url)
+        self.name = URL(fileURLWithPath: url).deletingPathExtension().lastPathComponent
         self.tag = tag
-    }
-
-    // Conformance to `Hashable` via synthesized implementation
-    static func == (lhs: MusicFile, rhs: MusicFile) -> Bool {
-        lhs.id == rhs.id // Two MusicFiles are equal if their IDs are the same
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id) // Hash by ID
+        self.played = played
     }
 }

@@ -2,7 +2,6 @@ import SwiftUI
 
 struct MusicItem: View {
     @ObservedObject var musicQueue = MusicQueue.shared // Shared music queue
-
     var musicFile: MusicFile
 
     var body: some View {
@@ -14,14 +13,14 @@ struct MusicItem: View {
                 // Music icon (squircle)
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(isNextToPlay() ? Color.green.opacity(0.8) : Color.blue.opacity(0.2)) // Highlight next song
+                        .fill(iconBackgroundColor()) // Adjust background color based on conditions
                         .frame(width: 40, height: 40)
 
                     Image(systemName: "music.note")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 20, height: 20)
-                        .foregroundColor(isNextToPlay() ? .white : .blue)
+                        .foregroundColor(iconForegroundColor()) // Adjust icon color based on conditions
                 }
 
                 // Song name
@@ -43,9 +42,31 @@ struct MusicItem: View {
         .listRowBackground(Color.clear) // Transparent row background
     }
 
-    /// ✅ Checks if this item is the next one to be played
+    /// Checks if this item is the next one to be played
     private func isNextToPlay() -> Bool {
         return musicQueue.nextSong?.id == musicFile.id
+    }
+
+    /// Determines the background color of the icon
+    private func iconBackgroundColor() -> Color {
+        if isNextToPlay() {
+            return Color.green.opacity(0.8)
+        } else if musicFile.played {
+            return Color.gray.opacity(0.3) // Gray for played songs
+        } else {
+            return Color.blue.opacity(0.2)
+        }
+    }
+
+    /// Determines the foreground color of the icon
+    private func iconForegroundColor() -> Color {
+        if isNextToPlay() {
+            return .white
+        } else if musicFile.played {
+            return .gray // Lighter gray for played songs
+        } else {
+            return .blue
+        }
     }
 
     /// Adds the file to the queue and updates UI
@@ -53,7 +74,7 @@ struct MusicItem: View {
         musicQueue.addToQueue(musicFile)
     }
 
-    /// ✅ Provides haptic feedback when the button is tapped
+    /// Provides haptic feedback when the button is tapped
     private func provideHapticFeedback() {
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()
