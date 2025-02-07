@@ -12,11 +12,11 @@ struct RemoveMusicButton: View {
                 Image(systemName: "minus.circle.fill")
                     .resizable()
                     .frame(width: 24, height: 24)
-                    .foregroundColor(.red)
+                    .foregroundColor(.red.darker())
                 
                 Text("Remove")
                     .font(.body)
-                    .foregroundColor(.red)
+                    .foregroundColor(.red.darker())
             }
             .frame(maxWidth: .infinity)
             .padding()

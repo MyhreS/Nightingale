@@ -15,11 +15,11 @@ struct AddMusicButton: View {
                 Image(systemName: isSuccess ? "checkmark.circle.fill" : "plus.circle.fill")
                     .resizable()
                     .frame(width: 24, height: 24)
-                    .foregroundColor(isSuccess ? Color.green.darker() : .blue)
+                    .foregroundColor(isSuccess ? Color.green.darker() : .blue.darker())
 
                 Text(successMessage)
                     .font(.body)
-                    .foregroundColor(isSuccess ? Color.green.darker() : .blue)
+                    .foregroundColor(isSuccess ? Color.green.darker() : .blue.darker())
             }
             .frame(maxWidth: .infinity)
             .padding()
