@@ -32,7 +32,7 @@ struct MusicItem: View {
                     .lineLimit(nil)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
+            .padding(5)
             .background(
                 RoundedRectangle(cornerRadius: 10)
                     .fill(isNextToPlay() ? Color.green.opacity(0.2) : Color.clear) // ✅ Subtle highlight for next song

@@ -5,10 +5,10 @@ struct MusicList: View {
 
     var body: some View {
         List(musicLibrary.musicFiles, id: \.self) { file in
-            MusicItem(file: file) // Use the updated MusicItem
+            MusicItem(file: file)
         }
-        .listStyle(.plain) // Remove extra styling
-        .scrollContentBackground(.hidden) // Ensure transparent background
-        .padding(.leading, 0) // Remove extra padding on the left
+        .listStyle(.plain) // Removes default styling
+        .scrollContentBackground(.hidden) // Transparent background for the list
+        .padding(.leading, 0) // Removes left padding from the list
     }
 }
