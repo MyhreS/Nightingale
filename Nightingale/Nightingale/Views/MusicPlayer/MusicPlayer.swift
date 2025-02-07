@@ -2,10 +2,11 @@ import SwiftUI
 
 struct MusicPlayer: View {
     var body: some View {
-        VStack {
-            Text("Music Player")
+        HStack(spacing: 10) {
+            CurrentQueued()
+            PlayPauseButton()
         }
-        .frame(maxWidth: .infinity, maxHeight: 150)
+        .frame(maxWidth: .infinity, maxHeight: 70)
         .padding(10)
         .background(Color.blue.opacity(0.5))
         .cornerRadius(20)
