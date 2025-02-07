@@ -7,7 +7,7 @@ struct Settings: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    AddMusic()
+                    Music()
                         .frame(maxWidth: .infinity, maxHeight: 150)
                         .background(Color.blue.opacity(0.3))
                         .cornerRadius(20)
