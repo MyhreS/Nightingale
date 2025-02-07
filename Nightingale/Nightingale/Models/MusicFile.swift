@@ -7,10 +7,10 @@ struct MusicFile: Identifiable, Codable, Hashable {
     var tag: String
     var played: Bool
 
-    init(url: String, tag: String = "", played: Bool = false) {
+    init(url: URL, tag: String = "", played: Bool = false) {
         self.id = UUID()
-        self.url = URL(fileURLWithPath: url)
-        self.name = URL(fileURLWithPath: url).deletingPathExtension().lastPathComponent
+        self.url = url
+        self.name = url.deletingPathExtension().lastPathComponent
         self.tag = tag
         self.played = played
     }

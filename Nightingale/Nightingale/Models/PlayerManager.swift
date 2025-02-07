@@ -12,13 +12,13 @@ class PlayerManager: ObservableObject {
         stop() // Stop any currently playing audio before starting a new one
         
         do {
-            let soundURL = musicFile.url // ✅ Use the original URL
-            
+            let soundURL = musicFile.url // ✅ Use the copied file inside the app
+
             // ✅ Ensure audio session is set to playback mode
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
 
-            // ✅ Check if the file exists
+            // ✅ Check if file exists
             guard FileManager.default.fileExists(atPath: soundURL.path) else {
                 print("❌ File not found: \(soundURL.path)")
                 return

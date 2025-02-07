@@ -10,16 +10,16 @@ class MusicLibrary: ObservableObject {
 
     private init() {
         self.musicFiles = [
-            MusicFile(url: "/mock/path/ACDC - Mock Highway to Hell.mp3"),
-            MusicFile(url: "/mock/path/Queen - Mock Bohemian Rhapsody.mp3"),
-            MusicFile(url: "/mock/path/Nirvana - Mock Smells Like Teen Spirit.mp3")
+            MusicFile(url: URL(fileURLWithPath: "/mock/path/ACDC - Mock Highway to Hell.mp3")),
+            MusicFile(url: URL(fileURLWithPath: "/mock/path/Queen - Mock Bohemian Rhapsody.mp3")),
+            MusicFile(url: URL(fileURLWithPath: "/mock/path/Nirvana - Mock Smells Like Teen Spirit.mp3"))
         ]
             
         loadMusicFiles()
     }
 
-    /// Adds a new music file and saves it persistently (prevents duplicates)
-    func addMusicFile(_ url: String) -> Bool {
+    /// ✅ Now accepts a **URL** instead of a **String**
+    func addMusicFile(_ url: URL) -> Bool {
         let newMusicFile = MusicFile(url: url)
         guard !musicFiles.contains(where: { $0.url == newMusicFile.url }) else {
             print("File already exists: \(newMusicFile.name)")
