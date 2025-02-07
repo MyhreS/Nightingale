@@ -4,34 +4,35 @@ import UniformTypeIdentifiers
 class MusicLibrary: ObservableObject {
     static let shared = MusicLibrary() // Singleton instance
 
-    @Published private(set) var musicFiles: [URL] = []
+    @Published private(set) var musicFiles: [MusicFile] = []
 
     private let storageKey = "SavedMusicFiles"
 
     private init() {
         self.musicFiles = [
-            URL(fileURLWithPath: "/mock/path/ACDC - Mock Highway to Hell.mp3"),
-            URL(fileURLWithPath: "/mock/path/Queen - Mock Bohemian Rhapsody.mp3"),
-            URL(fileURLWithPath: "/mock/path/Nirvana - Mock Smells Like Teen Spirit.mp3")
+            MusicFile(url: "/mock/path/ACDC - Mock Highway to Hell.mp3"),
+            MusicFile(url: "/mock/path/Queen - Mock Bohemian Rhapsody.mp3"),
+            MusicFile(url: "/mock/path/Nirvana - Mock Smells Like Teen Spirit.mp3")
         ]
             
         loadMusicFiles()
     }
 
     /// Adds a new music file and saves it persistently (prevents duplicates)
-    func addMusicFile(_ url: URL) -> Bool {
-        guard !musicFiles.contains(url) else {
-            print("File already exists: \(url.lastPathComponent)")
+    func addMusicFile(_ url: String) -> Bool {
+        let newMusicFile = MusicFile(url: url)
+        guard !musicFiles.contains(where: { $0.url == newMusicFile.url }) else {
+            print("File already exists: \(newMusicFile.name)")
             return false // ✅ Return false if duplicate
         }
-        musicFiles.append(url)
+        musicFiles.append(newMusicFile)
         saveMusicFiles()
         return true // ✅ Return true if successfully added
     }
 
     /// Removes a music file and updates storage
-    func removeMusicFile(_ url: URL) {
-        musicFiles.removeAll { $0 == url }
+    func removeMusicFile(_ musicFile: MusicFile) {
+        musicFiles.removeAll { $0.id == musicFile.id }
         saveMusicFiles()
     }
 
@@ -41,16 +42,23 @@ class MusicLibrary: ObservableObject {
         UserDefaults.standard.removeObject(forKey: storageKey)
     }
 
-    /// Saves the music file URLs persistently
+    /// Saves the music files persistently
     private func saveMusicFiles() {
-        let savedPaths = musicFiles.map { $0.path }
-        UserDefaults.standard.set(savedPaths, forKey: storageKey)
+        do {
+            let data = try JSONEncoder().encode(musicFiles)
+            UserDefaults.standard.set(data, forKey: storageKey)
+        } catch {
+            print("Failed to save music files: \(error.localizedDescription)")
+        }
     }
 
-    /// Loads stored music file paths
+    /// Loads stored music files
     private func loadMusicFiles() {
-        if let savedPaths = UserDefaults.standard.array(forKey: storageKey) as? [String] {
-            musicFiles = savedPaths.map { URL(fileURLWithPath: $0) }
+        guard let data = UserDefaults.standard.data(forKey: storageKey) else { return }
+        do {
+            musicFiles = try JSONDecoder().decode([MusicFile].self, from: data)
+        } catch {
+            print("Failed to load music files: \(error.localizedDescription)")
         }
     }
 }

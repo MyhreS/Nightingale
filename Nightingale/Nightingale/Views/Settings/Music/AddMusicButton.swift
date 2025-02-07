@@ -39,7 +39,8 @@ struct AddMusicButton: View {
         DispatchQueue.main.async { // Ensure UI updates happen on the main thread
             switch result {
             case .success(let urls):
-                let addedFiles = urls.filter { musicLibrary.addMusicFile($0) } // ✅ Filter and add only new files
+                // Convert URLs to Strings and add to the library
+                let addedFiles = urls.filter { musicLibrary.addMusicFile($0.path) }
                 
                 if addedFiles.isEmpty {
                     successMessage = "No new files"

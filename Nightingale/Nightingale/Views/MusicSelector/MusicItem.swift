@@ -3,11 +3,11 @@ import SwiftUI
 struct MusicItem: View {
     @ObservedObject var musicQueue = MusicQueue.shared // Shared music queue
 
-    var file: URL
+    var musicFile: MusicFile
 
     var body: some View {
         Button(action: {
-            addToQueue(file) // Add to queue
+            addToQueue(musicFile) // Add to queue
             provideHapticFeedback() // Haptic feedback when tapped
         }) {
             HStack(spacing: 10) {
@@ -25,7 +25,7 @@ struct MusicItem: View {
                 }
 
                 // Song name
-                Text(file.lastPathComponent)
+                Text(musicFile.name)
                     .font(.body)
                     .lineLimit(nil)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -45,12 +45,12 @@ struct MusicItem: View {
 
     /// ✅ Checks if this item is the next one to be played
     private func isNextToPlay() -> Bool {
-        return musicQueue.nextSong == file
+        return musicQueue.nextSong?.id == musicFile.id
     }
 
     /// Adds the file to the queue and updates UI
-    private func addToQueue(_ file: URL) {
-        musicQueue.addToQueue(file)
+    private func addToQueue(_ musicFile: MusicFile) {
+        musicQueue.addToQueue(musicFile)
     }
 
     /// ✅ Provides haptic feedback when the button is tapped

@@ -5,7 +5,7 @@ struct MusicList: View {
 
     var body: some View {
         List(musicLibrary.musicFiles, id: \.self) { file in
-            MusicItem(file: file)
+            MusicItem(musicFile: file) // Pass the MusicFile object to MusicItem
         }
         .listStyle(.plain) // Removes default styling
         .scrollContentBackground(.hidden) // Transparent background for the list

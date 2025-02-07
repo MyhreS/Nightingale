@@ -3,14 +3,14 @@ import SwiftUI
 struct RemoveMusic: View {
     @Binding var isPresented: Bool
     @ObservedObject private var musicLibrary = MusicLibrary.shared
-    @State private var selectedSongs: Set<URL> = [] // Stores selected songs
+    @State private var selectedSongs: Set<MusicFile> = [] // Stores selected songs
     
     var body: some View {
         NavigationView {
             VStack {
-                List(musicLibrary.musicFiles, id: \.self) { song in
+                List(musicLibrary.musicFiles) { song in
                     HStack {
-                        Text(song.lastPathComponent)
+                        Text(song.name)
                             .foregroundColor(selectedSongs.contains(song) ? .red : .primary)
                         
                         Spacer()
