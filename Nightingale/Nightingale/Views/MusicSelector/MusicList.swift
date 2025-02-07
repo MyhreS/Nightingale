@@ -9,6 +9,6 @@ struct MusicList: View {
         }
         .listStyle(.plain) // Remove extra styling
         .scrollContentBackground(.hidden) // Ensure transparent background
-        .padding(.leading, -35) // Remove extra padding on the left
+        .padding(.leading, -20) // Remove extra padding on the left
     }
 }
