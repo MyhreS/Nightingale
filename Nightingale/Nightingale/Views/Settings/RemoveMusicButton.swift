@@ -2,26 +2,29 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct RemoveMusicButton: View {
-    @State private var isSuccess = false
+    @State private var isShowingRemoveSheet = false
     
     var body: some View {
         Button(action: {
-            isSuccess.toggle()
+            isShowingRemoveSheet = true
         }) {
             HStack {
-                Image(systemName: isSuccess ? "checkmark.circle.fill" : "minus.circle.fill")
+                Image(systemName: "minus.circle.fill")
                     .resizable()
                     .frame(width: 24, height: 24)
-                    .foregroundColor(isSuccess ? Color.red.darker() : .red)
+                    .foregroundColor(.red)
                 
-                Text(isSuccess ? "Removed!" : "Remove")
+                Text("Remove")
                     .font(.body)
-                    .foregroundColor(isSuccess ? Color.red.darker() : .red)
+                    .foregroundColor(.red)
             }
-            .frame(maxWidth: .infinity) // Make both buttons equal width
+            .frame(maxWidth: .infinity)
             .padding()
-            .background(isSuccess ? Color.red.opacity(0.3) : Color.red.opacity(0.1))
+            .background(Color.red.opacity(0.1))
             .cornerRadius(10)
+        }
+        .sheet(isPresented: $isShowingRemoveSheet) {
+            RemoveMusic(isPresented: $isShowingRemoveSheet)
         }
     }
 }
