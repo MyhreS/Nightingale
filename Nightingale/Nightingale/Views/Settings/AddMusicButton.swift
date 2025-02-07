@@ -35,18 +35,21 @@ struct AddMusicButton: View {
     }
     
     private func handleFileSelection(_ result: Result<[URL], Error>) {
-        switch result {
-        case .success(let urls):
-            guard let fileURL = urls.first else { return }
-            musicLibrary.addMusicFile(fileURL)
+        DispatchQueue.main.async { // Ensure UI updates happen on the main thread
+            switch result {
+            case .success(let urls):
+                guard let fileURL = urls.first else { return }
+                musicLibrary.addMusicFile(fileURL)
 
-            isSuccess = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                isSuccess = false
+                isSuccess = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    isSuccess = false
+                }
+
+            case .failure(let error):
+                print("File selection error: \(error.localizedDescription)")
             }
-            
-        case .failure(let error):
-            print("File selection error: \(error.localizedDescription)")
+            showFilePicker = false // Explicitly dismiss file picker
         }
     }
 }

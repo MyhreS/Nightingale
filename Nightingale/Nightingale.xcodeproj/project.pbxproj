@@ -6,14 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		434A86222D53A5A3000C4AB5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 434A86212D53A5A3000C4AB5 /* FirebaseAnalytics */; };
-		434A86242D53A5A3000C4AB5 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = 434A86232D53A5A3000C4AB5 /* FirebaseAnalyticsOnDeviceConversion */; };
-		434A86262D53A5A3000C4AB5 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 434A86252D53A5A3000C4AB5 /* FirebaseAnalyticsWithoutAdIdSupport */; };
-		434A86282D53A5A3000C4AB5 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 434A86272D53A5A3000C4AB5 /* FirebaseAppCheck */; };
-		434A862A2D53A5A3000C4AB5 /* FirebaseAppDistribution-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 434A86292D53A5A3000C4AB5 /* FirebaseAppDistribution-Beta */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		434A85A72D535F29000C4AB5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -35,6 +27,7 @@
 		434A85962D535F27000C4AB5 /* Nightingale.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nightingale.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		434A85A62D535F29000C4AB5 /* NightingaleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NightingaleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		434A85B02D535F29000C4AB5 /* NightingaleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NightingaleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		434A86E22D5637EC000C4AB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -60,11 +53,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				434A86282D53A5A3000C4AB5 /* FirebaseAppCheck in Frameworks */,
-				434A86222D53A5A3000C4AB5 /* FirebaseAnalytics in Frameworks */,
-				434A862A2D53A5A3000C4AB5 /* FirebaseAppDistribution-Beta in Frameworks */,
-				434A86262D53A5A3000C4AB5 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
-				434A86242D53A5A3000C4AB5 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +76,7 @@
 		434A858D2D535F27000C4AB5 = {
 			isa = PBXGroup;
 			children = (
+				434A86E22D5637EC000C4AB5 /* Info.plist */,
 				434A85982D535F27000C4AB5 /* Nightingale */,
 				434A85A92D535F29000C4AB5 /* NightingaleTests */,
 				434A85B32D535F29000C4AB5 /* NightingaleUITests */,
@@ -125,11 +114,6 @@
 			);
 			name = Nightingale;
 			packageProductDependencies = (
-				434A86212D53A5A3000C4AB5 /* FirebaseAnalytics */,
-				434A86232D53A5A3000C4AB5 /* FirebaseAnalyticsOnDeviceConversion */,
-				434A86252D53A5A3000C4AB5 /* FirebaseAnalyticsWithoutAdIdSupport */,
-				434A86272D53A5A3000C4AB5 /* FirebaseAppCheck */,
-				434A86292D53A5A3000C4AB5 /* FirebaseAppDistribution-Beta */,
 			);
 			productName = Nightingale;
 			productReference = 434A85962D535F27000C4AB5 /* Nightingale.app */;
@@ -214,7 +198,6 @@
 			mainGroup = 434A858D2D535F27000C4AB5;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 434A85972D535F27000C4AB5 /* Products */;
@@ -579,45 +562,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 11.8.1;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		434A86212D53A5A3000C4AB5 /* FirebaseAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalytics;
-		};
-		434A86232D53A5A3000C4AB5 /* FirebaseAnalyticsOnDeviceConversion */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsOnDeviceConversion;
-		};
-		434A86252D53A5A3000C4AB5 /* FirebaseAnalyticsWithoutAdIdSupport */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsWithoutAdIdSupport;
-		};
-		434A86272D53A5A3000C4AB5 /* FirebaseAppCheck */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAppCheck;
-		};
-		434A86292D53A5A3000C4AB5 /* FirebaseAppDistribution-Beta */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 434A86202D53A5A3000C4AB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = "FirebaseAppDistribution-Beta";
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 434A858E2D535F27000C4AB5 /* Project object */;
 }
