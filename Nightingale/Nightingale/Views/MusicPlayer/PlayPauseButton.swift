@@ -10,13 +10,12 @@ struct PlayPauseButton: View {
                 playerManager.togglePlayback(for: song) // Play/Pause the current song
             }
         }) {
-            Image(systemName: playerManager.isPlaying ? "pause.fill" : "play.fill")
+            Image(systemName: playerManager.isPlaying ? "pause.fill" : "play.fill") // ✅ Outlined icons
                 .resizable()
-                .frame(width: 30, height: 30)
-                .foregroundColor(.white)
-                .padding(10)
-                .background(Color.blue)
-                .clipShape(Circle())
+                .frame(width: 25, height: 25)
+                .foregroundColor(.white) // ✅ White icon
+                .padding(.horizontal, 10) // ✅ Wider horizontally
+            
         }
     }
 }
