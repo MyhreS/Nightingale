@@ -5,7 +5,7 @@ struct MusicSelector: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Your Music")
+            Text("Playlist")
                 .font(.headline)
                 .fontWeight(.bold)
 
@@ -18,10 +18,13 @@ struct MusicSelector: View {
             }
         }
         .padding(10)
+        .background(Color.gray.opacity(0.05))
+        .cornerRadius(20)
 
         .overlay(
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.gray.opacity(0.3), lineWidth: 1) // Border
         )
+        
     }
 }

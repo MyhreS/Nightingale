@@ -7,11 +7,6 @@ struct ContentView: View {
                 MusicSelector()
 
                 MusicPlayer()
-                    .frame(maxWidth: .infinity, maxHeight: 150)
-                    .background(Color.blue.opacity(0.3))
-                    .cornerRadius(20)
-                    .padding(0)
-                    .shadow(radius: 10)
             }
             .padding()
             .toolbar {
