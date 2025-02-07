@@ -27,27 +27,30 @@ struct AddMusicButton: View {
         .fileImporter(
             isPresented: $showFilePicker,
             allowedContentTypes: [UTType.audio], // ✅ Allow only audio files
-            allowsMultipleSelection: false // ✅ Allow only one file at a time
+            allowsMultipleSelection: true // ✅ Now allows multiple files
         ) { result in
             handleFileSelection(result)
         }
     }
 
-    /// ✅ Handles the file selection and copies it to app storage
+    /// ✅ Handles file selection & copies multiple files
     private func handleFileSelection(_ result: Result<[URL], Error>) {
         DispatchQueue.main.async {
             switch result {
             case .success(let urls):
-                if let fileURL = urls.first {
-                    let storedURL = copyFileToAppStorage(fileURL) // ✅ Copy file to app storage
+                var addedCount = 0
+                for fileURL in urls {
+                    let storedURL = copyFileToAppStorage(fileURL) // ✅ Copy each file
                     let success = musicLibrary.addMusicFile(storedURL)
                     if success {
-                        print("✅ Successfully added music file: \(storedURL.lastPathComponent)")
+                        addedCount += 1
+                        print("✅ Successfully added: \(storedURL.lastPathComponent)")
                     } else {
-                        print("⚠️ File already exists in library: \(storedURL.lastPathComponent)")
+                        print("⚠️ Already exists: \(storedURL.lastPathComponent)")
                     }
-                } else {
-                    print("❌ No file selected")
+                }
+                if addedCount > 0 {
+                    print("✅ Added \(addedCount) new files to library.")
                 }
 
             case .failure(let error):
@@ -64,7 +67,7 @@ struct AddMusicButton: View {
 
         // ✅ Check if file already exists to avoid duplicates
         if fileManager.fileExists(atPath: destinationURL.path) {
-            print("✅ File already exists in app storage: \(destinationURL.path)")
+            print("✅ File already exists: \(destinationURL.path)")
             return destinationURL
         }
 
@@ -73,11 +76,10 @@ struct AddMusicButton: View {
         defer { if didStartAccessing { originalURL.stopAccessingSecurityScopedResource() } }
 
         do {
-            // ✅ Copy the file securely
             try fileManager.copyItem(at: originalURL, to: destinationURL)
-            print("✅ File copied to app storage: \(destinationURL.path)")
+            print("✅ Copied file to storage: \(destinationURL.path)")
         } catch {
-            print("❌ Failed to copy file: \(error.localizedDescription)")
+            print("❌ Copy failed: \(error.localizedDescription)")
         }
 
         return destinationURL

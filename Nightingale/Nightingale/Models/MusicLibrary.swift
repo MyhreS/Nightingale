@@ -1,5 +1,4 @@
 import Foundation
-import UniformTypeIdentifiers
 
 class MusicLibrary: ObservableObject {
     static let shared = MusicLibrary() // Singleton instance
@@ -9,35 +8,54 @@ class MusicLibrary: ObservableObject {
     private let storageKey = "SavedMusicFiles"
 
     private init() {
-        self.musicFiles = [
-            MusicFile(url: URL(fileURLWithPath: "/mock/path/ACDC - Mock Highway to Hell.mp3")),
-            MusicFile(url: URL(fileURLWithPath: "/mock/path/Queen - Mock Bohemian Rhapsody.mp3")),
-            MusicFile(url: URL(fileURLWithPath: "/mock/path/Nirvana - Mock Smells Like Teen Spirit.mp3"))
-        ]
-            
         loadMusicFiles()
     }
 
-    /// ✅ Now accepts a **URL** instead of a **String**
+    /// ✅ Add a new music file if it doesn’t already exist
     func addMusicFile(_ url: URL) -> Bool {
         let newMusicFile = MusicFile(url: url)
         guard !musicFiles.contains(where: { $0.url == newMusicFile.url }) else {
-            print("File already exists: \(newMusicFile.name)")
-            return false // ✅ Return false if duplicate
+            print("⚠️ File already exists: \(newMusicFile.name)")
+            return false
         }
         musicFiles.append(newMusicFile)
         saveMusicFiles()
-        return true // ✅ Return true if successfully added
+        return true
     }
 
-    /// Removes a music file and updates storage
+    /// ✅ Remove a music file & delete it from storage
     func removeMusicFile(_ musicFile: MusicFile) {
+        // ✅ Delete file from storage
+        let fileManager = FileManager.default
+        if fileManager.fileExists(atPath: musicFile.url.path) {
+            do {
+                try fileManager.removeItem(at: musicFile.url)
+                print("🗑️ Deleted file: \(musicFile.name)")
+            } catch {
+                print("❌ Failed to delete file: \(error.localizedDescription)")
+            }
+        } else {
+            print("⚠️ File not found in storage: \(musicFile.name)")
+        }
+
+        // ✅ Remove from library
         musicFiles.removeAll { $0.id == musicFile.id }
         saveMusicFiles()
     }
 
-    /// Clears all stored music files
+    /// Clears all stored music files & deletes them from storage
     func clearMusicLibrary() {
+        let fileManager = FileManager.default
+        for musicFile in musicFiles {
+            if fileManager.fileExists(atPath: musicFile.url.path) {
+                do {
+                    try fileManager.removeItem(at: musicFile.url)
+                    print("🗑️ Deleted file: \(musicFile.name)")
+                } catch {
+                    print("❌ Failed to delete file: \(error.localizedDescription)")
+                }
+            }
+        }
         musicFiles.removeAll()
         UserDefaults.standard.removeObject(forKey: storageKey)
     }
@@ -48,7 +66,7 @@ class MusicLibrary: ObservableObject {
             let data = try JSONEncoder().encode(musicFiles)
             UserDefaults.standard.set(data, forKey: storageKey)
         } catch {
-            print("Failed to save music files: \(error.localizedDescription)")
+            print("❌ Failed to save music files: \(error.localizedDescription)")
         }
     }
 
@@ -58,7 +76,7 @@ class MusicLibrary: ObservableObject {
         do {
             musicFiles = try JSONDecoder().decode([MusicFile].self, from: data)
         } catch {
-            print("Failed to load music files: \(error.localizedDescription)")
+            print("❌ Failed to load music files: \(error.localizedDescription)")
         }
     }
 }

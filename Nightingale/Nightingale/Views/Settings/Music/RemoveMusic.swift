@@ -55,19 +55,12 @@ struct RemoveMusic: View {
                 .padding()
             }
             .navigationTitle("Remove Music")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        isPresented = false
-                    }
-                }
-            }
         }
     }
     
     private func removeSelectedSongs() {
         for song in selectedSongs {
-            musicLibrary.removeMusicFile(song)
+            musicLibrary.removeMusicFile(song) // ✅ Now deletes from storage
         }
     }
 }
