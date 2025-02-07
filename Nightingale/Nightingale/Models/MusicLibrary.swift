@@ -9,6 +9,12 @@ class MusicLibrary: ObservableObject {
     private let storageKey = "SavedMusicFiles"
 
     private init() {
+        self.musicFiles = [
+            URL(fileURLWithPath: "/mock/path/ACDC - Mock Highway to Hell.mp3"),
+            URL(fileURLWithPath: "/mock/path/Queen - Mock Bohemian Rhapsody.mp3"),
+            URL(fileURLWithPath: "/mock/path/Nirvana - Mock Smells Like Teen Spirit.mp3")
+        ]
+            
         loadMusicFiles()
     }
 

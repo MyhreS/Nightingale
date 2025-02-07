@@ -5,10 +5,6 @@ struct ContentView: View {
         NavigationStack {
             VStack {
                 MusicSelector()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(20)
-                    .shadow(radius: 10)
 
                 MusicPlayer()
                     .frame(maxWidth: .infinity, maxHeight: 150)

@@ -14,13 +14,14 @@ struct MusicSelector: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
             } else {
-                List(musicLibrary.musicFiles, id: \.self) { file in
-                    Text(file.lastPathComponent)
-                        .font(.body)
-                }
+                MusicList()
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1) // Border
+        )
     }
 }
