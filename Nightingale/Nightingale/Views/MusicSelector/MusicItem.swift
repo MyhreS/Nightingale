@@ -14,16 +14,14 @@ struct MusicItem: View {
                 // Music icon (squircle)
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(isNextToPlay() ? Color.green.opacity(0.8) : Color.blue.opacity(0.2)) // ✅ Highlight next song
+                        .fill(isNextToPlay() ? Color.green.opacity(0.8) : Color.blue.opacity(0.2)) // Highlight next song
                         .frame(width: 40, height: 40)
-                        .animation(.easeInOut(duration: 0.3), value: isNextToPlay())
 
                     Image(systemName: "music.note")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 20, height: 20)
                         .foregroundColor(isNextToPlay() ? .white : .blue)
-                        .animation(.easeInOut(duration: 0.3), value: isNextToPlay())
                 }
 
                 // Song name
@@ -33,15 +31,16 @@ struct MusicItem: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(5)
+            .frame(maxWidth: .infinity) // Expand button to fill available space
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(isNextToPlay() ? Color.green.opacity(0.2) : Color.clear) // ✅ Subtle highlight for next song
-                    .animation(.easeInOut(duration: 0.3), value: isNextToPlay())
+                    .fill(isNextToPlay() ? Color.green.opacity(0.2) : Color.clear) // Subtle highlight for next song
             )
+            .contentShape(Rectangle()) // Make the entire area tappable
         }
-        .buttonStyle(PlainButtonStyle())
-        .listRowInsets(EdgeInsets())
-        .listRowBackground(Color.clear)
+        .buttonStyle(PlainButtonStyle()) // Remove default button styling
+        .listRowInsets(EdgeInsets()) // Remove default insets
+        .listRowBackground(Color.clear) // Transparent row background
     }
 
     /// ✅ Checks if this item is the next one to be played
