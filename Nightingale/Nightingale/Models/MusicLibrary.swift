@@ -13,13 +13,14 @@ class MusicLibrary: ObservableObject {
     }
 
     /// Adds a new music file and saves it persistently (prevents duplicates)
-    func addMusicFile(_ url: URL) {
+    func addMusicFile(_ url: URL) -> Bool {
         guard !musicFiles.contains(url) else {
             print("File already exists: \(url.lastPathComponent)")
-            return
+            return false // ✅ Return false if duplicate
         }
         musicFiles.append(url)
         saveMusicFiles()
+        return true // ✅ Return true if successfully added
     }
 
     /// Removes a music file and updates storage
