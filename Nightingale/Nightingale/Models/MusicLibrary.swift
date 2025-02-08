@@ -14,6 +14,8 @@ class MusicLibrary: ObservableObject {
 
     /// ✅ Add a new music file only if it doesn’t already exist in storage or list
     func addMusicFile(_ url: URL) -> Bool {
+        let initialCount = musicFiles.count // ✅ Store initial size of the list
+
         // ✅ Ensure file exists in storage
         let storedURL: URL
         let storedFiles = getStoredFiles()
@@ -37,16 +39,16 @@ class MusicLibrary: ObservableObject {
         // ✅ Check if the file is already in the `musicFiles` list
         if musicFiles.contains(where: { $0.url == storedURL }) {
             print("⚠️ File already exists in the music library: \(storedURL.lastPathComponent)")
-            return false
+        } else {
+            // ✅ Add the new file to the `musicFiles` list
+            let newMusicFile = MusicFile(url: storedURL)
+            musicFiles.append(newMusicFile)
+            saveMusicFiles()
+            print("✅ Successfully added music file: \(newMusicFile.name)")
         }
 
-        // ✅ Add the new file to the `musicFiles` list
-        let newMusicFile = MusicFile(url: storedURL)
-        musicFiles.append(newMusicFile)
-        saveMusicFiles()
-        print("✅ Successfully added music file: \(newMusicFile.name)")
-
-        return true
+        // ✅ Return true **only if** `musicFiles` increased in size
+        return musicFiles.count > initialCount
     }
 
     /// ✅ Ensures the `musicFiles` list only contains files that actually exist in storage
