@@ -137,12 +137,17 @@ class MusicLibrary: ObservableObject {
     func removeMusicFile(_ musicFile: MusicFile) {
         let fileManager = FileManager.default
 
+        // Log storage contents before attempting removal
+        print("🔍 Storage contents BEFORE removal:")
+        debugPrintStorageContents()
+
         var fileDeleted = false
         if fileManager.fileExists(atPath: musicFile.url.path) {
             do {
+                print("Attempting to delete file at path: \(musicFile.url.path)")
                 try fileManager.removeItem(at: musicFile.url)
                 fileDeleted = true
-                print("🗑️ Deleted file: \(musicFile.name)")
+                print("🗑️ Successfully deleted file: \(musicFile.name)")
             } catch {
                 print("❌ Failed to delete file: \(error.localizedDescription)")
             }
@@ -150,12 +155,17 @@ class MusicLibrary: ObservableObject {
             print("⚠️ File not found in storage: \(musicFile.name)")
         }
 
+        // Sync storage with MusicLibrary after attempting deletion
         if fileDeleted {
             musicFiles.removeAll { $0.id == musicFile.id }
             saveMusicFiles()
         }
 
+        // Sync MusicLibrary with storage regardless of deletion success
         syncMusicFilesWithStorage()
+
+        // Log storage contents after attempting removal
+        print("🔍 Storage contents AFTER removal:")
         debugPrintStorageContents()
     }
 
