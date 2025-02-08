@@ -10,9 +10,18 @@ struct MusicSelector: View {
                 .fontWeight(.bold)
 
             if musicLibrary.musicFiles.isEmpty {
-                Text("No music added yet. Go to settings to add some!")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
+                VStack {
+                    Text("No music added yet. Go to settings to add some!")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                        .padding(.leading, 0)
+                    
+                    // Invisible placeholder that takes up space
+                    Rectangle()
+                        .fill(Color.clear)
+                        .frame(height: .infinity)
+                        .padding(0)// Adjust height based on desired space
+                }
             } else {
                 MusicList()
             }
@@ -25,6 +34,5 @@ struct MusicSelector: View {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.gray.opacity(0.3), lineWidth: 1) // Border
         )
-        
     }
 }
