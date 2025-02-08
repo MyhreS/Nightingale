@@ -39,25 +39,29 @@ class MusicLibrary: ObservableObject {
         let storedFiles = storage.getStoredFiles()
         print("🔄 Syncing storage with MusicLibrary...")
 
-        var uniqueMusicFiles: [MusicFile] = []
+        var updatedMusicFiles: [MusicFile] = []
 
-        // ✅ Remove missing files & keep only unique files
+        // ✅ Ensure metadata is preserved
         for file in storedFiles {
             let fileURL = storage.getStorageURL(for: file)
-            if !uniqueMusicFiles.contains(where: { $0.url == fileURL }) {
-                uniqueMusicFiles.append(MusicFile(url: fileURL))
+            if let existingFile = musicFiles.first(where: { $0.url == fileURL }) {
+                // ✅ Reuse the existing object to preserve metadata
+                updatedMusicFiles.append(existingFile)
+            } else {
+                // ✅ Create a new MusicFile object if not already in the list
+                updatedMusicFiles.append(MusicFile(url: fileURL))
             }
         }
 
         // ✅ Update the list only if needed
-        if uniqueMusicFiles.count != musicFiles.count {
-            musicFiles = uniqueMusicFiles
+        if updatedMusicFiles.count != musicFiles.count {
+            musicFiles = updatedMusicFiles
             saveMusicFiles()
         }
 
         print("✅ MusicLibrary is now in sync with storage.")
     }
-
+    
     /// ✅ Removes a music file from both the library and storage
     func removeMusicFile(_ musicFile: MusicFile) {
         print("🔍 Storage contents BEFORE removal:")
