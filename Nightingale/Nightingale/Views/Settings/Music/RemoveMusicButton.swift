@@ -6,6 +6,7 @@ struct RemoveMusicButton: View {
     
     var body: some View {
         Button(action: {
+            provideHapticFeedback()
             isShowingRemoveSheet = true
         }) {
             HStack {

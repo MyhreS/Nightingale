@@ -73,10 +73,4 @@ struct MusicItem: View {
     private func addToQueue(_ musicFile: MusicFile) {
         musicQueue.addToQueue(musicFile)
     }
-
-    /// Provides haptic feedback when the button is tapped
-    private func provideHapticFeedback() {
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
-    }
 }

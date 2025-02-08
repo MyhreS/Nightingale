@@ -19,19 +19,17 @@ class MusicLibrary: ObservableObject {
         // ✅ Copy to storage if necessary
         let storedURL = storage.copyFileToStorage(url) ?? storage.getStorageURL(for: url.lastPathComponent)
 
-        // ✅ Sync Music Files list with storage
-        syncMusicFilesWithStorage()
-
         // ✅ Check if file already exists in music list
         if musicFiles.contains(where: { $0.url == storedURL }) {
             print("⚠️ File already exists in music library: \(storedURL.lastPathComponent)")
-        } else {
-            // ✅ Add the new file to the `musicFiles` list
-            let newMusicFile = MusicFile(url: storedURL)
-            musicFiles.append(newMusicFile)
-            saveMusicFiles()
-            print("✅ Successfully added music file: \(newMusicFile.name)")
+            return false
         }
+
+        // ✅ Add the new file to the `musicFiles` list
+        let newMusicFile = MusicFile(url: storedURL)
+        musicFiles.append(newMusicFile)
+        saveMusicFiles()
+        print("✅ Successfully added music file: \(newMusicFile.name)")
 
         return musicFiles.count > initialCount // ✅ Returns true if the list grew
     }
@@ -41,19 +39,22 @@ class MusicLibrary: ObservableObject {
         let storedFiles = storage.getStoredFiles()
         print("🔄 Syncing storage with MusicLibrary...")
 
-        // ✅ Remove missing files from `musicFiles`
-        musicFiles = musicFiles.filter { storedFiles.contains($0.url.lastPathComponent) }
+        var uniqueMusicFiles: [MusicFile] = []
 
-        // ✅ Add missing storage files to `musicFiles`
+        // ✅ Remove missing files & keep only unique files
         for file in storedFiles {
             let fileURL = storage.getStorageURL(for: file)
-            if !musicFiles.contains(where: { $0.url == fileURL }) {
-                print("➕ Adding missing file from storage: \(file)")
-                musicFiles.append(MusicFile(url: fileURL))
+            if !uniqueMusicFiles.contains(where: { $0.url == fileURL }) {
+                uniqueMusicFiles.append(MusicFile(url: fileURL))
             }
         }
 
-        saveMusicFiles()
+        // ✅ Update the list only if needed
+        if uniqueMusicFiles.count != musicFiles.count {
+            musicFiles = uniqueMusicFiles
+            saveMusicFiles()
+        }
+
         print("✅ MusicLibrary is now in sync with storage.")
     }
 
@@ -82,11 +83,21 @@ class MusicLibrary: ObservableObject {
         }
     }
 
-    /// ✅ Loads stored music files
+    /// ✅ Loads stored music files (Avoids duplicates)
     private func loadMusicFiles() {
         guard let data = UserDefaults.standard.data(forKey: storageKey) else { return }
         do {
-            musicFiles = try JSONDecoder().decode([MusicFile].self, from: data)
+            let savedFiles = try JSONDecoder().decode([MusicFile].self, from: data)
+            let storedFiles = storage.getStoredFiles()
+
+            // ✅ Avoid duplicates by ensuring only one instance per file
+            for file in savedFiles {
+                if storedFiles.contains(file.url.lastPathComponent) {
+                    if !musicFiles.contains(where: { $0.url == file.url }) {
+                        musicFiles.append(file)
+                    }
+                }
+            }
         } catch {
             print("❌ Failed to load music files: \(error.localizedDescription)")
         }

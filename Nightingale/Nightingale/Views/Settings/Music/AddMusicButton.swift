@@ -9,6 +9,7 @@ struct AddMusicButton: View {
 
     var body: some View {
         Button(action: {
+            provideHapticFeedback()
             showFilePicker = true
         }) {
             HStack {
