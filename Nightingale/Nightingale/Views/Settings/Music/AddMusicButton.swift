@@ -44,10 +44,7 @@ struct AddMusicButton: View {
                     let success = musicLibrary.addMusicFile(storedURL)
                     if success {
                         addedCount += 1
-                        print("✅ Successfully added: \(storedURL.lastPathComponent)")
-                    } else {
-                        print("⚠️ Already exists: \(storedURL.lastPathComponent)")
-                    }
+                    } 
                 }
                 if addedCount > 0 {
                     print("✅ Added \(addedCount) new files to library.")
@@ -67,7 +64,7 @@ struct AddMusicButton: View {
 
         // ✅ Check if file already exists to avoid duplicates
         if fileManager.fileExists(atPath: destinationURL.path) {
-            print("✅ File already exists: \(destinationURL.path)")
+            print("✅ Copy: File already exists: \(destinationURL.path)")
             return destinationURL
         }
 

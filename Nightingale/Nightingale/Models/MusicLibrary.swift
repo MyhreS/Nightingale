@@ -14,33 +14,38 @@ class MusicLibrary: ObservableObject {
 
     /// ✅ Add a new music file only if it doesn’t already exist in storage or list
     func addMusicFile(_ url: URL) -> Bool {
+        // ✅ Ensure file exists in storage
+        let storedURL: URL
         let storedFiles = getStoredFiles()
-        let newMusicFile = MusicFile(url: url)
 
-        // ✅ Check if file already exists in storage
         if storedFiles.contains(url.lastPathComponent) {
-            print("⚠️ File already exists in storage: \(newMusicFile.name)")
-            return false
-        }
-
-        // ✅ Check if file already exists in list
-        if musicFiles.contains(where: { $0.url == newMusicFile.url }) {
-            print("⚠️ File already exists in music library: \(newMusicFile.name)")
-            return false
-        }
-
-        // ✅ Add file to storage
-        let storedURL = copyFileToAppStorage(url)
-        if storedURL != nil {
-            musicFiles.append(MusicFile(url: storedURL!))
-            saveMusicFiles()
-            print("✅ Successfully added music file: \(newMusicFile.name)")
+            print("⚠️ File already exists in storage: \(url.lastPathComponent)")
+            storedURL = getStorageURL(for: url.lastPathComponent) // Get the URL from storage
         } else {
-            print("❌ Failed to add file: \(newMusicFile.name)")
+            // ✅ Copy to storage if it doesn't exist
+            guard let copiedURL = copyFileToAppStorage(url) else {
+                print("❌ Failed to copy file to storage: \(url.lastPathComponent)")
+                return false
+            }
+            storedURL = copiedURL
+            print("✅ File copied to storage: \(storedURL.lastPathComponent)")
+        }
+
+        // ✅ Sync Music Files list with storage
+        syncMusicFilesWithStorage()
+
+        // ✅ Check if the file is already in the `musicFiles` list
+        if musicFiles.contains(where: { $0.url == storedURL }) {
+            print("⚠️ File already exists in the music library: \(storedURL.lastPathComponent)")
             return false
         }
 
-        syncMusicFilesWithStorage() // ✅ Ensure storage & list are in sync
+        // ✅ Add the new file to the `musicFiles` list
+        let newMusicFile = MusicFile(url: storedURL)
+        musicFiles.append(newMusicFile)
+        saveMusicFiles()
+        print("✅ Successfully added music file: \(newMusicFile.name)")
+
         return true
     }
 
@@ -66,20 +71,27 @@ class MusicLibrary: ObservableObject {
         print("✅ MusicLibrary is now in sync with storage.")
     }
 
-    /// ✅ Returns an array of file names currently in app storage
+    /// Retrieves all file names from storage
     private func getStoredFiles() -> [String] {
         let fileManager = FileManager.default
-        let documentsDirectory = getDocumentsDirectory()
+        let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
 
         do {
-            return try fileManager.contentsOfDirectory(atPath: documentsDirectory.path)
+            let fileNames = try fileManager.contentsOfDirectory(atPath: documentsDirectory.path)
+            return fileNames
         } catch {
-            print("❌ Error retrieving storage files: \(error.localizedDescription)")
+            print("❌ Failed to retrieve stored files: \(error.localizedDescription)")
             return []
         }
     }
     
-    /*
+    /// Gets the full URL for a file in storage
+    private func getStorageURL(for fileName: String) -> URL {
+        let fileManager = FileManager.default
+        let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return documentsDirectory.appendingPathComponent(fileName)
+    }
+    
     /// ✅ Prints all files in app storage
     private func debugPrintStorageContents() {
         let storedFiles = getStoredFiles()
@@ -91,7 +103,6 @@ class MusicLibrary: ObservableObject {
             }
         }
     }
-    */
 
     /// ✅ Securely copies a file into the app’s Documents directory
     private func copyFileToAppStorage(_ originalURL: URL) -> URL? {
@@ -145,6 +156,7 @@ class MusicLibrary: ObservableObject {
         }
 
         syncMusicFilesWithStorage()
+        debugPrintStorageContents()
     }
 
     /// ✅ Saves the music files persistently
