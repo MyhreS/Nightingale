@@ -7,18 +7,16 @@ class PlayerManager: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
     @Published var isPlaying = false // Track play state
 
-    /// Plays the given music file
-    func play(_ musicFile: MusicFile) {
+    /// Plays the given music file from a specific position (in seconds)
+    func play(_ musicFile: MusicFile, from time: TimeInterval = 0.0) {
         stop() // Stop any currently playing audio before starting a new one
         
         do {
-            let soundURL = musicFile.url // ✅ Use the copied file inside the app
+            let soundURL = musicFile.url
 
-            // ✅ Ensure audio session is set to playback mode
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
 
-            // ✅ Check if file exists
             guard FileManager.default.fileExists(atPath: soundURL.path) else {
                 print("❌ File not found: \(soundURL.path)")
                 return
@@ -26,9 +24,10 @@ class PlayerManager: ObservableObject {
 
             audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
             audioPlayer?.prepareToPlay()
+            audioPlayer?.currentTime = time // ✅ Start playback from a specific time
             audioPlayer?.play()
             isPlaying = true
-            print("🎵 Playing: \(musicFile.name)")
+            print("🎵 Playing: \(musicFile.name) from \(time) sec")
         } catch {
             print("❌ Error loading audio file: \(error.localizedDescription)")
         }

@@ -30,9 +30,22 @@
 		434A86E22D5637EC000C4AB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		434A870E2D57894D000C4AB5 /* Exceptions for "Nightingale" folder in "Nightingale" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 434A85952D535F27000C4AB5 /* Nightingale */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		434A85982D535F27000C4AB5 /* Nightingale */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				434A870E2D57894D000C4AB5 /* Exceptions for "Nightingale" folder in "Nightingale" target */,
+			);
 			path = Nightingale;
 			sourceTree = "<group>";
 		};
@@ -403,6 +416,7 @@
 				DEVELOPMENT_TEAM = RQ5QCPF6Z2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Nightingale/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -432,6 +446,7 @@
 				DEVELOPMENT_TEAM = RQ5QCPF6Z2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Nightingale/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
