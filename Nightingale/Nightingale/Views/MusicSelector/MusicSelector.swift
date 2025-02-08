@@ -19,7 +19,7 @@ struct MusicSelector: View {
                     // Invisible placeholder that takes up space
                     Rectangle()
                         .fill(Color.clear)
-                        .frame(height: .infinity)
+                        .frame(maxHeight: .infinity)
                         .padding(0)// Adjust height based on desired space
                 }
             } else {
