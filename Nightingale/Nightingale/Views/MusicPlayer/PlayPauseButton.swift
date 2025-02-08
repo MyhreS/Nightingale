@@ -6,6 +6,7 @@ struct PlayPauseButton: View {
 
     var body: some View {
         Button(action: {
+            provideHapticFeedback()
             if let song = musicQueue.nextSong {
                 playerManager.togglePlayback(for: song) // Play/Pause the current song
             }
