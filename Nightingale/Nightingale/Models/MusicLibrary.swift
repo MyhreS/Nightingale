@@ -96,8 +96,11 @@ class MusicLibrary: ObservableObject {
         guard let data = UserDefaults.standard.data(forKey: storageKey) else { return }
         do {
             musicFiles = try JSONDecoder().decode([MusicFile].self, from: data)
+            print("✅ Successfully loaded music files")
         } catch {
-            fatalError("❌ CRITICAL ERROR: Failed to load music files: \(error.localizedDescription)")
+            print("❌ Failed to load music files, clearing invalid data: \(error.localizedDescription)")
+            UserDefaults.standard.removeObject(forKey: storageKey)
+            musicFiles = []
         }
     }
 
@@ -117,5 +120,14 @@ class MusicLibrary: ObservableObject {
         musicFiles.removeAll()
         
         print("✅ Music library configuration and storage cleared")
+    }
+    
+    /// Updates a song's settings
+    func updateSong(_ updatedSong: MusicFile) {
+        if let index = musicFiles.firstIndex(where: { $0.id == updatedSong.id }) {
+            musicFiles[index] = updatedSong
+            saveMusicFiles()
+            print("✅ Updated song settings: \(updatedSong.name)")
+        }
     }
 }

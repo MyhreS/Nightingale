@@ -10,6 +10,9 @@ struct Settings: View {
                     Music()
                         .frame(maxWidth: .infinity)
                     
+                    // Song Settings
+                    SongSettings()
+                    
                     // Development Tools Section
                     CustomCard {
                         VStack(alignment: .leading, spacing: 10) {

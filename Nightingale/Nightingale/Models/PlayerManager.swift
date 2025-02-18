@@ -26,6 +26,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
             audioPlayer?.delegate = self
             audioPlayer?.prepareToPlay()
+            audioPlayer?.currentTime = musicFile.startTime // Set the start time
             audioPlayer?.play()
 
             currentMusicFile = musicFile
@@ -34,7 +35,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             setupNowPlaying(musicFile: musicFile) // Setup Now Playing info
             setupRemoteCommandCenter() // Enable lock screen controls
 
-            print("🎵 Playing: \(musicFile.name)")
+            print("🎵 Playing: \(musicFile.name) from \(musicFile.startTime) seconds")
         } catch {
             print("❌ Error loading audio file: \(error.localizedDescription)")
         }
