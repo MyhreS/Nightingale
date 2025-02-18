@@ -135,40 +135,61 @@ private struct PlaylistPicker: View {
     
     var body: some View {
         NavigationView {
-            List {
-                Button(action: {
-                    if let current = currentPlaylist {
-                        playlistManager.removeSongFromPlaylist(songId: song.id, playlist: current)
-                    }
-                    isPresented = false
-                }) {
-                    HStack {
-                        Text("Remove from Playlist")
-                            .foregroundColor(.red)
-                        Spacer()
-                        if currentPlaylist == nil {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(.blue)
-                        }
-                    }
-                }
-                
-                ForEach(playlistManager.getPlaylists(), id: \.self) { playlist in
+            VStack {
+                // Remove from playlist button
+                if let current = currentPlaylist {
                     Button(action: {
-                        // Remove from current playlist if needed
-                        if let current = currentPlaylist, current != playlist {
-                            playlistManager.removeSongFromPlaylist(songId: song.id, playlist: current)
-                        }
-                        // Add to new playlist
-                        playlistManager.addSongToPlaylist(songId: song.id, playlist: playlist)
+                        playlistManager.removeSongFromPlaylist(songId: song.id, playlist: current)
                         isPresented = false
                     }) {
                         HStack {
-                            Text(playlist)
-                            Spacer()
-                            if currentPlaylist == playlist {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(.blue)
+                            Image(systemName: "minus.circle.fill")
+                            Text("Remove from Playlist")
+                        }
+                        .foregroundColor(.red)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.red.opacity(0.1))
+                        .cornerRadius(10)
+                    }
+                    .padding(.horizontal)
+                    .padding(.top)
+                }
+                
+                let playlists = playlistManager.getPlaylists()
+                if playlists.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "music.note.list")
+                            .font(.largeTitle)
+                            .foregroundColor(.gray)
+                        Text("No Playlists Created")
+                            .font(.headline)
+                            .foregroundColor(.gray)
+                        Text("Create a playlist in the music selector")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                    .frame(maxHeight: .infinity)
+                } else {
+                    List {
+                        ForEach(playlists, id: \.self) { playlist in
+                            Button(action: {
+                                // Remove from current playlist if needed
+                                if let current = currentPlaylist, current != playlist {
+                                    playlistManager.removeSongFromPlaylist(songId: song.id, playlist: current)
+                                }
+                                // Add to new playlist
+                                playlistManager.addSongToPlaylist(songId: song.id, playlist: playlist)
+                                isPresented = false
+                            }) {
+                                HStack {
+                                    Text(playlist)
+                                    Spacer()
+                                    if currentPlaylist == playlist {
+                                        Image(systemName: "checkmark")
+                                            .foregroundColor(.blue)
+                                    }
+                                }
                             }
                         }
                     }
