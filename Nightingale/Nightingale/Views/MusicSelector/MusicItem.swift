@@ -44,7 +44,7 @@ struct MusicItem: View {
                 }
                 .buttonStyle(PlainButtonStyle())
             }
-            .padding(5)
+            .padding(10)
             .frame(maxWidth: .infinity) // Expand button to fill available space
             .background(
                 RoundedRectangle(cornerRadius: 10)
@@ -66,7 +66,7 @@ struct MusicItem: View {
 
     /// Checks if this item is the next one to be played
     private func isNextToPlay() -> Bool {
-        return musicQueue.nextSong?.id == musicFile.id
+        return musicQueue.currentSong?.id == musicFile.id
     }
 
     /// Determines the background color of the icon
@@ -93,6 +93,9 @@ struct MusicItem: View {
 
     /// Adds the file to the queue and updates UI
     private func addToQueue(_ musicFile: MusicFile) {
+        // Stop any current playback
+        PlayerManager.shared.stop()
+        // Add to queue (this will also update upcoming song)
         musicQueue.addToQueue(musicFile)
     }
 }

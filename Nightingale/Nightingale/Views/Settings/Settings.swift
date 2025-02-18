@@ -42,6 +42,7 @@ struct Settings: View {
                                 .padding()
                                 .background(clearFeedback ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
                                 .cornerRadius(10)
+                                .frame(maxWidth: .infinity)
                             }
                             
                             Button(action: {
@@ -68,6 +69,7 @@ struct Settings: View {
                                 .padding()
                                 .background(resetFeedback ? Color.green.opacity(0.1) : Color.blue.opacity(0.1))
                                 .cornerRadius(10)
+                                .frame(maxWidth: .infinity)
                             }
                             
                             Text("Use this when rebuilding the app to clear stale configuration")
@@ -75,6 +77,7 @@ struct Settings: View {
                                 .foregroundColor(.gray)
                         }
                     }
+                    .frame(maxWidth: .infinity)
                 }
                 .padding()
                 .toolbar {

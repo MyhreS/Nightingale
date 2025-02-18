@@ -111,6 +111,17 @@ class MusicLibrary: ObservableObject {
         }
     }
 
+    /// Resets the played status of all songs to false
+    func resetPlayedStatus() {
+        musicFiles = musicFiles.map { song in
+            var updatedSong = song
+            updatedSong.played = false
+            return updatedSong
+        }
+        saveMusicFiles()
+        print("✅ Reset played status for all songs")
+    }
+    
     /// Clears the music library configuration and all files from storage
     func clearConfiguration() {
         print("🧹 Clearing music library configuration and storage...")
@@ -126,6 +137,10 @@ class MusicLibrary: ObservableObject {
         UserDefaults.standard.removeObject(forKey: storageKey)
         musicFiles.removeAll()
         
+        // Clear the queue
+        MusicQueue.shared.clearQueue()
+        PlayerManager.shared.stop()
+        
         print("✅ Music library configuration and storage cleared")
     }
     
@@ -135,24 +150,6 @@ class MusicLibrary: ObservableObject {
             musicFiles[index] = updatedSong
             saveMusicFiles()
             print("✅ Updated song settings: \(updatedSong.name)")
-        }
-    }
-    
-    /// Resets the played status of all songs to false
-    func resetPlayedStatus() {
-        musicFiles = musicFiles.map { song in
-            var updatedSong = song
-            updatedSong.played = false
-            return updatedSong
-        }
-        saveMusicFiles()
-        print("✅ Reset played status for all songs")
-    }
-    
-    /// Finds the next unplayed song with the same tag
-    func findNextUnplayedSong(withTag tag: String) -> MusicFile? {
-        return musicFiles.first { song in
-            song.tag == tag && !song.played
         }
     }
 }

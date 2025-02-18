@@ -37,7 +37,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
             audioPlayer?.delegate = self
             audioPlayer?.prepareToPlay()
-            audioPlayer?.currentTime = updatedSong.startTime // Use the updated song's start time
+            audioPlayer?.currentTime = updatedSong.startTime
             currentTime = updatedSong.startTime
             audioPlayer?.play()
 
@@ -102,10 +102,9 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
                   let currentFile = self.currentMusicFile,
                   self.isPlaying else { return }
             
-            // If we've reached the end of the song, stop playback and queue next song
+            // If we've reached the end of the song, stop playback
             if player.currentTime >= currentFile.duration {
                 self.stop()
-                self.queueNextUnplayedSong()
                 return
             }
             
@@ -122,17 +121,72 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         }
     }
 
-    /// Pauses the audio
+    /// Finds the next song with the same tag
+    private func findNextSongWithSameTag(_ currentSong: MusicFile) -> MusicFile? {
+        let musicLibrary = MusicLibrary.shared
+        let songsWithSameTag = musicLibrary.musicFiles.filter { $0.tag == currentSong.tag }
+        
+        guard let currentIndex = songsWithSameTag.firstIndex(where: { $0.id == currentSong.id }) else {
+            return nil
+        }
+        
+        // First try to find an unplayed song after the current index
+        for i in (currentIndex + 1)..<songsWithSameTag.count {
+            if !songsWithSameTag[i].played {
+                print("🎵 Found next unplayed song with same tag: \(songsWithSameTag[i].name)")
+                return songsWithSameTag[i]
+            }
+        }
+        
+        // If no unplayed songs after current index, check from start up to current index
+        for i in 0..<currentIndex {
+            if !songsWithSameTag[i].played {
+                print("🎵 Found next unplayed song with same tag (wrapped around): \(songsWithSameTag[i].name)")
+                return songsWithSameTag[i]
+            }
+        }
+        
+        // If all songs are played, get the next song in sequence
+        let nextIndex = (currentIndex + 1) % songsWithSameTag.count
+        if nextIndex != currentIndex {
+            print("🎵 All songs played, selected next song with same tag: \(songsWithSameTag[nextIndex].name)")
+            return songsWithSameTag[nextIndex]
+        }
+        
+        return nil
+    }
+
+    /// Pauses the audio and queues the next song
     func pause() {
         audioPlayer?.pause()
         isPlaying = false
         timer?.invalidate()
         timer = nil
         updateNowPlayingPlaybackState(isPlaying: false)
-        print("⏸️ Paused")
         
-        // Queue next unplayed song when pausing
-        queueNextUnplayedSong()
+        // Find and set next song
+        if let currentSong = currentMusicFile {
+            let musicLibrary = MusicLibrary.shared
+            let allSongs = musicLibrary.musicFiles
+            
+            if !currentSong.tag.isEmpty {
+                // If song has a tag, find next song with same tag
+                if let nextSong = findNextSongWithSameTag(currentSong) {
+                    MusicQueue.shared.addToQueue(nextSong)
+                    print("🎵 Changed to next song with same tag: \(nextSong.name)")
+                }
+            } else {
+                // If no tag, just get the next song in the library
+                if let currentIndex = allSongs.firstIndex(where: { $0.id == currentSong.id }) {
+                    let nextIndex = (currentIndex + 1) % allSongs.count
+                    let nextSong = allSongs[nextIndex]
+                    MusicQueue.shared.addToQueue(nextSong)
+                    print("🎵 Changed to next song in sequence: \(nextSong.name)")
+                }
+            }
+        }
+        
+        print("⏸️ Paused")
     }
 
     /// Stops playback completely
@@ -145,9 +199,6 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         timer = nil
         updateNowPlayingPlaybackState(isPlaying: false)
         print("🛑 Stopped")
-        
-        // Queue next unplayed song
-        queueNextUnplayedSong()
     }
 
     /// Setup Now Playing Info (lock screen & Control Center)
@@ -195,15 +246,6 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         commandCenter.stopCommand.addTarget { [weak self] _ in
             self?.stop()
             return .success
-        }
-    }
-
-    /// Queue the next unplayed song with the same tag
-    func queueNextUnplayedSong() {
-        if let currentSong = currentMusicFile,
-           let nextSong = MusicLibrary.shared.findNextUnplayedSong(withTag: currentSong.tag) {
-            MusicQueue.shared.addToQueue(nextSong)
-            print("✅ Queued next unplayed song: \(nextSong.name)")
         }
     }
 }

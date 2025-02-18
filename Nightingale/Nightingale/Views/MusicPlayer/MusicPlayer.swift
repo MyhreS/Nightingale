@@ -6,7 +6,7 @@ struct MusicPlayer: View {
     
     var body: some View {
         CustomCard {
-            VStack(spacing: 8) {
+            VStack(spacing: 0) {
                 // Main controls
                 HStack(spacing: 10) {
                     CurrentQueued()
@@ -25,7 +25,7 @@ struct MusicPlayer: View {
                                 .frame(height: 4)
                             
                             // Progress
-                            if let currentSong = musicQueue.nextSong {
+                            if let currentSong = musicQueue.currentSong {
                                 // Start time indicator (filled portion before start)
                                 Capsule()
                                     .fill(Color.blue.opacity(0.3))
@@ -49,14 +49,14 @@ struct MusicPlayer: View {
                         
                         Spacer()
                         
-                        Text(formatTime(musicQueue.nextSong?.duration ?? 0))
+                        Text(formatTime(musicQueue.currentSong?.duration ?? 0))
                             .font(.caption2)
                             .foregroundColor(.gray)
                             .monospacedDigit()
                     }
                 }
                 .padding(.horizontal, 16)
-                .padding(.bottom, 8)
+                .padding(.top, 8)
             }
         }
         .padding(10)
