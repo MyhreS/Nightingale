@@ -192,7 +192,7 @@ struct SongEditor: View {
         currentPlayTime = startTime
         var previewSong = song
         previewSong.startTime = startTime
-        playerManager.play(previewSong)
+        playerManager.previewPlay(previewSong)
         
         // Start timer to update progress
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
@@ -208,7 +208,7 @@ struct SongEditor: View {
         isPreviewPlaying = false
         timer?.invalidate()
         timer = nil
-        playerManager.stop()
+        playerManager.stopPreview()
     }
     
     private func togglePreview() {

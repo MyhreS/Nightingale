@@ -2,6 +2,8 @@ import SwiftUI
 
 struct Settings: View {
     @Binding var showSettings: Bool
+    @State private var clearFeedback = false
+    @State private var resetFeedback = false
 
     var body: some View {
         NavigationStack {
@@ -18,14 +20,53 @@ struct Settings: View {
                             
                             Button(action: {
                                 MusicLibrary.shared.clearConfiguration()
+                                withAnimation {
+                                    clearFeedback = true
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                    withAnimation {
+                                        clearFeedback = false
+                                    }
+                                }
                             }) {
                                 HStack {
-                                    Image(systemName: "trash")
-                                    Text("Clear Music Library")
+                                    if clearFeedback {
+                                        Image(systemName: "checkmark.circle.fill")
+                                        Text("Library Cleared!")
+                                    } else {
+                                        Image(systemName: "trash")
+                                        Text("Clear Music Library")
+                                    }
                                 }
-                                .foregroundColor(.red)
+                                .foregroundColor(clearFeedback ? .green : .red)
                                 .padding()
-                                .background(Color.red.opacity(0.1))
+                                .background(clearFeedback ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
+                                .cornerRadius(10)
+                            }
+                            
+                            Button(action: {
+                                MusicLibrary.shared.resetPlayedStatus()
+                                withAnimation {
+                                    resetFeedback = true
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                    withAnimation {
+                                        resetFeedback = false
+                                    }
+                                }
+                            }) {
+                                HStack {
+                                    if resetFeedback {
+                                        Image(systemName: "checkmark.circle.fill")
+                                        Text("Status Reset!")
+                                    } else {
+                                        Image(systemName: "arrow.counterclockwise")
+                                        Text("Reset Played Status")
+                                    }
+                                }
+                                .foregroundColor(resetFeedback ? .green : .blue)
+                                .padding()
+                                .background(resetFeedback ? Color.green.opacity(0.1) : Color.blue.opacity(0.1))
                                 .cornerRadius(10)
                             }
                             

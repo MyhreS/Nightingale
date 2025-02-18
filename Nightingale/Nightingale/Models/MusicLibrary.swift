@@ -137,4 +137,22 @@ class MusicLibrary: ObservableObject {
             print("✅ Updated song settings: \(updatedSong.name)")
         }
     }
+    
+    /// Resets the played status of all songs to false
+    func resetPlayedStatus() {
+        musicFiles = musicFiles.map { song in
+            var updatedSong = song
+            updatedSong.played = false
+            return updatedSong
+        }
+        saveMusicFiles()
+        print("✅ Reset played status for all songs")
+    }
+    
+    /// Finds the next unplayed song with the same tag
+    func findNextUnplayedSong(withTag tag: String) -> MusicFile? {
+        return musicFiles.first { song in
+            song.tag == tag && !song.played
+        }
+    }
 }

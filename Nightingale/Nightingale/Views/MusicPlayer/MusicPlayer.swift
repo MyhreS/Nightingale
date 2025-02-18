@@ -26,9 +26,15 @@ struct MusicPlayer: View {
                             
                             // Progress
                             if let currentSong = musicQueue.nextSong {
+                                // Start time indicator (filled portion before start)
+                                Capsule()
+                                    .fill(Color.blue.opacity(0.3))
+                                    .frame(width: geometry.size.width * (currentSong.startTime / currentSong.duration), height: 4)
+                                
+                                // Current progress
                                 Capsule()
                                     .fill(Color.blue)
-                                    .frame(width: max(0, min(geometry.size.width * ((playerManager.currentTime - currentSong.startTime) / (currentSong.duration - currentSong.startTime)), geometry.size.width)), height: 4)
+                                    .frame(width: max(0, min(geometry.size.width * (playerManager.currentTime / currentSong.duration), geometry.size.width)), height: 4)
                             }
                         }
                     }

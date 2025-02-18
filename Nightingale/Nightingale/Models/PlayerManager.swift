@@ -6,13 +6,17 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
     static let shared = PlayerManager() // Singleton instance
     
     private var audioPlayer: AVAudioPlayer?
+    private var previewPlayer: AVAudioPlayer? // Separate player for previews
     @Published var isPlaying = false // Track play state
+    @Published var isPreviewPlaying = false // Separate state for preview
     @Published var currentTime: Double = 0 // Track current playback position
     private var currentMusicFile: MusicFile?
     private var timer: Timer?
+    private var previewTimer: Timer?
 
     /// Plays the given music file
     func play(_ musicFile: MusicFile) {
+        stopPreview() // Stop any preview playback
         stop() // Stop any currently playing audio before starting a new one
         
         do {
@@ -25,24 +29,69 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
                 return
             }
 
+            // Mark the song as played
+            var updatedSong = musicFile
+            updatedSong.played = true
+            MusicLibrary.shared.updateSong(updatedSong)
+
             audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
             audioPlayer?.delegate = self
             audioPlayer?.prepareToPlay()
-            audioPlayer?.currentTime = musicFile.startTime // Set the start time
-            currentTime = musicFile.startTime // Set initial current time
+            audioPlayer?.currentTime = updatedSong.startTime // Use the updated song's start time
+            currentTime = updatedSong.startTime
             audioPlayer?.play()
 
-            currentMusicFile = musicFile
+            currentMusicFile = updatedSong
             isPlaying = true
             startPlaybackTimer()
 
-            setupNowPlaying(musicFile: musicFile) // Setup Now Playing info
-            setupRemoteCommandCenter() // Enable lock screen controls
+            setupNowPlaying(musicFile: updatedSong)
+            setupRemoteCommandCenter()
 
-            print("🎵 Playing: \(musicFile.name) from \(musicFile.startTime) seconds")
+            print("🎵 Playing: \(updatedSong.name) from \(updatedSong.startTime) seconds")
         } catch {
             print("❌ Error loading audio file: \(error.localizedDescription)")
         }
+    }
+
+    /// Preview playback for edit mode
+    func previewPlay(_ musicFile: MusicFile) {
+        if isPlaying { pause() } // Pause main playback if it's playing
+        
+        do {
+            let soundURL = musicFile.url
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
+            try AVAudioSession.sharedInstance().setActive(true)
+
+            previewPlayer = try AVAudioPlayer(contentsOf: soundURL)
+            previewPlayer?.prepareToPlay()
+            previewPlayer?.currentTime = musicFile.startTime
+            previewPlayer?.play()
+            
+            isPreviewPlaying = true
+            
+            // Start a timer to update preview state
+            previewTimer?.invalidate()
+            previewTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+                if let player = self?.previewPlayer, player.currentTime >= musicFile.duration {
+                    self?.stopPreview()
+                }
+            }
+            
+            print("🎵 Preview Playing: \(musicFile.name) from \(musicFile.startTime) seconds")
+        } catch {
+            print("❌ Error loading preview audio: \(error.localizedDescription)")
+        }
+    }
+    
+    /// Stop preview playback
+    func stopPreview() {
+        previewPlayer?.stop()
+        previewPlayer = nil
+        isPreviewPlaying = false
+        previewTimer?.invalidate()
+        previewTimer = nil
+        print("🛑 Preview Stopped")
     }
 
     private func startPlaybackTimer() {
@@ -53,9 +102,10 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
                   let currentFile = self.currentMusicFile,
                   self.isPlaying else { return }
             
-            // If we've reached the end of the song, stop playback
+            // If we've reached the end of the song, stop playback and queue next song
             if player.currentTime >= currentFile.duration {
                 self.stop()
+                self.queueNextUnplayedSong()
                 return
             }
             
@@ -80,6 +130,9 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         timer = nil
         updateNowPlayingPlaybackState(isPlaying: false)
         print("⏸️ Paused")
+        
+        // Queue next unplayed song when pausing
+        queueNextUnplayedSong()
     }
 
     /// Stops playback completely
@@ -87,11 +140,14 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         audioPlayer?.stop()
         audioPlayer = nil
         isPlaying = false
-        currentTime = currentMusicFile?.startTime ?? 0 // Reset to start time instead of 0
+        currentTime = currentMusicFile?.startTime ?? 0
         timer?.invalidate()
         timer = nil
         updateNowPlayingPlaybackState(isPlaying: false)
         print("🛑 Stopped")
+        
+        // Queue next unplayed song
+        queueNextUnplayedSong()
     }
 
     /// Setup Now Playing Info (lock screen & Control Center)
@@ -139,6 +195,15 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         commandCenter.stopCommand.addTarget { [weak self] _ in
             self?.stop()
             return .success
+        }
+    }
+
+    /// Queue the next unplayed song with the same tag
+    func queueNextUnplayedSong() {
+        if let currentSong = currentMusicFile,
+           let nextSong = MusicLibrary.shared.findNextUnplayedSong(withTag: currentSong.tag) {
+            MusicQueue.shared.addToQueue(nextSong)
+            print("✅ Queued next unplayed song: \(nextSong.name)")
         }
     }
 }

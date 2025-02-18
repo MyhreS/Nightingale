@@ -156,7 +156,7 @@ struct EditMusic: View {
         currentPlayTime = startTime
         var previewSong = song
         previewSong.startTime = startTime
-        playerManager.play(previewSong)
+        playerManager.previewPlay(previewSong)
         
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             if currentPlayTime < song.duration {
@@ -171,7 +171,7 @@ struct EditMusic: View {
         isPreviewPlaying = false
         timer?.invalidate()
         timer = nil
-        playerManager.stop()
+        playerManager.stopPreview()
     }
     
     private func togglePreview() {
