@@ -20,21 +20,19 @@ extension Color {
 
 struct Music: View {
     var body: some View {
-        VStack(alignment: .center, spacing: 10) {
-            Text("Music")
-                .font(.headline)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .center)
-            
-            HStack(spacing: 10) {
-                AddMusicButton()
-                RemoveMusicButton()
+        CustomCard {
+            VStack(alignment: .center, spacing: 10) {
+                Text("Music")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                
+                HStack(spacing: 10) {
+                    AddMusicButton()
+                    RemoveMusicButton()
+                }
+                .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
         }
-        .padding()
-        .background(Color(uiColor: .systemBackground)) // White background
-        .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
 }

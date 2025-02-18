@@ -4,37 +4,31 @@ struct MusicSelector: View {
     @ObservedObject var musicLibrary = MusicLibrary.shared // Access shared music library
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Playlist")
-                .font(.headline)
-                .fontWeight(.bold)
+        CustomCard {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Playlist")
+                    .font(.headline)
+                    .fontWeight(.bold)
 
-            if musicLibrary.musicFiles.isEmpty {
-                VStack {
-                    Text("No music added yet. Go to settings to add some!")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .padding(.leading, 0)
-                    
-                    // Invisible placeholder that takes up space
-                    Rectangle()
-                        .fill(Color.clear)
-                        .frame(maxHeight: .infinity)
-                        .padding(0)// Adjust height based on desired space
+                if musicLibrary.musicFiles.isEmpty {
+                    VStack {
+                        Text("No music added yet. Go to settings to add some!")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .padding(.leading, 0)
+                        
+                        // Invisible placeholder that takes up space
+                        Rectangle()
+                            .fill(Color.clear)
+                            .frame(maxHeight: .infinity)
+                            .padding(0)// Adjust height based on desired space
+                    }
+                } else {
+                    MusicList()
                 }
-            } else {
-                MusicList()
             }
         }
-        .padding(20)
-        .background(Color(uiColor: .systemBackground)) // White card background
-        .cornerRadius(20)
-        // Update shadow to be more subtle
-        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
-
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1) // Border
-        )
+        .padding(10)
     }
+        
 }
