@@ -206,25 +206,87 @@ private struct StartTimeEditor: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 24) {
-                // Current time display
-                Text(formatTime(startTime))
-                    .font(.system(size: 48, weight: .medium, design: .rounded))
-                    .monospacedDigit()
+                // Header with song name centered
+                Text(song.name)
+                    .font(.headline)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, 8)
                 
-                // Time slider
-                Slider(value: $startTime, in: 0...song.duration) { editing in
-                    if !editing && isPreviewPlaying {
-                        stopPreview()
-                        startPreview()
+                // Time information
+                HStack {
+                    // Start time
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Start:")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                        Text(formatTime(startTime))
+                            .monospacedDigit()
+                            .font(.system(.body, design: .rounded))
+                    }
+                    .frame(width: 80, alignment: .leading)
+                    
+                    Spacer()
+                    
+                    // Played time (centered)
+                    if showProgress {
+                        VStack(alignment: .center, spacing: 6) {
+                            Text("Played:")
+                                .font(.caption2)
+                                .foregroundColor(.gray)
+                            Text(formatTime(currentPlayTime))
+                                .monospacedDigit()
+                                .font(.system(.body, design: .rounded))
+                                .foregroundColor(.green)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    // Duration time
+                    VStack(alignment: .trailing, spacing: 6) {
+                        Text("Duration:")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                        Text(formatTime(song.duration))
+                            .monospacedDigit()
+                            .font(.system(.body, design: .rounded))
+                            .foregroundColor(.gray)
+                    }
+                    .frame(width: 80, alignment: .trailing)
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 24)
+                
+                // Custom Slider with progress
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        // Background track
+                        Capsule()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(height: 6)
+                        
+                        // Playback progress
+                        if showProgress {
+                            Capsule()
+                                .fill(Color.green.opacity(0.7))
+                                .frame(width: max(0, min(geometry.size.width * (currentPlayTime / song.duration), geometry.size.width)), height: 6)
+                        }
+                        
+                        // Slider
+                        Slider(value: $startTime, in: 0...song.duration)
+                            .accentColor(.blue)
+                            .onChange(of: startTime) { newValue in
+                                if isPreviewPlaying {
+                                    stopPreview()
+                                }
+                            }
                     }
                 }
-                .padding(.horizontal)
+                .frame(height: 30)
+                .padding(.horizontal, 24)
                 
-                // Duration
-                Text("Duration: \(formatTime(song.duration))")
-                    .foregroundColor(.gray)
-                
-                // Preview button
+                // Preview button centered
                 Button(action: togglePreview) {
                     Image(systemName: isPreviewPlaying ? "stop.fill" : "play.fill")
                         .font(.title)
@@ -233,27 +295,12 @@ private struct StartTimeEditor: View {
                         .background(Color.blue.opacity(0.1))
                         .clipShape(Circle())
                 }
-                
-                if showProgress {
-                    // Preview progress
-                    GeometryReader { geometry in
-                        ZStack(alignment: .leading) {
-                            Capsule()
-                                .fill(Color.gray.opacity(0.2))
-                                .frame(height: 4)
-                            
-                            Capsule()
-                                .fill(Color.blue)
-                                .frame(width: max(0, min(geometry.size.width * (currentPlayTime / song.duration), geometry.size.width)), height: 4)
-                        }
-                    }
-                    .frame(height: 4)
-                    .padding(.top)
-                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
                 
                 Spacer()
             }
-            .padding()
+            .padding(.horizontal, 16)
             .navigationTitle("Edit Start Time")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -302,6 +349,7 @@ private struct StartTimeEditor: View {
         if isPreviewPlaying {
             stopPreview()
         } else {
+            currentPlayTime = startTime
             startPreview()
         }
     }

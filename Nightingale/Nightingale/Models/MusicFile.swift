@@ -23,8 +23,16 @@ struct MusicFile: Identifiable, Codable, Hashable {
         self.url = url
         self.name = url.deletingPathExtension().lastPathComponent
         self.startTime = 0.0
-        self.duration = 0.0
         self.played = false
+        
+        // Get duration using AVFoundation
+        if let audioAsset = try? AVAudioFile(forReading: url) {
+            self.duration = Double(audioAsset.length) / audioAsset.processingFormat.sampleRate
+            print("✅ Set duration for \(name): \(self.duration) seconds")
+        } else {
+            print("⚠️ Could not get duration for \(name), defaulting to 0")
+            self.duration = 0.0
+        }
     }
     
     init(from decoder: Decoder) throws {

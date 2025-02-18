@@ -21,7 +21,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         
         do {
             let soundURL = musicFile.url
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
 
             guard FileManager.default.fileExists(atPath: soundURL.path) else {
@@ -29,17 +29,27 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
                 return
             }
 
+            audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
+            guard let player = audioPlayer else {
+                print("❌ Failed to create audio player")
+                return
+            }
+
+            player.delegate = self
+            player.prepareToPlay()
+            
+            // Validate duration
+            let duration = musicFile.duration > 0 ? musicFile.duration : player.duration
+            let validStartTime = min(musicFile.startTime, duration)
+            
+            player.currentTime = validStartTime
+            currentTime = validStartTime
+            player.play()
+
             // Mark the song as played
             var updatedSong = musicFile
             updatedSong.played = true
             MusicLibrary.shared.updateSong(updatedSong)
-
-            audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
-            audioPlayer?.delegate = self
-            audioPlayer?.prepareToPlay()
-            audioPlayer?.currentTime = updatedSong.startTime
-            currentTime = updatedSong.startTime
-            audioPlayer?.play()
 
             currentMusicFile = updatedSong
             isPlaying = true
@@ -48,7 +58,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             setupNowPlaying(musicFile: updatedSong)
             setupRemoteCommandCenter()
 
-            print("🎵 Playing: \(updatedSong.name) from \(updatedSong.startTime) seconds")
+            print("🎵 Playing: \(updatedSong.name) from \(validStartTime) seconds (duration: \(duration) seconds)")
         } catch {
             print("❌ Error loading audio file: \(error.localizedDescription)")
         }
@@ -60,25 +70,35 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         
         do {
             let soundURL = musicFile.url
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
 
             previewPlayer = try AVAudioPlayer(contentsOf: soundURL)
-            previewPlayer?.prepareToPlay()
-            previewPlayer?.currentTime = musicFile.startTime
-            previewPlayer?.play()
+            guard let player = previewPlayer else {
+                print("❌ Failed to create preview player")
+                return
+            }
+
+            player.prepareToPlay()
+            
+            // Validate duration and start time
+            let duration = musicFile.duration > 0 ? musicFile.duration : player.duration
+            let validStartTime = min(musicFile.startTime, duration)
+            
+            player.currentTime = validStartTime
+            player.play()
             
             isPreviewPlaying = true
             
             // Start a timer to update preview state
             previewTimer?.invalidate()
             previewTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-                if let player = self?.previewPlayer, player.currentTime >= musicFile.duration {
+                if let player = self?.previewPlayer, player.currentTime >= duration {
                     self?.stopPreview()
                 }
             }
             
-            print("🎵 Preview Playing: \(musicFile.name) from \(musicFile.startTime) seconds")
+            print("🎵 Preview Playing: \(musicFile.name) from \(validStartTime) seconds (duration: \(duration) seconds)")
         } catch {
             print("❌ Error loading preview audio: \(error.localizedDescription)")
         }
