@@ -141,36 +141,44 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         }
     }
 
-    /// Finds the next song with the same tag
-    private func findNextSongWithSameTag(_ currentSong: MusicFile) -> MusicFile? {
+    /// Finds the next song with the same playlist
+    private func findNextSongInSamePlaylist(_ currentSong: MusicFile) -> MusicFile? {
+        let playlistManager = PlaylistManager.shared
         let musicLibrary = MusicLibrary.shared
-        let songsWithSameTag = musicLibrary.musicFiles.filter { $0.tag == currentSong.tag }
         
-        guard let currentIndex = songsWithSameTag.firstIndex(where: { $0.id == currentSong.id }) else {
+        // Get the current playlist
+        guard let currentPlaylist = playlistManager.playlistForSong(currentSong.id) else {
+            return nil
+        }
+        
+        // Get all songs in the playlist
+        let playlistSongs = playlistManager.songsInPlaylist(currentPlaylist)
+        
+        guard let currentIndex = playlistSongs.firstIndex(where: { $0.id == currentSong.id }) else {
             return nil
         }
         
         // First try to find an unplayed song after the current index
-        for i in (currentIndex + 1)..<songsWithSameTag.count {
-            if !songsWithSameTag[i].played {
-                print("🎵 Found next unplayed song with same tag: \(songsWithSameTag[i].name)")
-                return songsWithSameTag[i]
+        for i in (currentIndex + 1)..<playlistSongs.count {
+            if !playlistSongs[i].played {
+                print("🎵 Found next unplayed song in playlist: \(playlistSongs[i].name)")
+                return playlistSongs[i]
             }
         }
         
         // If no unplayed songs after current index, check from start up to current index
         for i in 0..<currentIndex {
-            if !songsWithSameTag[i].played {
-                print("🎵 Found next unplayed song with same tag (wrapped around): \(songsWithSameTag[i].name)")
-                return songsWithSameTag[i]
+            if !playlistSongs[i].played {
+                print("🎵 Found next unplayed song in playlist (wrapped around): \(playlistSongs[i].name)")
+                return playlistSongs[i]
             }
         }
         
         // If all songs are played, get the next song in sequence
-        let nextIndex = (currentIndex + 1) % songsWithSameTag.count
+        let nextIndex = (currentIndex + 1) % playlistSongs.count
         if nextIndex != currentIndex {
-            print("🎵 All songs played, selected next song with same tag: \(songsWithSameTag[nextIndex].name)")
-            return songsWithSameTag[nextIndex]
+            print("🎵 All songs played, selected next song in playlist: \(playlistSongs[nextIndex].name)")
+            return playlistSongs[nextIndex]
         }
         
         return nil
@@ -189,14 +197,12 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             let musicLibrary = MusicLibrary.shared
             let allSongs = musicLibrary.musicFiles
             
-            if !currentSong.tag.isEmpty {
-                // If song has a tag, find next song with same tag
-                if let nextSong = findNextSongWithSameTag(currentSong) {
-                    MusicQueue.shared.addToQueue(nextSong)
-                    print("🎵 Changed to next song with same tag: \(nextSong.name)")
-                }
+            // Check if song is in a playlist
+            if let nextSong = findNextSongInSamePlaylist(currentSong) {
+                MusicQueue.shared.addToQueue(nextSong)
+                print("🎵 Changed to next song in playlist: \(nextSong.name)")
             } else {
-                // If no tag, just get the next song in the library
+                // If not in a playlist, just get the next song in the library
                 if let currentIndex = allSongs.firstIndex(where: { $0.id == currentSong.id }) {
                     let nextIndex = (currentIndex + 1) % allSongs.count
                     let nextSong = allSongs[nextIndex]
