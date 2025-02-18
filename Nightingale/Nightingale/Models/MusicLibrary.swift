@@ -78,7 +78,6 @@ class MusicLibrary: ObservableObject {
         if !missingInStorage.isEmpty {
             fatalError("❌ CRITICAL ERROR: Files in config but missing in storage: \(missingInStorage)")
         }
-
         print("✅ Consistency check complete. All good")
     }
 
@@ -100,5 +99,23 @@ class MusicLibrary: ObservableObject {
         } catch {
             fatalError("❌ CRITICAL ERROR: Failed to load music files: \(error.localizedDescription)")
         }
+    }
+
+    /// Clears the music library configuration and all files from storage
+    func clearConfiguration() {
+        print("🧹 Clearing music library configuration and storage...")
+        
+        // Clear all files from storage first
+        let storedFiles = storage.getStoredFiles()
+        for fileName in storedFiles {
+            let fileURL = storage.getStorageURL(for: fileName)
+            _ = storage.deleteFileFromStorage(fileURL)
+        }
+        
+        // Clear configuration from UserDefaults
+        UserDefaults.standard.removeObject(forKey: storageKey)
+        musicFiles.removeAll()
+        
+        print("✅ Music library configuration and storage cleared")
     }
 }
