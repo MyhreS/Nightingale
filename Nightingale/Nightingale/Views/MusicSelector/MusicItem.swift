@@ -2,8 +2,14 @@ import SwiftUI
 
 struct MusicItem: View {
     @ObservedObject var musicQueue = MusicQueue.shared // Shared music queue
+    @ObservedObject var musicLibrary = MusicLibrary.shared
     var musicFile: MusicFile
-
+    @State private var showEditSheet = false
+    
+    init(musicFile: MusicFile) {
+        self.musicFile = musicFile
+    }
+    
     var body: some View {
         Button(action: {
             addToQueue(musicFile) // Add to queue
@@ -28,6 +34,15 @@ struct MusicItem: View {
                     .font(.body)
                     .lineLimit(nil)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                
+                // Edit button
+                Button(action: {
+                    showEditSheet = true
+                }) {
+                    Image(systemName: "slider.horizontal.3")
+                        .foregroundColor(.blue)
+                }
+                .buttonStyle(PlainButtonStyle())
             }
             .padding(5)
             .frame(maxWidth: .infinity) // Expand button to fill available space
@@ -40,6 +55,13 @@ struct MusicItem: View {
         .buttonStyle(PlainButtonStyle()) // Remove default button styling
         .listRowInsets(EdgeInsets()) // Remove default insets
         .listRowBackground(Color.clear) // Transparent row background
+        .sheet(isPresented: $showEditSheet) {
+            EditMusic(song: musicFile) { updatedSong in
+                musicLibrary.updateSong(updatedSong)
+            }
+            .presentationDetents([.height(350)])
+            .presentationDragIndicator(.visible)
+        }
     }
 
     /// Checks if this item is the next one to be played
