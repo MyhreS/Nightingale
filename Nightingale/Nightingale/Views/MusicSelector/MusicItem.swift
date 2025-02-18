@@ -59,7 +59,7 @@ struct MusicItem: View {
             EditMusic(song: musicFile) { updatedSong in
                 musicLibrary.updateSong(updatedSong)
             }
-            .presentationDetents([.height(350)])
+            .presentationDetents([.height(500)])
             .presentationDragIndicator(.visible)
         }
     }

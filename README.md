@@ -1,2 +1,2 @@
 # Nightingale
-A swift app to play hockey music
+A swift app to play hockey music. The user should be able to add songs. Idealy with spotify but in the short term through mp3 files. Furthermore, the user should be able to group them/ tag them. The user should also be able to go through the groups/tags/playlists and select which to play. The user should  also be able to predifine start time of the songs. When a user has selected a song, it should be added to the next song, so he can click play and its played. 
