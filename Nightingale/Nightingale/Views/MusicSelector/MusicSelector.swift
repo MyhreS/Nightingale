@@ -27,8 +27,10 @@ struct MusicSelector: View {
             }
         }
         .padding(20)
-        .background(Color.gray.opacity(0.05))
+        .background(Color(uiColor: .systemBackground)) // White card background
         .cornerRadius(20)
+        // Update shadow to be more subtle
+        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
 
         .overlay(
             RoundedRectangle(cornerRadius: 20)

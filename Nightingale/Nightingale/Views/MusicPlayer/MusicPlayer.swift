@@ -8,12 +8,9 @@ struct MusicPlayer: View {
         }
         .frame(maxWidth: .infinity, maxHeight: 70)
         .padding(10)
-        .background(Color.blue.opacity(0.5))
+        .background(Color(uiColor: .systemBackground)) // White card background
         .cornerRadius(20)
-
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1) // Border
-        )
+        // Update shadow to be more subtle
+        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
 }

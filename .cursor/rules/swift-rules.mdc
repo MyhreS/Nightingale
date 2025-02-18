@@ -1,0 +1,8 @@
+---
+description: Follow Apple Swift UI guidelines
+globs: *.swift
+---
+
+# Your rule content
+UI Design Dos and Don’ts made by Apple for swift
+https://developer.apple.com/design/tips/

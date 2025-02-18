@@ -24,14 +24,17 @@ struct Music: View {
             Text("Music")
                 .font(.headline)
                 .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .center) // Centering the title
+                .frame(maxWidth: .infinity, alignment: .center)
             
             HStack(spacing: 10) {
                 AddMusicButton()
                 RemoveMusicButton()
             }
-            .frame(maxWidth: .infinity) // Ensuring HStack takes full width
+            .frame(maxWidth: .infinity)
         }
         .padding()
+        .background(Color(uiColor: .systemBackground)) // White background
+        .cornerRadius(20)
+        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
 }

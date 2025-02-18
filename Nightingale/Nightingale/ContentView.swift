@@ -14,6 +14,7 @@ struct ContentView: View {
                     Toolbar()
                 }
             }
+            .background(Color.blue.opacity(0.1))
         }
     }
 }

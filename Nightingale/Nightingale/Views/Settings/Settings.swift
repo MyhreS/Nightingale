@@ -8,10 +8,7 @@ struct Settings: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     Music()
-                        .frame(maxWidth: .infinity, maxHeight: 150)
-                        .background(Color.blue.opacity(0.3))
-                        .cornerRadius(20)
-                        .shadow(radius: 10)
+                        .frame(maxWidth: .infinity)
                 }
                 .padding()
                 .toolbar {
@@ -20,6 +17,7 @@ struct Settings: View {
                     }
                 }
             }
+            .background(Color.blue.opacity(0.1))
         }
     }
 }

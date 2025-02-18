@@ -48,18 +48,19 @@ class MusicStorage {
     }
 
     /// ✅ Deletes a file from storage
-    func deleteFileFromStorage(_ fileURL: URL) -> Bool {
+    func deleteFileFromStorage(_ fileURL: URL) -> URL? {
         if fileManager.fileExists(atPath: fileURL.path) {
             do {
                 try fileManager.removeItem(at: fileURL)
                 print("🗑️ Successfully deleted file: \(fileURL.lastPathComponent)")
-                return true
+                return fileURL
             } catch {
                 print("❌ Failed to delete file: \(error.localizedDescription)")
+                return nil
             }
         } else {
             print("⚠️ File not found in storage: \(fileURL.lastPathComponent)")
+            return nil
         }
-        return false
     }
 }

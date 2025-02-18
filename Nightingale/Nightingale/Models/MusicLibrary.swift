@@ -9,72 +9,77 @@ class MusicLibrary: ObservableObject {
 
     private init() {
         loadMusicFiles()
-        syncMusicFilesWithStorage() // ✅ Ensure storage & list match at startup
+        validateConsistency() // ✅ Check consistency on startup
     }
 
-    /// ✅ Adds a music file if it doesn't already exist
+    /// ✅ Adds a music file
     func addMusicFile(_ url: URL) -> Bool {
-        let initialCount = musicFiles.count // Store initial size
-
-        // ✅ Copy to storage if necessary
-        let storedURL = storage.copyFileToStorage(url) ?? storage.getStorageURL(for: url.lastPathComponent)
-
-        // ✅ Check if file already exists in music list
-        if musicFiles.contains(where: { $0.url == storedURL }) {
-            print("⚠️ File already exists in music library: \(storedURL.lastPathComponent)")
-            return false
+        // 1. Copy to storage
+        guard let storedURL = storage.copyFileToStorage(url) else {
+            fatalError("❌ CRITICAL ERROR: Failed to add file to storage: \(url.lastPathComponent)")
         }
 
-        // ✅ Add the new file to the `musicFiles` list
+        // 2. Create MusicFile
         let newMusicFile = MusicFile(url: storedURL)
+
+        // 3. Check if it already exists in the list
+        if musicFiles.contains(where: { $0.url == newMusicFile.url }) {
+            fatalError("⚠️ File already exists in music library: \(storedURL.lastPathComponent)")
+        }
+
+        // 4. Add to the list
         musicFiles.append(newMusicFile)
         saveMusicFiles()
         print("✅ Successfully added music file: \(newMusicFile.name)")
 
-        return musicFiles.count > initialCount // ✅ Returns true if the list grew
+        // 5. Validate consistency
+        validateConsistency()
+
+        return true
     }
 
-    /// ✅ Ensures the `musicFiles` list only contains files that actually exist in storage
-    private func syncMusicFilesWithStorage() {
+    /// ✅ Removes a music file
+    func removeMusicFile(_ musicFile: MusicFile) -> Bool {
+        // 1. Delete from storage
+        guard let deletedURL = storage.deleteFileFromStorage(musicFile.url) else {
+            fatalError("❌ CRITICAL ERROR: Failed to delete file from storage: \(musicFile.name)")
+        }
+
+        // 2. Find and remove from list
+        guard let index = musicFiles.firstIndex(where: { $0.url == deletedURL }) else {
+            fatalError("❌ CRITICAL ERROR: File not found in music library (but deleted from storage): \(deletedURL.lastPathComponent)")
+        }
+
+        musicFiles.remove(at: index)
+        saveMusicFiles()
+        print("✅ Successfully removed music file: \(deletedURL.lastPathComponent)")
+
+        // 3. Validate consistency
+        validateConsistency()
+
+        return true
+    }
+
+    /// ✅ Validates consistency between storage and the music library
+    private func validateConsistency() {
         let storedFiles = storage.getStoredFiles()
-        print("🔄 Syncing storage with MusicLibrary...")
+        let configFiles = musicFiles.map { $0.url.lastPathComponent }
 
-        var updatedMusicFiles: [MusicFile] = []
+        print("🔍 Validating consistency between storage and config...")
 
-        // ✅ Ensure metadata is preserved
-        for file in storedFiles {
-            let fileURL = storage.getStorageURL(for: file)
-            if let existingFile = musicFiles.first(where: { $0.url == fileURL }) {
-                // ✅ Reuse the existing object to preserve metadata
-                updatedMusicFiles.append(existingFile)
-            } else {
-                // ✅ Create a new MusicFile object if not already in the list
-                updatedMusicFiles.append(MusicFile(url: fileURL))
-            }
+        // Files in storage but not in config
+        let missingInConfig = storedFiles.filter { !configFiles.contains($0) }
+        if !missingInConfig.isEmpty {
+            fatalError("❌ CRITICAL ERROR: Files in storage but missing in config: \(missingInConfig)")
         }
 
-        // ✅ Update the list only if needed
-        if updatedMusicFiles.count != musicFiles.count {
-            musicFiles = updatedMusicFiles
-            saveMusicFiles()
+        // Files in config but not in storage
+        let missingInStorage = configFiles.filter { !storedFiles.contains($0) }
+        if !missingInStorage.isEmpty {
+            fatalError("❌ CRITICAL ERROR: Files in config but missing in storage: \(missingInStorage)")
         }
 
-        print("✅ MusicLibrary is now in sync with storage.")
-    }
-    
-    /// ✅ Removes a music file from both the library and storage
-    func removeMusicFile(_ musicFile: MusicFile) {
-        print("🔍 Storage contents BEFORE removal:")
-        debugPrintStorageContents()
-
-        if storage.deleteFileFromStorage(musicFile.url) {
-            musicFiles.removeAll { $0.id == musicFile.id }
-            saveMusicFiles()
-        }
-
-        syncMusicFilesWithStorage()
-        print("🔍 Storage contents AFTER removal:")
-        debugPrintStorageContents()
+        print("✅ Consistency check complete. All good")
     }
 
     /// ✅ Saves the music files persistently
@@ -83,39 +88,17 @@ class MusicLibrary: ObservableObject {
             let data = try JSONEncoder().encode(musicFiles)
             UserDefaults.standard.set(data, forKey: storageKey)
         } catch {
-            print("❌ Failed to save music files: \(error.localizedDescription)")
+            fatalError("❌ CRITICAL ERROR: Failed to save music files: \(error.localizedDescription)")
         }
     }
 
-    /// ✅ Loads stored music files (Avoids duplicates)
+    /// ✅ Loads stored music files
     private func loadMusicFiles() {
         guard let data = UserDefaults.standard.data(forKey: storageKey) else { return }
         do {
-            let savedFiles = try JSONDecoder().decode([MusicFile].self, from: data)
-            let storedFiles = storage.getStoredFiles()
-
-            // ✅ Avoid duplicates by ensuring only one instance per file
-            for file in savedFiles {
-                if storedFiles.contains(file.url.lastPathComponent) {
-                    if !musicFiles.contains(where: { $0.url == file.url }) {
-                        musicFiles.append(file)
-                    }
-                }
-            }
+            musicFiles = try JSONDecoder().decode([MusicFile].self, from: data)
         } catch {
-            print("❌ Failed to load music files: \(error.localizedDescription)")
-        }
-    }
-
-    /// ✅ Prints all files in app storage
-    private func debugPrintStorageContents() {
-        let storedFiles = storage.getStoredFiles()
-        if storedFiles.isEmpty {
-            print("📂 Storage is EMPTY")
-        } else {
-            for file in storedFiles {
-                print("📄 \(file)")
-            }
+            fatalError("❌ CRITICAL ERROR: Failed to load music files: \(error.localizedDescription)")
         }
     }
 }
