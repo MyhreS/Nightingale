@@ -7,7 +7,9 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
     
     private var audioPlayer: AVAudioPlayer?
     @Published var isPlaying = false // Track play state
+    @Published var currentTime: Double = 0 // Track current playback position
     private var currentMusicFile: MusicFile?
+    private var timer: Timer?
 
     /// Plays the given music file
     func play(_ musicFile: MusicFile) {
@@ -27,10 +29,12 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             audioPlayer?.delegate = self
             audioPlayer?.prepareToPlay()
             audioPlayer?.currentTime = musicFile.startTime // Set the start time
+            currentTime = musicFile.startTime // Set initial current time
             audioPlayer?.play()
 
             currentMusicFile = musicFile
             isPlaying = true
+            startPlaybackTimer()
 
             setupNowPlaying(musicFile: musicFile) // Setup Now Playing info
             setupRemoteCommandCenter() // Enable lock screen controls
@@ -38,6 +42,24 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             print("🎵 Playing: \(musicFile.name) from \(musicFile.startTime) seconds")
         } catch {
             print("❌ Error loading audio file: \(error.localizedDescription)")
+        }
+    }
+
+    private func startPlaybackTimer() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            guard let self = self, 
+                  let player = self.audioPlayer, 
+                  let currentFile = self.currentMusicFile,
+                  self.isPlaying else { return }
+            
+            // If we've reached the end of the song, stop playback
+            if player.currentTime >= currentFile.duration {
+                self.stop()
+                return
+            }
+            
+            self.currentTime = player.currentTime
         }
     }
 
@@ -54,6 +76,8 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
     func pause() {
         audioPlayer?.pause()
         isPlaying = false
+        timer?.invalidate()
+        timer = nil
         updateNowPlayingPlaybackState(isPlaying: false)
         print("⏸️ Paused")
     }
@@ -63,6 +87,9 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         audioPlayer?.stop()
         audioPlayer = nil
         isPlaying = false
+        currentTime = currentMusicFile?.startTime ?? 0 // Reset to start time instead of 0
+        timer?.invalidate()
+        timer = nil
         updateNowPlayingPlaybackState(isPlaying: false)
         print("🛑 Stopped")
     }
