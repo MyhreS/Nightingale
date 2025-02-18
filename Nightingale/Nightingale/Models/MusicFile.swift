@@ -1,10 +1,12 @@
 import Foundation
+import AVFoundation
 
 struct MusicFile: Identifiable, Codable, Hashable {
     // Required properties that must always exist
     let id: UUID
     let url: URL
     let name: String
+    let duration: Double // Duration in seconds
     
     // Optional properties with default values
     var tag: String = ""
@@ -13,7 +15,7 @@ struct MusicFile: Identifiable, Codable, Hashable {
     // Add new properties here with default values
     
     enum CodingKeys: String, CodingKey {
-        case id, url, name, tag, played, startTime
+        case id, url, name, duration, tag, played, startTime
         // Add new coding keys here when adding properties
     }
     
@@ -24,6 +26,14 @@ struct MusicFile: Identifiable, Codable, Hashable {
         self.tag = tag
         self.played = played
         self.startTime = startTime
+        
+        // Get duration from audio file
+        if let audioAsset = try? AVAudioFile(forReading: url) {
+            self.duration = Double(audioAsset.length) / audioAsset.processingFormat.sampleRate
+        } else {
+            self.duration = 0.0
+            print("⚠️ Could not get duration for: \(name)")
+        }
     }
     
     init(from decoder: Decoder) throws {
@@ -33,6 +43,7 @@ struct MusicFile: Identifiable, Codable, Hashable {
         id = try container.decode(UUID.self, forKey: .id)
         url = try container.decode(URL.self, forKey: .url)
         name = try container.decode(String.self, forKey: .name)
+        duration = try container.decode(Double.self, forKey: .duration)
         
         // Optional properties (use default values if not found)
         tag = try container.decodeIfPresent(String.self, forKey: .tag) ?? ""
@@ -48,6 +59,7 @@ struct MusicFile: Identifiable, Codable, Hashable {
         try container.encode(id, forKey: .id)
         try container.encode(url, forKey: .url)
         try container.encode(name, forKey: .name)
+        try container.encode(duration, forKey: .duration)
         try container.encode(tag, forKey: .tag)
         try container.encode(played, forKey: .played)
         try container.encode(startTime, forKey: .startTime)

@@ -67,17 +67,24 @@ class MusicLibrary: ObservableObject {
 
         print("🔍 Validating consistency between storage and config...")
 
-        // Files in storage but not in config
+        // Files in storage but not in config - add them back
         let missingInConfig = storedFiles.filter { !configFiles.contains($0) }
         if !missingInConfig.isEmpty {
-            fatalError("❌ CRITICAL ERROR: Files in storage but missing in config: \(missingInConfig)")
+            print("⚠️ Found files in storage missing from config, adding them back: \(missingInConfig)")
+            for fileName in missingInConfig {
+                let url = storage.getStorageURL(for: fileName)
+                _ = addMusicFile(url)
+            }
         }
 
-        // Files in config but not in storage
+        // Files in config but not in storage - remove them
         let missingInStorage = configFiles.filter { !storedFiles.contains($0) }
         if !missingInStorage.isEmpty {
-            fatalError("❌ CRITICAL ERROR: Files in config but missing in storage: \(missingInStorage)")
+            print("⚠️ Found files in config missing from storage, removing them")
+            musicFiles.removeAll { missingInStorage.contains($0.url.lastPathComponent) }
+            saveMusicFiles()
         }
+
         print("✅ Consistency check complete. All good")
     }
 

@@ -10,98 +10,216 @@ struct SongSettings: View {
     var body: some View {
         CustomCard {
             VStack(alignment: .leading, spacing: 15) {
-                Text("Song Settings")
-                    .font(.headline)
-                    .fontWeight(.bold)
+                HStack {
+                    Text("Song Settings")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                    
+                    Spacer()
+                    
+                    if editingSong != nil {
+                        Button(action: { editingSong = nil }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.gray)
+                        }
+                    }
+                }
                 
                 if musicLibrary.musicFiles.isEmpty {
                     Text("No songs added yet")
                         .foregroundColor(.gray)
                         .padding(.vertical)
                 } else {
-                    ScrollView {
-                        VStack(spacing: 15) {
-                            ForEach(musicLibrary.musicFiles) { song in
-                                SongSettingsRow(song: song, isEditing: editingSong?.id == song.id) { updatedSong in
-                                    musicLibrary.updateSong(updatedSong)
+                    if let song = editingSong {
+                        SongEditor(song: song) { updatedSong in
+                            musicLibrary.updateSong(updatedSong)
+                            editingSong = nil
+                        }
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 12) {
+                                ForEach(musicLibrary.musicFiles) { song in
+                                    SongRow(song: song, isSelected: false) {
+                                        editingSong = song
+                                    }
                                 }
                             }
                         }
+                        .frame(maxHeight: 300)
                     }
-                    .frame(maxHeight: 300)
                 }
             }
+            .padding(.horizontal)
         }
     }
 }
 
-struct SongSettingsRow: View {
+struct SongEditor: View {
     let song: MusicFile
-    let isEditing: Bool
-    let onUpdate: (MusicFile) -> Void
+    let onSave: (MusicFile) -> Void
     
-    @State private var startTime: String
-    @State private var isPlaying = false
+    @State private var startTime: Double
+    @State private var isPreviewPlaying = false
+    @State private var currentPlayTime: Double
+    @State private var timer: Timer?
     private let playerManager = PlayerManager.shared
     
-    init(song: MusicFile, isEditing: Bool, onUpdate: @escaping (MusicFile) -> Void) {
+    init(song: MusicFile, onSave: @escaping (MusicFile) -> Void) {
         self.song = song
-        self.isEditing = isEditing
-        self.onUpdate = onUpdate
-        self._startTime = State(initialValue: String(format: "%.1f", song.startTime))
+        self.onSave = onSave
+        self._startTime = State(initialValue: song.startTime)
+        self._currentPlayTime = State(initialValue: song.startTime)
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 15) {
             Text(song.name)
-                .font(.subheadline)
-                .fontWeight(.medium)
+                .font(.headline)
             
+            // Time display
             HStack {
-                // Start Time Input
-                HStack {
-                    Text("Start:")
-                        .font(.caption)
-                    TextField("0.0", text: $startTime)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .keyboardType(.decimalPad)
-                        .frame(width: 60)
-                    Text("sec")
-                        .font(.caption)
+                Text(formatTime(startTime))
+                    .monospacedDigit()
+                Spacer()
+                Text(formatTime(song.duration))
+                    .monospacedDigit()
+                    .foregroundColor(.gray)
+            }
+            .font(.caption)
+            
+            // Custom Slider with progress
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    // Background track
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(height: 4)
+                        .cornerRadius(2)
+                    
+                    // Playback progress
+                    if isPreviewPlaying {
+                        Rectangle()
+                            .fill(Color.green.opacity(0.3))
+                            .frame(width: geometry.size.width * (currentPlayTime / song.duration), height: 4)
+                            .cornerRadius(2)
+                    }
+                    
+                    // Slider
+                    Slider(value: $startTime, in: 0...song.duration)
+                        .accentColor(.blue)
+                        .onChange(of: startTime) { newValue in
+                            if isPreviewPlaying {
+                                stopPreview()
+                                startPreview()
+                            }
+                        }
                 }
-                
+            }
+            .frame(height: 30) // Give enough height for touch target
+            
+            // Preview controls
+            HStack {
                 Spacer()
                 
-                // Preview Button
-                Button(action: {
-                    if isPlaying {
-                        playerManager.stop()
-                        isPlaying = false
-                    } else {
-                        // Create a temporary MusicFile with current start time
-                        var previewSong = song
-                        previewSong.startTime = Double(startTime) ?? 0.0
-                        playerManager.play(previewSong)
-                        isPlaying = true
-                    }
-                }) {
-                    Image(systemName: isPlaying ? "stop.fill" : "play.fill")
+                Button(action: togglePreview) {
+                    Image(systemName: isPreviewPlaying ? "stop.fill" : "play.fill")
+                        .font(.title2)
                         .foregroundColor(.blue)
                 }
                 
-                // Save Button
-                Button(action: {
-                    var updatedSong = song
-                    updatedSong.startTime = Double(startTime) ?? 0.0
-                    onUpdate(updatedSong)
-                }) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+                Spacer()
+            }
+            .padding(.vertical, 5)
+            
+            // Save button
+            Button(action: {
+                stopPreview()
+                var updatedSong = song
+                updatedSong.startTime = startTime
+                onSave(updatedSong)
+            }) {
+                HStack {
+                    Spacer()
+                    Text("Save")
+                    Spacer()
                 }
             }
+            .buttonStyle(.borderedProminent)
         }
         .padding()
         .background(Color.gray.opacity(0.1))
         .cornerRadius(10)
+        .onDisappear {
+            stopPreview()
+        }
+    }
+    
+    private func formatTime(_ time: Double) -> String {
+        let minutes = Int(time) / 60
+        let seconds = Int(time) % 60
+        return String(format: "%d:%02d", minutes, seconds)
+    }
+    
+    private func startPreview() {
+        isPreviewPlaying = true
+        currentPlayTime = startTime
+        var previewSong = song
+        previewSong.startTime = startTime
+        playerManager.play(previewSong)
+        
+        // Start timer to update progress
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            if currentPlayTime < song.duration {
+                currentPlayTime += 0.1
+            } else {
+                stopPreview()
+            }
+        }
+    }
+    
+    private func stopPreview() {
+        isPreviewPlaying = false
+        timer?.invalidate()
+        timer = nil
+        playerManager.stop()
+    }
+    
+    private func togglePreview() {
+        if isPreviewPlaying {
+            stopPreview()
+        } else {
+            startPreview()
+        }
+    }
+}
+
+struct SongRow: View {
+    let song: MusicFile
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(song.name)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    
+                    Text("Starts at: \(String(format: "%.1f", song.startTime))s")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                
+                Spacer()
+                
+                Image(systemName: "slider.horizontal.3")
+                    .foregroundColor(.blue)
+            }
+            .padding()
+            .background(isSelected ? Color.blue.opacity(0.1) : Color.gray.opacity(0.1))
+            .cornerRadius(10)
+        }
+        .buttonStyle(.plain)
     }
 } 
