@@ -2,32 +2,21 @@ import SwiftUI
 
 struct MusicSelector: View {
     @ObservedObject var musicLibrary = MusicLibrary.shared
-    @State private var selectedTag: String = "All" // Default to All Music
-    @State private var showAddNewTag = false
-    
-    private var untaggedSongs: [MusicFile] {
-        musicLibrary.musicFiles.filter { $0.tag.isEmpty }
-    }
-    
-    private var availableTags: [String] {
-        var tags = Set(musicLibrary.musicFiles.map { $0.tag })
-        tags.remove("") // Remove empty tag since it's handled separately
-        return Array(tags).sorted()
-    }
+    @ObservedObject var playlistManager = PlaylistManager.shared
+    @State private var selectedPlaylist: String = "All" // Default to All Music
+    @State private var showAddNewPlaylist = false
     
     private var filteredSongs: [MusicFile] {
-        if selectedTag == "All" {
-            // Show all songs, sorted by tag (untagged first)
-            let untagged = untaggedSongs
-            let tagged = musicLibrary.musicFiles.filter { !$0.tag.isEmpty }
-                .sorted { ($0.tag, $0.name) < ($1.tag, $1.name) }
-            return untagged + tagged
-        } else if selectedTag.isEmpty {
-            // Show untagged songs
-            return untaggedSongs
+        if selectedPlaylist == "All" {
+            // Show all songs in a single list, sorted by playlist then name
+            return musicLibrary.musicFiles.sorted { (song1, song2) in
+                let playlist1 = playlistManager.playlistForSong(song1.id) ?? ""
+                let playlist2 = playlistManager.playlistForSong(song2.id) ?? ""
+                return (playlist1, song1.name) < (playlist2, song2.name)
+            }
         } else {
             // Show songs from selected playlist
-            return musicLibrary.musicFiles.filter { $0.tag == selectedTag }
+            return playlistManager.songsInPlaylist(selectedPlaylist)
                 .sorted { $0.name < $1.name }
         }
     }
@@ -43,34 +32,26 @@ struct MusicSelector: View {
                     Spacer()
                     
                     // Add new playlist button
-                    Button(action: { showAddNewTag = true }) {
+                    Button(action: { showAddNewPlaylist = true }) {
                         Image(systemName: "plus.circle.fill")
                             .foregroundColor(.blue)
                             .font(.title3)
                     }
                 }
                 
-                // Tag selector
+                // Playlist selector
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
-                        // All Music option
-                        TagButton(tag: "All Music", isSelected: selectedTag == "All") {
-                            selectedTag = "All"
+                        // All option
+                        TagButton(tag: "All", isSelected: selectedPlaylist == "All") {
+                            selectedPlaylist = "All"
                             provideHapticFeedback()
                         }
                         
-                        // No Playlist option - only show if there are untagged songs
-                        if !untaggedSongs.isEmpty {
-                            TagButton(tag: "No Playlist", isSelected: selectedTag.isEmpty) {
-                                selectedTag = ""
-                                provideHapticFeedback()
-                            }
-                        }
-                        
                         // User-created playlists
-                        ForEach(availableTags, id: \.self) { tag in
-                            TagButton(tag: tag, isSelected: selectedTag == tag) {
-                                selectedTag = tag
+                        ForEach(playlistManager.getPlaylists(), id: \.self) { playlist in
+                            TagButton(tag: playlist, isSelected: selectedPlaylist == playlist) {
+                                selectedPlaylist = playlist
                                 provideHapticFeedback()
                             }
                         }
@@ -99,46 +80,13 @@ struct MusicSelector: View {
                             .padding(0)
                     }
                 } else {
-                    if selectedTag == "All" {
-                        // Group songs by playlist in All view
-                        VStack(alignment: .leading, spacing: 15) {
-                            if !untaggedSongs.isEmpty {
-                                PlaylistSection(title: "No Playlist", songs: untaggedSongs)
-                            }
-                            
-                            ForEach(availableTags, id: \.self) { tag in
-                                let songs = musicLibrary.musicFiles.filter { $0.tag == tag }
-                                if !songs.isEmpty {
-                                    PlaylistSection(title: tag, songs: songs.sorted { $0.name < $1.name })
-                                }
-                            }
-                        }
-                    } else {
-                        MusicList(songs: filteredSongs)
-                    }
+                    MusicList(songs: filteredSongs)
                 }
             }
         }
         .padding(10)
-        .sheet(isPresented: $showAddNewTag) {
-            AddNewPlaylistSheet(isPresented: $showAddNewTag, selectedTag: $selectedTag)
-        }
-    }
-}
-
-// Playlist section component for All view
-private struct PlaylistSection: View {
-    let title: String
-    let songs: [MusicFile]
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.gray)
-                .padding(.horizontal)
-            
-            MusicList(songs: songs)
+        .sheet(isPresented: $showAddNewPlaylist) {
+            AddNewPlaylistSheet(isPresented: $showAddNewPlaylist, selectedPlaylist: $selectedPlaylist)
         }
     }
 }
@@ -146,15 +94,11 @@ private struct PlaylistSection: View {
 // Updated AddNewPlaylistSheet
 private struct AddNewPlaylistSheet: View {
     @Binding var isPresented: Bool
-    @Binding var selectedTag: String
-    @ObservedObject private var musicLibrary = MusicLibrary.shared
+    @Binding var selectedPlaylist: String
+    @ObservedObject private var playlistManager = PlaylistManager.shared
     
     @State private var newPlaylistName: String = ""
     @FocusState private var isTextFieldFocused: Bool
-    
-    private var existingPlaylists: Set<String> {
-        Set(musicLibrary.musicFiles.map { $0.tag }).subtracting(["", "All"])
-    }
     
     var body: some View {
         NavigationView {
@@ -169,7 +113,7 @@ private struct AddNewPlaylistSheet: View {
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                 
-                if !newPlaylistName.isEmpty && existingPlaylists.contains(newPlaylistName) {
+                if !newPlaylistName.isEmpty && playlistManager.getPlaylists().contains(newPlaylistName) {
                     Text("This playlist already exists")
                         .foregroundColor(.red)
                         .font(.caption)
@@ -183,7 +127,7 @@ private struct AddNewPlaylistSheet: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-                .disabled(newPlaylistName.isEmpty || existingPlaylists.contains(newPlaylistName))
+                .disabled(newPlaylistName.isEmpty || playlistManager.getPlaylists().contains(newPlaylistName))
                 .padding(.horizontal)
                 
                 Spacer()
@@ -203,17 +147,8 @@ private struct AddNewPlaylistSheet: View {
     
     private func createPlaylist() {
         let trimmedName = newPlaylistName.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmedName.isEmpty && !existingPlaylists.contains(trimmedName) {
-            // Create a new empty playlist by updating the selected tag
-            selectedTag = trimmedName
-            
-            // If there are untagged songs, move one to the new playlist
-            if let firstUntaggedSong = musicLibrary.musicFiles.first(where: { $0.tag.isEmpty }) {
-                var updatedSong = firstUntaggedSong
-                updatedSong.tag = trimmedName
-                musicLibrary.updateSong(updatedSong)
-            }
-            
+        if playlistManager.createPlaylist(trimmedName) {
+            selectedPlaylist = trimmedName
             isPresented = false
         }
     }

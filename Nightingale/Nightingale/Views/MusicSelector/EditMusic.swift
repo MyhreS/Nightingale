@@ -11,18 +11,20 @@ struct EditMusic: View {
     @State private var currentPlayTime: Double
     @State private var showProgress = false
     @State private var timer: Timer?
-    @State private var selectedTag: String
     @State private var showPlaylistPicker = false
     @State private var showStartTimeEditor = false
     private let playerManager = PlayerManager.shared
-    @ObservedObject private var musicLibrary = MusicLibrary.shared
+    @ObservedObject private var playlistManager = PlaylistManager.shared
     
     init(song: MusicFile, onSave: @escaping (MusicFile) -> Void) {
         self.song = song
         self.onSave = onSave
         self._startTime = State(initialValue: song.startTime)
         self._currentPlayTime = State(initialValue: song.startTime)
-        self._selectedTag = State(initialValue: song.tag)
+    }
+    
+    private var currentPlaylist: String? {
+        playlistManager.playlistForSong(song.id)
     }
     
     var body: some View {
@@ -54,7 +56,7 @@ struct EditMusic: View {
                             .font(.headline)
                             .lineLimit(1)
                         
-                        Text(selectedTag.isEmpty ? "No Playlist" : selectedTag)
+                        Text(currentPlaylist ?? "Not in playlist")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                     }
@@ -73,7 +75,7 @@ struct EditMusic: View {
                             HStack {
                                 Image(systemName: "music.note.list")
                                     .frame(width: 25)
-                                Text(selectedTag.isEmpty ? "Add to Playlist" : "Current Playlist: \(selectedTag)")
+                                Text(currentPlaylist == nil ? "Add to Playlist" : "Current Playlist: \(currentPlaylist!)")
                                 Spacer()
                                 Image(systemName: "chevron.right")
                                     .foregroundColor(.gray)
@@ -102,12 +104,7 @@ struct EditMusic: View {
             .background(Color(uiColor: .systemGroupedBackground))
         }
         .sheet(isPresented: $showPlaylistPicker) {
-            PlaylistPicker(selectedTag: $selectedTag, isPresented: $showPlaylistPicker)
-                .onDisappear {
-                    var updatedSong = song
-                    updatedSong.tag = selectedTag
-                    onSave(updatedSong)
-                }
+            PlaylistPicker(song: song, isPresented: $showPlaylistPicker)
         }
         .sheet(isPresented: $showStartTimeEditor) {
             StartTimeEditor(song: song, startTime: $startTime, isPresented: $showStartTimeEditor)
@@ -128,43 +125,48 @@ struct EditMusic: View {
 
 // Playlist Picker Sheet
 private struct PlaylistPicker: View {
-    @Binding var selectedTag: String
+    let song: MusicFile
     @Binding var isPresented: Bool
-    @ObservedObject private var musicLibrary = MusicLibrary.shared
+    @ObservedObject private var playlistManager = PlaylistManager.shared
     
-    private var availableTags: [String] {
-        musicLibrary.musicFiles.map { $0.tag }
-            .filter { !$0.isEmpty }
-            .uniqued()
-            .sorted()
+    private var currentPlaylist: String? {
+        playlistManager.playlistForSong(song.id)
     }
     
     var body: some View {
         NavigationView {
             List {
                 Button(action: {
-                    selectedTag = ""
+                    if let current = currentPlaylist {
+                        playlistManager.removeSongFromPlaylist(songId: song.id, playlist: current)
+                    }
                     isPresented = false
                 }) {
                     HStack {
-                        Text("No Playlist")
+                        Text("Remove from Playlist")
+                            .foregroundColor(.red)
                         Spacer()
-                        if selectedTag.isEmpty {
+                        if currentPlaylist == nil {
                             Image(systemName: "checkmark")
                                 .foregroundColor(.blue)
                         }
                     }
                 }
                 
-                ForEach(availableTags, id: \.self) { tag in
+                ForEach(playlistManager.getPlaylists(), id: \.self) { playlist in
                     Button(action: {
-                        selectedTag = tag
+                        // Remove from current playlist if needed
+                        if let current = currentPlaylist, current != playlist {
+                            playlistManager.removeSongFromPlaylist(songId: song.id, playlist: current)
+                        }
+                        // Add to new playlist
+                        playlistManager.addSongToPlaylist(songId: song.id, playlist: playlist)
                         isPresented = false
                     }) {
                         HStack {
-                            Text(tag)
+                            Text(playlist)
                             Spacer()
-                            if selectedTag == tag {
+                            if currentPlaylist == playlist {
                                 Image(systemName: "checkmark")
                                     .foregroundColor(.blue)
                             }

@@ -34,6 +34,9 @@ class MusicLibrary: ObservableObject {
 
         // 5. Validate consistency
         validateConsistency()
+        
+        // 6. Notify observers of change
+        NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
 
         return true
     }
@@ -56,6 +59,9 @@ class MusicLibrary: ObservableObject {
 
         // 3. Validate consistency
         validateConsistency()
+        
+        // 4. Notify observers of change
+        NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
 
         return true
     }
@@ -140,6 +146,9 @@ class MusicLibrary: ObservableObject {
         // Clear the queue
         MusicQueue.shared.clearQueue()
         PlayerManager.shared.stop()
+        
+        // Notify observers of change
+        NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
         
         print("✅ Music library configuration and storage cleared")
     }

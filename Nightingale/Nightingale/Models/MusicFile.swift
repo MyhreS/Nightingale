@@ -3,44 +3,35 @@ import AVFoundation
 
 struct MusicFile: Identifiable, Codable, Hashable {
     // Required properties that must always exist
-    let id: UUID
+    let id: String
     let url: URL
     let name: String
-    let duration: Double // Duration in seconds
+    var startTime: Double
+    var duration: Double
+    var played: Bool
     
     // Optional properties with default values
     var tag: String = ""
-    var played: Bool = false
-    var startTime: Double = 0.0
-    // Add new properties here with default values
     
     enum CodingKeys: String, CodingKey {
         case id, url, name, duration, tag, played, startTime
         // Add new coding keys here when adding properties
     }
     
-    init(url: URL, tag: String = "", played: Bool = false, startTime: Double = 0.0) {
-        self.id = UUID()
+    init(url: URL) {
+        self.id = UUID().uuidString
         self.url = url
         self.name = url.deletingPathExtension().lastPathComponent
-        self.tag = tag
-        self.played = played
-        self.startTime = startTime
-        
-        // Get duration from audio file
-        if let audioAsset = try? AVAudioFile(forReading: url) {
-            self.duration = Double(audioAsset.length) / audioAsset.processingFormat.sampleRate
-        } else {
-            self.duration = 0.0
-            print("⚠️ Could not get duration for: \(name)")
-        }
+        self.startTime = 0.0
+        self.duration = 0.0
+        self.played = false
     }
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         // Required properties (must exist)
-        id = try container.decode(UUID.self, forKey: .id)
+        id = try container.decode(String.self, forKey: .id)
         url = try container.decode(URL.self, forKey: .url)
         name = try container.decode(String.self, forKey: .name)
         duration = try container.decode(Double.self, forKey: .duration)
@@ -64,5 +55,13 @@ struct MusicFile: Identifiable, Codable, Hashable {
         try container.encode(played, forKey: .played)
         try container.encode(startTime, forKey: .startTime)
         // Add new property encoding here
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: MusicFile, rhs: MusicFile) -> Bool {
+        return lhs.id == rhs.id
     }
 }
