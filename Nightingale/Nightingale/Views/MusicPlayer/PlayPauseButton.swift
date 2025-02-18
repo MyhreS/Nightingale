@@ -14,7 +14,7 @@ struct PlayPauseButton: View {
             Image(systemName: playerManager.isPlaying ? "pause.fill" : "play.fill") // ✅ Filled icons
                 .resizable()
                 .frame(width: 40, height: 40)
-                .foregroundColor(.white) // ✅ White icon
+                .foregroundColor(.blue) // Changed to blue
                 .overlay(
                     Image(systemName: playerManager.isPlaying ? "pause.fill" : "play.fill")
                         .resizable()
