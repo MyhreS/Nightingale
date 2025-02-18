@@ -61,6 +61,7 @@ struct SongEditor: View {
     @State private var startTime: Double
     @State private var isPreviewPlaying = false
     @State private var currentPlayTime: Double
+    @State private var showProgress = false
     @State private var timer: Timer?
     private let playerManager = PlayerManager.shared
     
@@ -76,16 +77,44 @@ struct SongEditor: View {
             Text(song.name)
                 .font(.headline)
             
-            // Time display
-            HStack {
-                Text(formatTime(startTime))
-                    .monospacedDigit()
-                Spacer()
-                Text(formatTime(song.duration))
-                    .monospacedDigit()
-                    .foregroundColor(.gray)
+            // Time information
+            VStack(alignment: .leading, spacing: 4) {
+                // Start time and duration
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("Start:")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                        Text(formatTime(startTime))
+                            .monospacedDigit()
+                    }
+                    
+                    Spacer()
+                    
+                    if showProgress {
+                        VStack(alignment: .center) {
+                            Text("Played:")
+                                .font(.caption2)
+                                .foregroundColor(.gray)
+                            Text(formatTime(currentPlayTime))
+                                .monospacedDigit()
+                                .foregroundColor(.green)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .trailing) {
+                        Text("Duration:")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                        Text(formatTime(song.duration))
+                            .monospacedDigit()
+                            .foregroundColor(.gray)
+                    }
+                }
             }
-            .font(.caption)
+            .padding(.vertical, 4)
             
             // Custom Slider with progress
             GeometryReader { geometry in
@@ -97,10 +126,10 @@ struct SongEditor: View {
                         .cornerRadius(2)
                     
                     // Playback progress
-                    if isPreviewPlaying {
+                    if showProgress {
                         Rectangle()
-                            .fill(Color.green.opacity(0.3))
-                            .frame(width: geometry.size.width * (currentPlayTime / song.duration), height: 4)
+                            .fill(Color.green.opacity(0.7))
+                            .frame(width: max(0, min(geometry.size.width * (currentPlayTime / song.duration), geometry.size.width)), height: 4)
                             .cornerRadius(2)
                     }
                     
@@ -110,12 +139,11 @@ struct SongEditor: View {
                         .onChange(of: startTime) { newValue in
                             if isPreviewPlaying {
                                 stopPreview()
-                                startPreview()
                             }
                         }
                 }
             }
-            .frame(height: 30) // Give enough height for touch target
+            .frame(height: 30)
             
             // Preview controls
             HStack {
@@ -147,8 +175,6 @@ struct SongEditor: View {
             .buttonStyle(.borderedProminent)
         }
         .padding()
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(10)
         .onDisappear {
             stopPreview()
         }
@@ -161,6 +187,7 @@ struct SongEditor: View {
     }
     
     private func startPreview() {
+        showProgress = true
         isPreviewPlaying = true
         currentPlayTime = startTime
         var previewSong = song
@@ -188,6 +215,8 @@ struct SongEditor: View {
         if isPreviewPlaying {
             stopPreview()
         } else {
+            // Reset progress display when starting new playback
+            currentPlayTime = startTime
             startPreview()
         }
     }
