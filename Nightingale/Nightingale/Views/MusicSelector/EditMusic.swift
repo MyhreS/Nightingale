@@ -109,9 +109,18 @@ struct EditMusic: View {
         .sheet(isPresented: $showStartTimeEditor) {
             StartTimeEditor(song: song, startTime: $startTime, isPresented: $showStartTimeEditor)
                 .onDisappear {
+                    print("[EditMusic] 🕒 onDisappear called, updating song with new startTime: \(startTime)")
                     var updatedSong = song
                     updatedSong.startTime = startTime
+                    print("[EditMusic] 🔄 Calling onSave with updated song, startTime: \(updatedSong.startTime)")
+                    
+                    // Update the song in the library directly to ensure it's saved
+                    MusicLibrary.shared.updateSong(updatedSong)
+                    
+                    // Also call the onSave callback
                     onSave(updatedSong)
+                    
+                    // Don't automatically play the song after editing
                 }
         }
     }
@@ -123,7 +132,6 @@ struct EditMusic: View {
     }
 }
 
-// Playlist Picker Sheet
 private struct PlaylistPicker: View {
     let song: MusicFile
     @Binding var isPresented: Bool
@@ -206,7 +214,6 @@ private struct PlaylistPicker: View {
     }
 }
 
-// Start Time Editor Sheet
 private struct StartTimeEditor: View {
     let song: MusicFile
     @Binding var startTime: Double
@@ -222,6 +229,7 @@ private struct StartTimeEditor: View {
         self._startTime = startTime
         self._isPresented = isPresented
         self._currentPlayTime = State(initialValue: startTime.wrappedValue)
+        print("[StartTimeEditor] 🔄 Initialized with song: \(song.name), startTime: \(startTime.wrappedValue)")
     }
     
     var body: some View {
@@ -298,6 +306,7 @@ private struct StartTimeEditor: View {
                         Slider(value: $startTime, in: 0...song.duration)
                             .accentColor(.blue)
                             .onChange(of: startTime) { newValue in
+                                print("[StartTimeEditor] 🕒 Start time changed to: \(newValue)")
                                 if isPreviewPlaying {
                                     stopPreview()
                                 }
@@ -326,11 +335,15 @@ private struct StartTimeEditor: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { isPresented = false }
+                    Button("Done") { 
+                        print("[StartTimeEditor] ✅ Done button pressed, final startTime: \(startTime)")
+                        isPresented = false 
+                    }
                 }
             }
         }
         .onDisappear {
+            print("[StartTimeEditor] 🔄 onDisappear called, final startTime: \(startTime)")
             stopPreview()
         }
     }
@@ -347,6 +360,7 @@ private struct StartTimeEditor: View {
         currentPlayTime = startTime
         var previewSong = song
         previewSong.startTime = startTime
+        print("[StartTimeEditor] ▶️ Starting preview with startTime: \(previewSong.startTime)")
         playerManager.previewPlay(previewSong)
         
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
@@ -362,6 +376,7 @@ private struct StartTimeEditor: View {
         isPreviewPlaying = false
         timer?.invalidate()
         timer = nil
+        print("[StartTimeEditor] ⏹️ Stopping preview")
         playerManager.stopPreview()
         showProgress = false
     }
@@ -370,6 +385,7 @@ private struct StartTimeEditor: View {
         if isPreviewPlaying {
             stopPreview()
         } else {
+            // Reset progress display when starting new playback
             currentPlayTime = startTime
             startPreview()
         }

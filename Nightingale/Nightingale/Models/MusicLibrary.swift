@@ -156,9 +156,14 @@ class MusicLibrary: ObservableObject {
     /// Updates a song's settings
     func updateSong(_ updatedSong: MusicFile) {
         if let index = musicFiles.firstIndex(where: { $0.id == updatedSong.id }) {
+            print("[MusicLibrary] 🔄 Updating song: \(updatedSong.name)")
+            print("[MusicLibrary] 🕒 Old startTime: \(musicFiles[index].startTime), New startTime: \(updatedSong.startTime)")
             musicFiles[index] = updatedSong
             saveMusicFiles()
-            print("✅ Updated song settings: \(updatedSong.name)")
+            print("[MusicLibrary] ✅ Updated song settings: \(updatedSong.name)")
+            
+            // Notify observers of change
+            NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
         }
     }
 }

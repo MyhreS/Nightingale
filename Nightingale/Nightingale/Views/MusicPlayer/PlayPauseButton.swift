@@ -7,6 +7,7 @@ struct PlayPauseButton: View {
     var body: some View {
         Button(action: {
             provideHapticFeedback()
+            print("[PlayPauseButton] 👆 Button tapped, current isPlaying state: \(playerManager.isPlaying)")
             if let song = musicQueue.currentSong {
                 playerManager.togglePlayback(for: song)
             }
@@ -25,5 +26,8 @@ struct PlayPauseButton: View {
                 .shadow(color: Color.black.opacity(0.1), radius: 4, x: 2, y: 2)
         }
         .animation(.easeInOut(duration: 0.1), value: playerManager.isPlaying)
+        .onChange(of: playerManager.isPlaying) { newValue in
+            print("[PlayPauseButton] 🔄 isPlaying changed to: \(newValue)")
+        }
     }
 }

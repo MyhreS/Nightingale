@@ -16,7 +16,27 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
 
     /// Plays the given music file
     func play(_ musicFile: MusicFile) {
-        stopPreview() // Stop any preview playback
+        print("[PlayerManager] 📱 play() called with song: \(musicFile.name), startTime: \(musicFile.startTime)")
+        
+        // Verify we have the latest version from the library
+        let musicLibrary = MusicLibrary.shared
+        let latestVersion = musicLibrary.musicFiles.first(where: { $0.id == musicFile.id })
+        
+        if let latest = latestVersion {
+            print("[PlayerManager] 🔍 Found latest version in library with startTime: \(latest.startTime)")
+            if latest.startTime != musicFile.startTime {
+                print("[PlayerManager] ⚠️ Start time mismatch! Passed: \(musicFile.startTime), Latest: \(latest.startTime)")
+                // Use the latest version
+                print("[PlayerManager] 🔄 Using latest version from library")
+                return play(latest)
+            }
+        } else {
+            print("[PlayerManager] ⚠️ Song not found in library, using provided version")
+        }
+        
+        // Don't stop preview playback - let it run independently
+        // stopPreview() // This line is removed
+        
         stop() // Stop any currently playing audio before starting a new one
         
         do {
@@ -25,13 +45,13 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             try AVAudioSession.sharedInstance().setActive(true)
 
             guard FileManager.default.fileExists(atPath: soundURL.path) else {
-                print("❌ File not found: \(soundURL.path)")
+                print("[PlayerManager] ❌ File not found: \(soundURL.path)")
                 return
             }
 
             audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
             guard let player = audioPlayer else {
-                print("❌ Failed to create audio player")
+                print("[PlayerManager] ❌ Failed to create audio player")
                 return
             }
 
@@ -39,9 +59,9 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             player.prepareToPlay()
             
             // Set start time
+            print("[PlayerManager] 🕒 Setting player start time to: \(musicFile.startTime) seconds")
             player.currentTime = musicFile.startTime
             currentTime = musicFile.startTime
-            print("🎵 Setting start time to: \(musicFile.startTime) seconds")
             
             player.play()
 
@@ -57,15 +77,20 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             setupNowPlaying(musicFile: updatedSong)
             setupRemoteCommandCenter()
 
-            print("🎵 Playing: \(updatedSong.name) from \(musicFile.startTime) seconds (duration: \(player.duration) seconds)")
+            print("[PlayerManager] 🎵 Playing: \(updatedSong.name) from \(musicFile.startTime) seconds (duration: \(player.duration) seconds)")
         } catch {
-            print("❌ Error loading audio file: \(error.localizedDescription)")
+            print("[PlayerManager] ❌ Error loading audio file: \(error.localizedDescription)")
         }
     }
 
     /// Preview playback for edit mode
     func previewPlay(_ musicFile: MusicFile) {
-        if isPlaying { pause() } // Pause main playback if it's playing
+        print("[PlayerManager] 📱 previewPlay() called with song: \(musicFile.name), startTime: \(musicFile.startTime)")
+        
+        // Don't pause main playback anymore - let both run independently
+        // if isPlaying { pause() } // This line is removed
+        
+        stopPreview() // Stop any existing preview first
         
         do {
             let soundURL = musicFile.url
@@ -74,19 +99,24 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
 
             previewPlayer = try AVAudioPlayer(contentsOf: soundURL)
             guard let player = previewPlayer else {
-                print("❌ Failed to create preview player")
+                print("[PlayerManager] ❌ Failed to create preview player")
                 return
             }
 
+            player.delegate = self // Set delegate to handle completion
             player.prepareToPlay()
+            print("[PlayerManager] 🕒 Setting preview player start time to: \(musicFile.startTime) seconds")
             player.currentTime = musicFile.startTime
             player.play()
             
             isPreviewPlaying = true
             
-            print("🎵 Preview Playing: \(musicFile.name) from \(musicFile.startTime) seconds")
+            // Start a timer to track preview playback
+            startPreviewPlaybackTimer()
+            
+            print("[PlayerManager] 🎵 Preview Playing: \(musicFile.name) from \(musicFile.startTime) seconds")
         } catch {
-            print("❌ Error loading preview audio: \(error.localizedDescription)")
+            print("[PlayerManager] ❌ Error loading preview audio: \(error.localizedDescription)")
         }
     }
     
@@ -97,7 +127,22 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         isPreviewPlaying = false
         previewTimer?.invalidate()
         previewTimer = nil
-        print("🛑 Preview Stopped")
+        print("[PlayerManager] 🛑 Preview Stopped")
+    }
+
+    /// Start a timer for preview playback
+    private func startPreviewPlaybackTimer() {
+        previewTimer?.invalidate()
+        previewTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            guard let self = self, 
+                  let player = self.previewPlayer,
+                  self.isPreviewPlaying else { return }
+            
+            // If we've reached the end of the preview, stop it
+            if player.currentTime >= player.duration {
+                self.stopPreview()
+            }
+        }
     }
 
     private func startPlaybackTimer() {
@@ -123,11 +168,18 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
 
     /// Toggles between play and pause
     func togglePlayback(for musicFile: MusicFile) {
+        print("[PlayerManager] 📱 togglePlayback() called with song: \(musicFile.name), startTime: \(musicFile.startTime)")
+        print("[PlayerManager] 🔄 Current isPlaying state: \(isPlaying)")
+        
         if isPlaying {
+            print("[PlayerManager] ⏸️ Currently playing, will pause")
             pause()
         } else {
+            print("[PlayerManager] ▶️ Currently paused, will play")
             play(musicFile)
         }
+        
+        print("[PlayerManager] 🔄 New isPlaying state: \(isPlaying)")
     }
 
     /// Finds the next song with the same playlist
@@ -150,7 +202,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         // First try to find an unplayed song after the current index
         for i in (currentIndex + 1)..<playlistSongs.count {
             if !playlistSongs[i].played {
-                print("🎵 Found next unplayed song in playlist: \(playlistSongs[i].name)")
+                print("[PlayerManager] 🎵 Found next unplayed song in playlist: \(playlistSongs[i].name)")
                 return playlistSongs[i]
             }
         }
@@ -158,7 +210,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         // If no unplayed songs after current index, check from start up to current index
         for i in 0..<currentIndex {
             if !playlistSongs[i].played {
-                print("🎵 Found next unplayed song in playlist (wrapped around): \(playlistSongs[i].name)")
+                print("[PlayerManager] 🎵 Found next unplayed song in playlist (wrapped around): \(playlistSongs[i].name)")
                 return playlistSongs[i]
             }
         }
@@ -166,7 +218,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         // If all songs are played, get the next song in sequence
         let nextIndex = (currentIndex + 1) % playlistSongs.count
         if nextIndex != currentIndex {
-            print("🎵 All songs played, selected next song in playlist: \(playlistSongs[nextIndex].name)")
+            print("[PlayerManager] 🎵 All songs played, selected next song in playlist: \(playlistSongs[nextIndex].name)")
             return playlistSongs[nextIndex]
         }
         
@@ -175,8 +227,10 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
 
     /// Pauses the audio and queues the next song
     func pause() {
+        print("[PlayerManager] ⏸️ pause() called")
         audioPlayer?.pause()
-        isPlaying = false
+        isPlaying = false  // This is correct, but let's add more logging
+        print("[PlayerManager] 🔄 Setting isPlaying to false")
         timer?.invalidate()
         timer = nil
         updateNowPlayingPlaybackState(isPlaying: false)
@@ -188,23 +242,23 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             
             // Check if song is in a playlist
             if let nextSong = findNextSongInSamePlaylist(currentSong) {
-                MusicQueue.shared.addToQueue(nextSong)
-                print("🎵 Changed to next song in playlist: \(nextSong.name)")
+                MusicQueue.shared.addToQueueWithoutPlaying(nextSong)
+                print("[PlayerManager] 🎵 Changed to next song in playlist: \(nextSong.name)")
             } else {
                 // If not in a playlist, just get the next song in the library
                 if let currentIndex = allSongs.firstIndex(where: { $0.id == currentSong.id }) {
                     let nextIndex = (currentIndex + 1) % allSongs.count
                     let nextSong = allSongs[nextIndex]
-                    MusicQueue.shared.addToQueue(nextSong)
-                    print("🎵 Changed to next song in sequence: \(nextSong.name)")
+                    MusicQueue.shared.addToQueueWithoutPlaying(nextSong)
+                    print("[PlayerManager] 🎵 Changed to next song in sequence: \(nextSong.name)")
                 }
             }
         }
         
-        print("⏸️ Paused")
+        print("[PlayerManager] ⏸️ Paused")
     }
 
-    /// Stops playback completely
+    /// Stops playback completely (main player only, not preview)
     func stop() {
         audioPlayer?.stop()
         audioPlayer = nil
@@ -213,7 +267,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         timer?.invalidate()
         timer = nil
         updateNowPlayingPlaybackState(isPlaying: false)
-        print("🛑 Stopped")
+        print("[PlayerManager] 🛑 Main player stopped (preview player unaffected)")
     }
 
     /// Setup Now Playing Info (lock screen & Control Center)
@@ -267,8 +321,14 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
 
 extension PlayerManager: AVAudioPlayerDelegate {
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        isPlaying = false
-        updateNowPlayingPlaybackState(isPlaying: false)
-        print("🎵 Playback finished.")
+        // Determine which player finished
+        if player === audioPlayer {
+            isPlaying = false
+            updateNowPlayingPlaybackState(isPlaying: false)
+            print("[PlayerManager] 🎵 Main playback finished.")
+        } else if player === previewPlayer {
+            isPreviewPlaying = false
+            print("[PlayerManager] 🎵 Preview playback finished.")
+        }
     }
 }
