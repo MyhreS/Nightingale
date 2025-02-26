@@ -38,12 +38,11 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             player.delegate = self
             player.prepareToPlay()
             
-            // Validate duration
-            let duration = musicFile.duration > 0 ? musicFile.duration : player.duration
-            let validStartTime = min(musicFile.startTime, duration)
+            // Set start time
+            player.currentTime = musicFile.startTime
+            currentTime = musicFile.startTime
+            print("🎵 Setting start time to: \(musicFile.startTime) seconds")
             
-            player.currentTime = validStartTime
-            currentTime = validStartTime
             player.play()
 
             // Mark the song as played
@@ -58,7 +57,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             setupNowPlaying(musicFile: updatedSong)
             setupRemoteCommandCenter()
 
-            print("🎵 Playing: \(updatedSong.name) from \(validStartTime) seconds (duration: \(duration) seconds)")
+            print("🎵 Playing: \(updatedSong.name) from \(musicFile.startTime) seconds (duration: \(player.duration) seconds)")
         } catch {
             print("❌ Error loading audio file: \(error.localizedDescription)")
         }
@@ -80,25 +79,12 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             }
 
             player.prepareToPlay()
-            
-            // Validate duration and start time
-            let duration = musicFile.duration > 0 ? musicFile.duration : player.duration
-            let validStartTime = min(musicFile.startTime, duration)
-            
-            player.currentTime = validStartTime
+            player.currentTime = musicFile.startTime
             player.play()
             
             isPreviewPlaying = true
             
-            // Start a timer to update preview state
-            previewTimer?.invalidate()
-            previewTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-                if let player = self?.previewPlayer, player.currentTime >= duration {
-                    self?.stopPreview()
-                }
-            }
-            
-            print("🎵 Preview Playing: \(musicFile.name) from \(validStartTime) seconds (duration: \(duration) seconds)")
+            print("🎵 Preview Playing: \(musicFile.name) from \(musicFile.startTime) seconds")
         } catch {
             print("❌ Error loading preview audio: \(error.localizedDescription)")
         }
@@ -122,8 +108,11 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
                   let currentFile = self.currentMusicFile,
                   self.isPlaying else { return }
             
-            // If we've reached the end of the song, stop playback
-            if player.currentTime >= currentFile.duration {
+            // If we've reached the end of the song, queue next and stop
+            if player.currentTime >= player.duration {
+                if let nextSong = self.findNextSongInSamePlaylist(currentFile) {
+                    MusicQueue.shared.addToQueue(nextSong)
+                }
                 self.stop()
                 return
             }

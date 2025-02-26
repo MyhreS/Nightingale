@@ -10,12 +10,8 @@ struct MusicFile: Identifiable, Codable, Hashable {
     var duration: Double
     var played: Bool
     
-    // Optional properties with default values
-    var tag: String = ""
-    
     enum CodingKeys: String, CodingKey {
-        case id, url, name, duration, tag, played, startTime
-        // Add new coding keys here when adding properties
+        case id, url, name, duration, played, startTime
     }
     
     init(url: URL) {
@@ -43,12 +39,8 @@ struct MusicFile: Identifiable, Codable, Hashable {
         url = try container.decode(URL.self, forKey: .url)
         name = try container.decode(String.self, forKey: .name)
         duration = try container.decode(Double.self, forKey: .duration)
-        
-        // Optional properties (use default values if not found)
-        tag = try container.decodeIfPresent(String.self, forKey: .tag) ?? ""
         played = try container.decodeIfPresent(Bool.self, forKey: .played) ?? false
         startTime = try container.decodeIfPresent(Double.self, forKey: .startTime) ?? 0.0
-        // Add new property decoding here
     }
     
     func encode(to encoder: Encoder) throws {
@@ -59,10 +51,8 @@ struct MusicFile: Identifiable, Codable, Hashable {
         try container.encode(url, forKey: .url)
         try container.encode(name, forKey: .name)
         try container.encode(duration, forKey: .duration)
-        try container.encode(tag, forKey: .tag)
         try container.encode(played, forKey: .played)
         try container.encode(startTime, forKey: .startTime)
-        // Add new property encoding here
     }
     
     func hash(into hasher: inout Hasher) {
