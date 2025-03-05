@@ -8,7 +8,7 @@ struct RemoveMusic: View {
     var body: some View {
         NavigationView {
             VStack {
-                List(musicLibrary.musicFiles) { song in
+                List(musicLibrary.getMusicFiles()) { song in
                     HStack {
                         Text(song.name)
                             .foregroundColor(selectedSongs.contains(song) ? .red : .primary)

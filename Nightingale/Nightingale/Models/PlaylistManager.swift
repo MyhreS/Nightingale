@@ -64,13 +64,13 @@ class PlaylistManager: ObservableObject {
     /// Gets all songs in a playlist
     func songsInPlaylist(_ playlist: String) -> [MusicFile] {
         guard let songIds = playlists[playlist] else { return [] }
-        return musicLibrary.musicFiles.filter { songIds.contains($0.id) }
+        return musicLibrary.getMusicFiles().filter { songIds.contains($0.id) }
     }
     
     /// Gets all songs not in any playlist
     func untaggedSongs() -> [MusicFile] {
         let allPlaylistSongs = Set(playlists.values.flatMap { $0 })
-        return musicLibrary.musicFiles.filter { !allPlaylistSongs.contains($0.id) }
+        return musicLibrary.getMusicFiles().filter { !allPlaylistSongs.contains($0.id) }
     }
     
     /// Gets the playlist a song is in (if any)
@@ -123,7 +123,7 @@ class PlaylistManager: ObservableObject {
         print("🔍 Validating playlist consistency...")
         
         // Remove references to songs that no longer exist
-        let validSongIds = Set(musicLibrary.musicFiles.map { $0.id })
+        let validSongIds = Set(musicLibrary.getMusicFiles().map { $0.id })
         for (playlist, songs) in playlists {
             let validSongs = songs.intersection(validSongIds)
             if validSongs.count != songs.count {

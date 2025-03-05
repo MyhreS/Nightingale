@@ -1,72 +1,29 @@
 import Foundation
 
 class MusicLibrary: ObservableObject {
-    static let shared = MusicLibrary() // Singleton instance
+    static let shared = MusicLibrary()
+    
+    private let musicStorage = MusicStorage.shared
+    private let musicConfig = MusicConfig.shared
 
-    @Published private(set) var musicFiles: [MusicFile] = []
-    private let storageKey = "SavedMusicFiles"
-    private let storage = MusicStorage.shared
-
-    private init() {
-        loadMusicFiles()
-        validateConsistency() // ✅ Check consistency on startup
-    }
-
-    /// ✅ Adds a music file
-    func addMusicFile(_ url: URL) -> Bool {
-        // 1. Copy to storage
-        guard let storedURL = storage.copyFileToStorage(url) else {
-            fatalError("❌ CRITICAL ERROR: Failed to add file to storage: \(url.lastPathComponent)")
-        }
-
-        // 2. Create MusicFile
-        let newMusicFile = MusicFile(url: storedURL)
-
-        // 3. Check if it already exists in the list
-        if musicFiles.contains(where: { $0.url == newMusicFile.url }) {
-            fatalError("⚠️ File already exists in music library: \(storedURL.lastPathComponent)")
-        }
-
-        // 4. Add to the list
-        musicFiles.append(newMusicFile)
-        saveMusicFiles()
-        print("✅ Successfully added music file: \(newMusicFile.name)")
-
-        // 5. Validate consistency
-        validateConsistency()
-        
-        // 6. Notify observers of change
+    
+    func addMusicFile(_ url: URL) {
+        let storedURL = musicStorage.copyFileToStorage(url)
+        let newMusicFile = MusicFile(from: url, url: storedURL)
+        musicConfig.addMusicFileToConfig(newMusicFile)
+        print("✅ Added music file: \(newMusicFile.name)")
         NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
-
-        return true
     }
 
-    /// ✅ Removes a music file
-    func removeMusicFile(_ musicFile: MusicFile) -> Bool {
-        // 1. Delete from storage
-        guard let deletedURL = storage.deleteFileFromStorage(musicFile.url) else {
-            fatalError("❌ CRITICAL ERROR: Failed to delete file from storage: \(musicFile.name)")
-        }
-
-        // 2. Find and remove from list
-        guard let index = musicFiles.firstIndex(where: { $0.url == deletedURL }) else {
-            fatalError("❌ CRITICAL ERROR: File not found in music library (but deleted from storage): \(deletedURL.lastPathComponent)")
-        }
-
-        musicFiles.remove(at: index)
-        saveMusicFiles()
-        print("✅ Successfully removed music file: \(deletedURL.lastPathComponent)")
-
-        // 3. Validate consistency
-        validateConsistency()
-        
-        // 4. Notify observers of change
+    
+    func removeMusicFile(_ musicFile: MusicFile) {
+        musicStorage.deleteFileFromStorage(musicFile.url)
+        musicConfig.removeMusicFileFromConfig(musicFile)
+        print("✅ Removed music file: \(musicFile.name)")
         NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
-
-        return true
     }
 
-    /// ✅ Validates consistency between storage and the music library
+    /*
     private func validateConsistency() {
         let storedFiles = storage.getStoredFiles()
         let configFiles = musicFiles.map { $0.url.lastPathComponent }
@@ -93,77 +50,23 @@ class MusicLibrary: ObservableObject {
 
         print("✅ Consistency check complete. All good")
     }
-
-    /// ✅ Saves the music files persistently
-    private func saveMusicFiles() {
-        do {
-            let data = try JSONEncoder().encode(musicFiles)
-            UserDefaults.standard.set(data, forKey: storageKey)
-        } catch {
-            fatalError("❌ CRITICAL ERROR: Failed to save music files: \(error.localizedDescription)")
-        }
-    }
-
-    /// ✅ Loads stored music files
-    private func loadMusicFiles() {
-        guard let data = UserDefaults.standard.data(forKey: storageKey) else { return }
-        do {
-            musicFiles = try JSONDecoder().decode([MusicFile].self, from: data)
-            print("✅ Successfully loaded music files")
-        } catch {
-            print("❌ Failed to load music files, clearing invalid data: \(error.localizedDescription)")
-            UserDefaults.standard.removeObject(forKey: storageKey)
-            musicFiles = []
-        }
-    }
-
-    /// Resets the played status of all songs to false
-    func resetPlayedStatus() {
-        musicFiles = musicFiles.map { song in
-            var updatedSong = song
-            updatedSong.played = false
-            return updatedSong
-        }
-        saveMusicFiles()
-        print("✅ Reset played status for all songs")
-    }
+    */
     
-    /// Clears the music library configuration and all files from storage
-    func clearConfiguration() {
-        print("🧹 Clearing music library configuration and storage...")
-        
-        // Clear all files from storage first
-        let storedFiles = storage.getStoredFiles()
-        for fileName in storedFiles {
-            let fileURL = storage.getStorageURL(for: fileName)
-            _ = storage.deleteFileFromStorage(fileURL)
-        }
-        
-        // Clear configuration from UserDefaults
-        UserDefaults.standard.removeObject(forKey: storageKey)
-        musicFiles.removeAll()
-        
-        // Clear the queue
-        MusicQueue.shared.clearQueue()
-        PlayerManager.shared.stop()
-        
-        // Notify observers of change
+    
+    func removeAllMusic() {
+        musicStorage.deleteAllFilesFromStorage()
+        musicConfig.removeAllMusicFilesFromConfig()
+        print("✅ Removed all music from library")
         NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
-        
-        print("✅ Music library configuration and storage cleared")
     }
     
-    /// Updates a song's settings
-    func updateSong(_ updatedSong: MusicFile) {
-        if let index = musicFiles.firstIndex(where: { $0.id == updatedSong.id }) {
-            print("[MusicLibrary] 🔄 Updating song: \(updatedSong.name)")
-            print("[MusicLibrary] 🕒 Old startTime: \(musicFiles[index].startTime), New startTime: \(updatedSong.startTime)")
-            musicFiles[index] = updatedSong
-            saveMusicFiles()
-            print("[MusicLibrary] ✅ Updated song settings: \(updatedSong.name)")
-            
-            // Notify observers of change
-            NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
-        }
+    func editMusicFile(_ editedMusicFile: MusicFile) {
+        musicConfig.editMusicFile(editedMusicFile)
+        print("Edited music file: \(editedMusicFile.name)")
+        NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
+    }
+    
+    func getMusicFiles() -> [MusicFile] {
+        return musicConfig.getMusicFiles()
     }
 }

@@ -41,8 +41,10 @@ struct AddMusicButton: View {
         DispatchQueue.main.async {
             switch result {
             case .success(let urls):
-                let addedCount = urls.filter { musicLibrary.addMusicFile($0) }.count
-
+                urls.forEach { url in
+                    musicLibrary.addMusicFile(url)
+                }
+                let addedCount = urls.count
                 if addedCount == 0 {
                     successMessage = "No new files"
                 } else if addedCount == 1 {

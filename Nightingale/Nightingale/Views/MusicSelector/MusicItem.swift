@@ -57,7 +57,7 @@ struct MusicItem: View {
         .listRowBackground(Color.clear) // Transparent row background
         .sheet(isPresented: $showEditSheet) {
             EditMusic(song: musicFile) { updatedSong in
-                musicLibrary.updateSong(updatedSong)
+                musicLibrary.editMusicFile(updatedSong)
             }
             .presentationDetents([.height(500)])
             .presentationDragIndicator(.visible)

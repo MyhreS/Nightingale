@@ -47,7 +47,7 @@ class MusicQueue: ObservableObject {
     private func getLatestSongVersion(_ file: MusicFile) -> MusicFile {
         // Try to find the song in the library by ID
         let musicLibrary = MusicLibrary.shared
-        if let updatedSong = musicLibrary.musicFiles.first(where: { $0.id == file.id }) {
+        if let updatedSong = musicLibrary.getMusicFiles().first(where: { $0.id == file.id }) {
             print("[MusicQueue] 🔍 Found updated song in library with startTime: \(updatedSong.startTime)")
             return updatedSong
         }

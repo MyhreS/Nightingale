@@ -4,6 +4,7 @@ import AVFoundation
 struct MusicFile: Identifiable, Codable, Hashable {
     // Required properties that must always exist
     let id: String
+    let from: URL
     let url: URL
     let name: String
     var startTime: Double
@@ -11,11 +12,12 @@ struct MusicFile: Identifiable, Codable, Hashable {
     var played: Bool
     
     enum CodingKeys: String, CodingKey {
-        case id, url, name, duration, played, startTime
+        case id, from, url, name, duration, played, startTime
     }
     
-    init(url: URL) {
+    init(from: URL, url: URL) {
         self.id = UUID().uuidString
+        self.from = from
         self.url = url
         self.name = url.deletingPathExtension().lastPathComponent
         self.startTime = 0.0
@@ -36,6 +38,7 @@ struct MusicFile: Identifiable, Codable, Hashable {
         
         // Required properties (must exist)
         id = try container.decode(String.self, forKey: .id)
+        from = try container.decode(URL.self, forKey: .from)
         url = try container.decode(URL.self, forKey: .url)
         name = try container.decode(String.self, forKey: .name)
         duration = try container.decode(Double.self, forKey: .duration)
@@ -48,6 +51,7 @@ struct MusicFile: Identifiable, Codable, Hashable {
         
         // Encode all properties
         try container.encode(id, forKey: .id)
+        try container.encode(from, forKey: .from)
         try container.encode(url, forKey: .url)
         try container.encode(name, forKey: .name)
         try container.encode(duration, forKey: .duration)

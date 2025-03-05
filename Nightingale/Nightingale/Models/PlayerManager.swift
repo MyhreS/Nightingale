@@ -20,9 +20,9 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         
         // Verify we have the latest version from the library
         let musicLibrary = MusicLibrary.shared
-        let latestVersion = musicLibrary.musicFiles.first(where: { $0.id == musicFile.id })
+        let checkedMusicFile = musicLibrary.getMusicFiles().first(where: { $0.id == musicFile.id })
         
-        if let latest = latestVersion {
+        if let latest = checkedMusicFile {
             print("[PlayerManager] 🔍 Found latest version in library with startTime: \(latest.startTime)")
             if latest.startTime != musicFile.startTime {
                 print("[PlayerManager] ⚠️ Start time mismatch! Passed: \(musicFile.startTime), Latest: \(latest.startTime)")
@@ -68,7 +68,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             // Mark the song as played
             var updatedSong = musicFile
             updatedSong.played = true
-            MusicLibrary.shared.updateSong(updatedSong)
+            MusicLibrary.shared.editMusicFile(updatedSong)
 
             currentMusicFile = updatedSong
             isPlaying = true
@@ -185,7 +185,6 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
     /// Finds the next song with the same playlist
     private func findNextSongInSamePlaylist(_ currentSong: MusicFile) -> MusicFile? {
         let playlistManager = PlaylistManager.shared
-        let musicLibrary = MusicLibrary.shared
         
         // Get the current playlist
         guard let currentPlaylist = playlistManager.playlistForSong(currentSong.id) else {
@@ -238,7 +237,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         // Find and set next song
         if let currentSong = currentMusicFile {
             let musicLibrary = MusicLibrary.shared
-            let allSongs = musicLibrary.musicFiles
+            let allSongs = musicLibrary.getMusicFiles()
             
             // Check if song is in a playlist
             if let nextSong = findNextSongInSamePlaylist(currentSong) {

@@ -26,11 +26,10 @@ class MusicStorage {
     }
 
     /// ✅ Copies a file into the app’s Documents directory (if it doesn’t already exist)
-    func copyFileToStorage(_ originalURL: URL) -> URL? {
+    func copyFileToStorage(_ originalURL: URL) -> URL {
         let destinationURL = getStorageURL(for: originalURL.lastPathComponent)
 
         if fileManager.fileExists(atPath: destinationURL.path) {
-            print("✅ File already exists in storage: \(destinationURL.lastPathComponent)")
             return destinationURL
         }
 
@@ -39,28 +38,35 @@ class MusicStorage {
 
         do {
             try fileManager.copyItem(at: originalURL, to: destinationURL)
-            print("✅ File copied to storage: \(destinationURL.path)")
             return destinationURL
         } catch {
-            print("❌ Failed to copy file: \(error.localizedDescription)")
-            return nil
+            fatalError("❌ Failed to copy file: \(error.localizedDescription)")
         }
     }
 
     /// ✅ Deletes a file from storage
-    func deleteFileFromStorage(_ fileURL: URL) -> URL? {
+    func deleteFileFromStorage(_ fileURL: URL) {
         if fileManager.fileExists(atPath: fileURL.path) {
             do {
                 try fileManager.removeItem(at: fileURL)
-                print("🗑️ Successfully deleted file: \(fileURL.lastPathComponent)")
-                return fileURL
             } catch {
-                print("❌ Failed to delete file: \(error.localizedDescription)")
-                return nil
+                fatalError("❌ Failed to delete file: \(error.localizedDescription)")
             }
         } else {
-            print("⚠️ File not found in storage: \(fileURL.lastPathComponent)")
-            return nil
+            fatalError("⚠️ File not found in storage: \(fileURL.lastPathComponent)")
+        }
+    }
+    
+    func deleteAllFilesFromStorage() {
+        do {
+            let fileNames = try fileManager.contentsOfDirectory(atPath: documentsDirectory.path)
+            
+            for fileName in fileNames {
+                let fileURL = documentsDirectory.appendingPathComponent(fileName)
+                try fileManager.removeItem(at: fileURL)
+            }
+        } catch {
+            fatalError("❌ Failed to delete all files: \(error.localizedDescription)")
         }
     }
 }

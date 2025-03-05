@@ -25,20 +25,20 @@ struct SongSettings: View {
                     }
                 }
                 
-                if musicLibrary.musicFiles.isEmpty {
+                if musicLibrary.getMusicFiles().isEmpty {
                     Text("No songs added yet")
                         .foregroundColor(.gray)
                         .padding(.vertical)
                 } else {
                     if let song = editingSong {
                         SongEditor(song: song) { updatedSong in
-                            musicLibrary.updateSong(updatedSong)
+                            musicLibrary.editMusicFile(updatedSong)
                             editingSong = nil
                         }
                     } else {
                         ScrollView {
                             VStack(spacing: 12) {
-                                ForEach(musicLibrary.musicFiles) { song in
+                                ForEach(musicLibrary.getMusicFiles()) { song in
                                     SongRow(song: song, isSelected: false) {
                                         editingSong = song
                                     }

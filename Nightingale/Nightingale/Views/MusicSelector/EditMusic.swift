@@ -115,7 +115,7 @@ struct EditMusic: View {
                     print("[EditMusic] 🔄 Calling onSave with updated song, startTime: \(updatedSong.startTime)")
                     
                     // Update the song in the library directly to ensure it's saved
-                    MusicLibrary.shared.updateSong(updatedSong)
+                    MusicLibrary.shared.editMusicFile(updatedSong)
                     
                     // Also call the onSave callback
                     onSave(updatedSong)
