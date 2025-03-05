@@ -16,7 +16,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
 
     /// Plays the given music file
     func play(_ musicFile: MusicFile) {
-        print("[PlayerManager] 📱 play() called with song: \(musicFile.name), startTime: \(musicFile.startTime)")
+        print("[PlayerManager] 📱 play() called with song: \(musicFile.fileName), startTime: \(musicFile.startTime)")
         
         // Verify we have the latest version from the library
         let musicLibrary = MusicLibrary.shared
@@ -77,7 +77,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             setupNowPlaying(musicFile: updatedSong)
             setupRemoteCommandCenter()
 
-            print("[PlayerManager] 🎵 Playing: \(updatedSong.name) from \(musicFile.startTime) seconds (duration: \(player.duration) seconds)")
+            print("[PlayerManager] 🎵 Playing: \(updatedSong.fileName) from \(musicFile.startTime) seconds (duration: \(player.duration) seconds)")
         } catch {
             print("[PlayerManager] ❌ Error loading audio file: \(error.localizedDescription)")
         }
@@ -85,7 +85,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
 
     /// Preview playback for edit mode
     func previewPlay(_ musicFile: MusicFile) {
-        print("[PlayerManager] 📱 previewPlay() called with song: \(musicFile.name), startTime: \(musicFile.startTime)")
+        print("[PlayerManager] 📱 previewPlay() called with song: \(musicFile.fileName), startTime: \(musicFile.startTime)")
         
         // Don't pause main playback anymore - let both run independently
         // if isPlaying { pause() } // This line is removed
@@ -114,7 +114,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             // Start a timer to track preview playback
             startPreviewPlaybackTimer()
             
-            print("[PlayerManager] 🎵 Preview Playing: \(musicFile.name) from \(musicFile.startTime) seconds")
+            print("[PlayerManager] 🎵 Preview Playing: \(musicFile.fileName) from \(musicFile.startTime) seconds")
         } catch {
             print("[PlayerManager] ❌ Error loading preview audio: \(error.localizedDescription)")
         }
@@ -168,7 +168,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
 
     /// Toggles between play and pause
     func togglePlayback(for musicFile: MusicFile) {
-        print("[PlayerManager] 📱 togglePlayback() called with song: \(musicFile.name), startTime: \(musicFile.startTime)")
+        print("[PlayerManager] 📱 togglePlayback() called with song: \(musicFile.fileName), startTime: \(musicFile.startTime)")
         print("[PlayerManager] 🔄 Current isPlaying state: \(isPlaying)")
         
         if isPlaying {
@@ -201,7 +201,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         // First try to find an unplayed song after the current index
         for i in (currentIndex + 1)..<playlistSongs.count {
             if !playlistSongs[i].played {
-                print("[PlayerManager] 🎵 Found next unplayed song in playlist: \(playlistSongs[i].name)")
+                print("[PlayerManager] 🎵 Found next unplayed song in playlist: \(playlistSongs[i].fileName)")
                 return playlistSongs[i]
             }
         }
@@ -209,7 +209,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         // If no unplayed songs after current index, check from start up to current index
         for i in 0..<currentIndex {
             if !playlistSongs[i].played {
-                print("[PlayerManager] 🎵 Found next unplayed song in playlist (wrapped around): \(playlistSongs[i].name)")
+                print("[PlayerManager] 🎵 Found next unplayed song in playlist (wrapped around): \(playlistSongs[i].fileName)")
                 return playlistSongs[i]
             }
         }
@@ -217,7 +217,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         // If all songs are played, get the next song in sequence
         let nextIndex = (currentIndex + 1) % playlistSongs.count
         if nextIndex != currentIndex {
-            print("[PlayerManager] 🎵 All songs played, selected next song in playlist: \(playlistSongs[nextIndex].name)")
+            print("[PlayerManager] 🎵 All songs played, selected next song in playlist: \(playlistSongs[nextIndex].fileName)")
             return playlistSongs[nextIndex]
         }
         
@@ -242,14 +242,14 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             // Check if song is in a playlist
             if let nextSong = findNextSongInSamePlaylist(currentSong) {
                 MusicQueue.shared.addToQueueWithoutPlaying(nextSong)
-                print("[PlayerManager] 🎵 Changed to next song in playlist: \(nextSong.name)")
+                print("[PlayerManager] 🎵 Changed to next song in playlist: \(nextSong.fileName)")
             } else {
                 // If not in a playlist, just get the next song in the library
                 if let currentIndex = allSongs.firstIndex(where: { $0.id == currentSong.id }) {
                     let nextIndex = (currentIndex + 1) % allSongs.count
                     let nextSong = allSongs[nextIndex]
                     MusicQueue.shared.addToQueueWithoutPlaying(nextSong)
-                    print("[PlayerManager] 🎵 Changed to next song in sequence: \(nextSong.name)")
+                    print("[PlayerManager] 🎵 Changed to next song in sequence: \(nextSong.fileName)")
                 }
             }
         }
@@ -272,7 +272,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
     /// Setup Now Playing Info (lock screen & Control Center)
     private func setupNowPlaying(musicFile: MusicFile) {
         var nowPlayingInfo: [String: Any] = [
-            MPMediaItemPropertyTitle: musicFile.name,
+            MPMediaItemPropertyTitle: musicFile.fileName,
             MPNowPlayingInfoPropertyPlaybackRate: 1.0
         ]
 

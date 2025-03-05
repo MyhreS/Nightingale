@@ -16,11 +16,12 @@ class MusicStorage {
     }
 
     /// ✅ Retrieves all file names from storage
-    func getStoredFiles() -> [String] {
+    func getStoredFileNames() -> [String] {
         do {
-            return try fileManager.contentsOfDirectory(atPath: documentsDirectory.path)
+            let fileURLs = try fileManager.contentsOfDirectory(at: documentsDirectory, includingPropertiesForKeys: nil)
+            return fileURLs.map { $0.deletingPathExtension().lastPathComponent } // Remove extension
         } catch {
-            print("❌ Failed to retrieve stored files: \(error.localizedDescription)")
+            print("❌ Failed to retrieve stored file names: \(error.localizedDescription)")
             return []
         }
     }

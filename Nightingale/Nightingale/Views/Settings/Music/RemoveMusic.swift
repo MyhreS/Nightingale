@@ -10,7 +10,7 @@ struct RemoveMusic: View {
             VStack {
                 List(musicLibrary.getMusicFiles()) { song in
                     HStack {
-                        Text(song.name)
+                        Text(song.fileName)
                             .foregroundColor(selectedSongs.contains(song) ? .red : .primary)
                         
                         Spacer()

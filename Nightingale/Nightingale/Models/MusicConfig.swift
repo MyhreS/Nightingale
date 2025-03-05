@@ -11,14 +11,25 @@ class MusicConfig {
     }
     
     private func loadMusicFilesFromConfig() {
-        guard let data = UserDefaults.standard.data(forKey: storageConfigKey) else { return }
-        
+        guard let data = UserDefaults.standard.data(forKey: storageConfigKey) else {
+            print("⚠️ No saved music files found in UserDefaults.")
+            return
+        }
+
+        do {
+            musicFiles = try JSONDecoder().decode([MusicFile].self, from: data)
+        } catch {
+            print("❌ Failed to decode music files: \(error.localizedDescription)")
+            print("🧐 Raw stored data: \(String(data: data, encoding: .utf8) ?? "Invalid UTF-8 Data")")
+            fatalError("CRITICAL ERROR: Failed to load music config")
+        }
     }
     
     private func updateConfig() {
         do {
             let data = try JSONEncoder().encode(musicFiles)
             UserDefaults.standard.set(data, forKey: storageConfigKey)
+            UserDefaults.standard.synchronize() // ✅ Force save
         } catch {
             fatalError("❌ CRITICAL ERROR: Failed to update music config: \(error.localizedDescription)")
         }
@@ -26,7 +37,7 @@ class MusicConfig {
     
     func addMusicFileToConfig(_ musicFile: MusicFile) {
         if(musicFiles.contains(where: {
-            $0.name == musicFile.name
+            $0.fileName == musicFile.fileName
         })) {
             return
         }
@@ -46,17 +57,6 @@ class MusicConfig {
         musicFiles.removeAll()
         updateConfig()
     }
-    
-    /*
-    func resetPlayedStatus() {
-        musicFiles = musicFiles.map { musicFile in
-            var updatedMusicFile = musicFile
-            updatedMusicFile.played = false
-            return updatedMusicFile
-        }
-        updateConfig()
-    }
-     */
     
     func editMusicFile(_ editedMusicFile: MusicFile) {
         guard let index = musicFiles.firstIndex(where: {$0.id == editedMusicFile.id}) else {

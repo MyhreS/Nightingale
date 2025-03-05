@@ -20,7 +20,7 @@ struct SongEditor: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
-            Text(song.name)
+            Text(song.fileName)
                 .font(.headline)
             
             // Time information

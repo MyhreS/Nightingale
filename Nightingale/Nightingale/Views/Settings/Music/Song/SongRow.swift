@@ -9,7 +9,7 @@ struct SongRow: View {
         Button(action: onTap) {
             HStack {
                 VStack(alignment: .leading) {
-                    Text(song.name)
+                    Text(song.fileName)
                         .font(.subheadline)
                         .fontWeight(.medium)
                     

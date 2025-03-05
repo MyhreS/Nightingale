@@ -19,7 +19,7 @@ struct CurrentQueued: View {
             }
 
             if let song = musicQueue.currentSong {
-                Text(song.name)
+                Text(song.fileName)
                     .font(.headline)
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)

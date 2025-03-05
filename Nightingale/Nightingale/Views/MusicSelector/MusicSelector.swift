@@ -12,12 +12,12 @@ struct MusicSelector: View {
             return musicLibrary.getMusicFiles().sorted { (song1, song2) in
                 let playlist1 = playlistManager.playlistForSong(song1.id) ?? ""
                 let playlist2 = playlistManager.playlistForSong(song2.id) ?? ""
-                return (playlist1, song1.name) < (playlist2, song2.name)
+                return (playlist1, song1.fileName) < (playlist2, song2.fileName)
             }
         } else {
             // Show songs from selected playlist
             return playlistManager.songsInPlaylist(selectedPlaylist)
-                .sorted { $0.name < $1.name }
+                .sorted { $0.fileName < $1.fileName }
         }
     }
 

@@ -10,7 +10,7 @@ class MusicQueue: ObservableObject {
 
     /// Adds a file to be played
     func addToQueue(_ file: MusicFile) {
-        print("[MusicQueue] 🎵 Adding song to queue: \(file.name), startTime: \(file.startTime)")
+        print("[MusicQueue] 🎵 Adding song to queue: \(file.fileName), startTime: \(file.startTime)")
         
         // Get the latest version of the song from the library to ensure we have the most up-to-date start time
         let updatedFile = getLatestSongVersion(file)
@@ -34,7 +34,7 @@ class MusicQueue: ObservableObject {
     
     /// Adds a file to the queue without auto-playing
     func addToQueueWithoutPlaying(_ file: MusicFile) {
-        print("[MusicQueue] 🎵 Adding song to queue without playing: \(file.name), startTime: \(file.startTime)")
+        print("[MusicQueue] 🎵 Adding song to queue without playing: \(file.fileName), startTime: \(file.startTime)")
         
         // Get the latest version of the song from the library
         let updatedFile = getLatestSongVersion(file)

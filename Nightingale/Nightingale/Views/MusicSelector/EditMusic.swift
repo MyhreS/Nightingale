@@ -52,7 +52,7 @@ struct EditMusic: View {
                     
                     // Song details
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(song.name)
+                        Text(song.fileName)
                             .font(.headline)
                             .lineLimit(1)
                         
@@ -229,14 +229,14 @@ private struct StartTimeEditor: View {
         self._startTime = startTime
         self._isPresented = isPresented
         self._currentPlayTime = State(initialValue: startTime.wrappedValue)
-        print("[StartTimeEditor] 🔄 Initialized with song: \(song.name), startTime: \(startTime.wrappedValue)")
+        print("[StartTimeEditor] 🔄 Initialized with song: \(song.fileName), startTime: \(startTime.wrappedValue)")
     }
     
     var body: some View {
         NavigationView {
             VStack(spacing: 24) {
                 // Header with song name centered
-                Text(song.name)
+                Text(song.fileName)
                     .font(.headline)
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .center)

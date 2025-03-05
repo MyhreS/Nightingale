@@ -30,7 +30,7 @@ struct MusicItem: View {
                 }
 
                 // Song name
-                Text(musicFile.name)
+                Text(musicFile.fileName)
                     .font(.body)
                     .lineLimit(nil)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -93,7 +93,7 @@ struct MusicItem: View {
 
     /// Adds the file to the queue and updates UI
     private func addToQueue(_ musicFile: MusicFile) {
-        print("[MusicItem] 🎵 Adding song to queue: \(musicFile.name), startTime: \(musicFile.startTime)")
+        print("[MusicItem] 🎵 Adding song to queue: \(musicFile.fileName), startTime: \(musicFile.startTime)")
         // Stop any current playback
         PlayerManager.shared.stop()
         // Add to queue (this will also update upcoming song)
