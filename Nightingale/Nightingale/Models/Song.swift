@@ -65,4 +65,9 @@ struct Song: Identifiable, Codable, Hashable {
     static func == (lhs: Song, rhs: Song) -> Bool {
         return lhs.id == rhs.id
     }
+    
+    static func dummySong() -> Song {
+        let dummyURL = URL(fileURLWithPath: "/dev/null")
+        return Song(from: dummyURL, url: dummyURL)
+    }
 }

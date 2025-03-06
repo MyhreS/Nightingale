@@ -10,21 +10,26 @@ class MusicLibrary: ObservableObject {
     @Published var songs: [Song] = []
     private var cancellables = Set<AnyCancellable>()
     
-    init () {
-        musicConfig.$musicConfigItems
-                    .sink { [weak self] newMusicItems in
-                        self?.songs = newMusicItems
+    init() {
+            musicConfig.$musicConfigItems
+                .sink { [weak self] newMusicItems in
+                    var allSongs = newMusicItems
+                    
+                    // ✅ Add dummy song only in preview
+                    if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
+                        let dummySong = Song.dummySong()
+                        if !allSongs.contains(where: { $0.id == dummySong.id }) {
+                            allSongs.append(dummySong)
+                        }
                     }
-                    .store(in: &cancellables)
-        
-        
-        let result = validateConsistency()
-        if !result {
-            print("Validation failed")
-        } else {
-            print("Validation succeeded")
+                    
+                    self?.songs = allSongs
+                }
+                .store(in: &cancellables)
+
+            let result = validateConsistency()
+            print(result ? "Validation succeeded" : "Validation failed")
         }
-    }
     
     func addMusicFile(_ url: URL) {
         let storedURL = musicStorage.copyFileToStorage(url)
