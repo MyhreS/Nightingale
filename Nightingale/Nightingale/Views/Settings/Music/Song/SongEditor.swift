@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct SongEditor: View {
-    let song: MusicFile
-    let onSave: (MusicFile) -> Void
+    let song: Song
+    let onSave: (Song) -> Void
     
     @State private var startTime: Double
     @State private var isPreviewPlaying = false
@@ -11,7 +11,7 @@ struct SongEditor: View {
     @State private var timer: Timer?
     private let playerManager = PlayerManager.shared
     
-    init(song: MusicFile, onSave: @escaping (MusicFile) -> Void) {
+    init(song: Song, onSave: @escaping (Song) -> Void) {
         self.song = song
         self.onSave = onSave
         self._startTime = State(initialValue: song.startTime)

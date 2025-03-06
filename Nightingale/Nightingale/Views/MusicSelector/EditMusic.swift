@@ -3,8 +3,8 @@ import AVFoundation
 
 struct EditMusic: View {
     @Environment(\.dismiss) private var dismiss
-    let song: MusicFile
-    let onSave: (MusicFile) -> Void
+    let song: Song
+    let onSave: (Song) -> Void
     
     @State private var startTime: Double
     @State private var isPreviewPlaying = false
@@ -16,7 +16,7 @@ struct EditMusic: View {
     private let playerManager = PlayerManager.shared
     @ObservedObject private var playlistManager = PlaylistManager.shared
     
-    init(song: MusicFile, onSave: @escaping (MusicFile) -> Void) {
+    init(song: Song, onSave: @escaping (Song) -> Void) {
         self.song = song
         self.onSave = onSave
         self._startTime = State(initialValue: song.startTime)
@@ -133,7 +133,7 @@ struct EditMusic: View {
 }
 
 private struct PlaylistPicker: View {
-    let song: MusicFile
+    let song: Song
     @Binding var isPresented: Bool
     @ObservedObject private var playlistManager = PlaylistManager.shared
     
@@ -215,7 +215,7 @@ private struct PlaylistPicker: View {
 }
 
 private struct StartTimeEditor: View {
-    let song: MusicFile
+    let song: Song
     @Binding var startTime: Double
     @Binding var isPresented: Bool
     @State private var isPreviewPlaying = false
@@ -224,7 +224,7 @@ private struct StartTimeEditor: View {
     @State private var timer: Timer?
     private let playerManager = PlayerManager.shared
     
-    init(song: MusicFile, startTime: Binding<Double>, isPresented: Binding<Bool>) {
+    init(song: Song, startTime: Binding<Double>, isPresented: Binding<Bool>) {
         self.song = song
         self._startTime = startTime
         self._isPresented = isPresented

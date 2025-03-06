@@ -54,13 +54,13 @@ class PlaylistManager: ObservableObject {
     }
     
     /// Gets all songs in a playlist
-    func songsInPlaylist(_ playlist: String) -> [MusicFile] {
+    func songsInPlaylist(_ playlist: String) -> [Song] {
         guard let songIds = playlists[playlist] else { return [] }
         return musicLibrary.songs.filter { songIds.contains($0.id) }
     }
     
     /// Gets all songs not in any playlist
-    func untaggedSongs() -> [MusicFile] {
+    func untaggedSongs() -> [Song] {
         let allPlaylistSongs = Set(playlists.values.flatMap { $0 })
         return musicLibrary.songs.filter { !allPlaylistSongs.contains($0.id) }
     }

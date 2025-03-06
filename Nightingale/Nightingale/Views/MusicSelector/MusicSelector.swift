@@ -6,7 +6,7 @@ struct MusicSelector: View {
     @State private var selectedPlaylist: String = "All" // Default to All Music
     @State private var showAddNewPlaylist = false
     
-    private var filteredSongs: [MusicFile] {
+    private var filteredSongs: [Song] {
         if selectedPlaylist == "All" {
             // Show all songs in a single list, sorted by playlist then name
             return musicLibrary.songs.sorted { (song1, song2) in

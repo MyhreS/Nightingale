@@ -2,7 +2,7 @@ import Foundation
 
 class MusicConfig {
     static let shared = MusicConfig()
-    @Published private(set) var musicConfigItems: [MusicFile] = []
+    @Published private(set) var musicConfigItems: [Song] = []
     private let storageConfigKey = "SavedMusicFiles"
     
     private init() {
@@ -16,7 +16,7 @@ class MusicConfig {
         }
 
         do {
-            musicConfigItems = try JSONDecoder().decode([MusicFile].self, from: data)
+            musicConfigItems = try JSONDecoder().decode([Song].self, from: data)
         } catch {
             print("❌ Failed to decode music files: \(error.localizedDescription)")
             print("🧐 Raw stored data: \(String(data: data, encoding: .utf8) ?? "Invalid UTF-8 Data")")
@@ -34,7 +34,7 @@ class MusicConfig {
         }
     }
     
-    func addMusicFileToConfig(_ musicFile: MusicFile) {
+    func addMusicFileToConfig(_ musicFile: Song) {
         if(musicConfigItems.contains(where: {
             $0.fileName == musicFile.fileName
         })) {
@@ -44,7 +44,7 @@ class MusicConfig {
         updateConfig()
     }
     
-    func removeMusicFileFromConfig(_ musicFile: MusicFile) {
+    func removeMusicFileFromConfig(_ musicFile: Song) {
         guard let index = musicConfigItems.firstIndex(where: { $0.url == musicFile.url }) else {
             fatalError("❌ CRITICAL ERROR: File not found in music library (but deleted from storage): \(musicFile.url.lastPathComponent)")
         }
@@ -57,7 +57,7 @@ class MusicConfig {
         updateConfig()
     }
     
-    func editMusicFile(_ editedMusicFile: MusicFile) {
+    func editMusicFile(_ editedMusicFile: Song) {
         guard let index = musicConfigItems.firstIndex(where: {$0.id == editedMusicFile.id}) else {
             fatalError("❌ CRITICAL ERROR: Music file not found when updating it: \(editedMusicFile.id)")
         }
@@ -65,7 +65,7 @@ class MusicConfig {
         updateConfig()
     }
     
-    func getMusicConfigItems() -> [MusicFile] {
+    func getMusicConfigItems() -> [Song] {
         return musicConfigItems
     }
 }

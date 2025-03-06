@@ -3,7 +3,7 @@ import SwiftUI
 struct RemoveMusic: View {
     @Binding var isPresented: Bool
     @ObservedObject private var musicLibrary = MusicLibrary.shared
-    @State private var selectedSongs: Set<MusicFile> = [] // Stores selected songs
+    @State private var selectedSongs: Set<Song> = [] // Stores selected songs
     
     var body: some View {
         NavigationView {

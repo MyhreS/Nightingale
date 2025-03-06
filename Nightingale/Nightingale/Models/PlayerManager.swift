@@ -10,12 +10,12 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
     @Published var isPlaying = false // Track play state
     @Published var isPreviewPlaying = false // Separate state for preview
     @Published var currentTime: Double = 0 // Track current playback position
-    private var currentMusicFile: MusicFile?
+    private var currentMusicFile: Song?
     private var timer: Timer?
     private var previewTimer: Timer?
 
     /// Plays the given music file
-    func play(_ musicFile: MusicFile) {
+    func play(_ musicFile: Song) {
         print("[PlayerManager] 📱 play() called with song: \(musicFile.fileName), startTime: \(musicFile.startTime)")
         
         // Verify we have the latest version from the library
@@ -84,7 +84,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
     }
 
     /// Preview playback for edit mode
-    func previewPlay(_ musicFile: MusicFile) {
+    func previewPlay(_ musicFile: Song) {
         print("[PlayerManager] 📱 previewPlay() called with song: \(musicFile.fileName), startTime: \(musicFile.startTime)")
         
         // Don't pause main playback anymore - let both run independently
@@ -167,7 +167,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
     }
 
     /// Toggles between play and pause
-    func togglePlayback(for musicFile: MusicFile) {
+    func togglePlayback(for musicFile: Song) {
         print("[PlayerManager] 📱 togglePlayback() called with song: \(musicFile.fileName), startTime: \(musicFile.startTime)")
         print("[PlayerManager] 🔄 Current isPlaying state: \(isPlaying)")
         
@@ -183,7 +183,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
     }
 
     /// Finds the next song with the same playlist
-    private func findNextSongInSamePlaylist(_ currentSong: MusicFile) -> MusicFile? {
+    private func findNextSongInSamePlaylist(_ currentSong: Song) -> Song? {
         let playlistManager = PlaylistManager.shared
         
         // Get the current playlist
@@ -270,7 +270,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
     }
 
     /// Setup Now Playing Info (lock screen & Control Center)
-    private func setupNowPlaying(musicFile: MusicFile) {
+    private func setupNowPlaying(musicFile: Song) {
         var nowPlayingInfo: [String: Any] = [
             MPMediaItemPropertyTitle: musicFile.fileName,
             MPNowPlayingInfoPropertyPlaybackRate: 1.0

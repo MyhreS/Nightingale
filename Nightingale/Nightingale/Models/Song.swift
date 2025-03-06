@@ -1,7 +1,7 @@
 import Foundation
 import AVFoundation
 
-struct MusicFile: Identifiable, Codable, Hashable {
+struct Song: Identifiable, Codable, Hashable {
     let id: String
     let from: URL
     let fileName: String // ✅ Store only the file name
@@ -18,7 +18,6 @@ struct MusicFile: Identifiable, Codable, Hashable {
         case id, from, fileName, duration, played, startTime
     }
     
-    /// ✅ Corrected initializer
     init(from: URL, url: URL) {
         self.id = UUID().uuidString
         self.from = from
@@ -36,7 +35,6 @@ struct MusicFile: Identifiable, Codable, Hashable {
         }
     }
 
-    /// ✅ Fixed Decoding: Properly initializes `fileName` instead of `url`
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
@@ -48,7 +46,7 @@ struct MusicFile: Identifiable, Codable, Hashable {
         startTime = try container.decodeIfPresent(Double.self, forKey: .startTime) ?? 0.0
     }
     
-    /// ✅ Fixed Encoding: Store `fileName` instead of full `url`
+    
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
@@ -64,7 +62,7 @@ struct MusicFile: Identifiable, Codable, Hashable {
         hasher.combine(id)
     }
     
-    static func == (lhs: MusicFile, rhs: MusicFile) -> Bool {
+    static func == (lhs: Song, rhs: Song) -> Bool {
         return lhs.id == rhs.id
     }
 }

@@ -3,7 +3,7 @@ import AVFoundation
 
 struct SongSettings: View {
     @ObservedObject private var musicLibrary = MusicLibrary.shared
-    @State private var editingSong: MusicFile?
+    @State private var editingSong: Song?
     @State private var isPlaying = false
     private let playerManager = PlayerManager.shared
     

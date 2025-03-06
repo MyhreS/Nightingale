@@ -3,13 +3,13 @@ import Foundation
 class MusicQueue: ObservableObject {
     static let shared = MusicQueue()
     
-    @Published private(set) var currentSong: MusicFile?
+    @Published private(set) var currentSong: Song?
     private var autoPlayEnabled = true
 
     private init() {}
 
     /// Adds a file to be played
-    func addToQueue(_ file: MusicFile) {
+    func addToQueue(_ file: Song) {
         print("[MusicQueue] 🎵 Adding song to queue: \(file.fileName), startTime: \(file.startTime)")
         
         // Get the latest version of the song from the library to ensure we have the most up-to-date start time
@@ -33,7 +33,7 @@ class MusicQueue: ObservableObject {
     }
     
     /// Adds a file to the queue without auto-playing
-    func addToQueueWithoutPlaying(_ file: MusicFile) {
+    func addToQueueWithoutPlaying(_ file: Song) {
         print("[MusicQueue] 🎵 Adding song to queue without playing: \(file.fileName), startTime: \(file.startTime)")
         
         // Get the latest version of the song from the library
@@ -44,7 +44,7 @@ class MusicQueue: ObservableObject {
     }
     
     /// Gets the latest version of a song from the library
-    private func getLatestSongVersion(_ file: MusicFile) -> MusicFile {
+    private func getLatestSongVersion(_ file: Song) -> Song {
         // Try to find the song in the library by ID
         let musicLibrary = MusicLibrary.shared
         if let updatedSong = musicLibrary.songs.first(where: { $0.id == file.id }) {

@@ -3,10 +3,10 @@ import SwiftUI
 struct MusicItem: View {
     @ObservedObject var musicQueue = MusicQueue.shared // Shared music queue
     @ObservedObject var musicLibrary = MusicLibrary.shared
-    var musicFile: MusicFile
+    var musicFile: Song
     @State private var showEditSheet = false
     
-    init(musicFile: MusicFile) {
+    init(musicFile: Song) {
         self.musicFile = musicFile
     }
     
@@ -92,7 +92,7 @@ struct MusicItem: View {
     }
 
     /// Adds the file to the queue and updates UI
-    private func addToQueue(_ musicFile: MusicFile) {
+    private func addToQueue(_ musicFile: Song) {
         print("[MusicItem] 🎵 Adding song to queue: \(musicFile.fileName), startTime: \(musicFile.startTime)")
         // Stop any current playback
         PlayerManager.shared.stop()

@@ -7,7 +7,7 @@ class MusicLibrary: ObservableObject {
     private let musicStorage = MusicStorage.shared
     private let musicConfig = MusicConfig.shared
     
-    @Published var songs: [MusicFile] = []
+    @Published var songs: [Song] = []
     private var cancellables = Set<AnyCancellable>()
     
     init () {
@@ -28,13 +28,13 @@ class MusicLibrary: ObservableObject {
     
     func addMusicFile(_ url: URL) {
         let storedURL = musicStorage.copyFileToStorage(url)
-        let newMusicFile = MusicFile(from: url, url: storedURL)
+        let newMusicFile = Song(from: url, url: storedURL)
         musicConfig.addMusicFileToConfig(newMusicFile)
         print("✅ Added music file: \(newMusicFile.fileName)")
     }
 
     
-    func removeMusicFile(_ musicFile: MusicFile) {
+    func removeMusicFile(_ musicFile: Song) {
         musicStorage.deleteFileFromStorage(musicFile.url)
         musicConfig.removeMusicFileFromConfig(musicFile)
         print("✅ Removed music file: \(musicFile.fileName)")
@@ -46,24 +46,24 @@ class MusicLibrary: ObservableObject {
         print("✅ Removed all music from library")
     }
     
-    func editMusicFile(_ editedMusicFile: MusicFile) {
+    func editMusicFile(_ editedMusicFile: Song) {
         musicConfig.editMusicFile(editedMusicFile)
         print("Edited music file: \(editedMusicFile.fileName)")
     }
     
-    private func findFilesMissingInConfig(_ storedFileNames: [String], _ musicFiles: [MusicFile]) -> [String] {
+    private func findFilesMissingInConfig(_ storedFileNames: [String], _ musicFiles: [Song]) -> [String] {
         return storedFileNames.filter { storedFile in
             !musicFiles.contains(where: { $0.fileName == storedFile })
         }
     }
     
-    private func findFilesMissingInStorage(_ storedFileNames: [String], _ musicFiles: [MusicFile]) -> [MusicFile] {
+    private func findFilesMissingInStorage(_ storedFileNames: [String], _ musicFiles: [Song]) -> [Song] {
         return musicFiles.filter { musicFile in
             !storedFileNames.contains(musicFile.fileName)
         }
     }
     
-    private func restoreMissingFiles(_ missingFiles: [MusicFile]) {
+    private func restoreMissingFiles(_ missingFiles: [Song]) {
         missingFiles.forEach { missingFile in
             addMusicFile(missingFile.from)
         }
