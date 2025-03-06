@@ -3,13 +3,13 @@ import UniformTypeIdentifiers
 
 struct AddSheet: View {
     @State private var showCreatePlaylist = false
-    @StateObject private var fileImporterHelper = FileImporterHelper() // ✅ Use new helper
+    @ObservedObject var fileImporterHelper: FileImporterHelper // ✅ Use injected instance
 
     var body: some View {
         ZStack {
             List {
                 Section {
-                    Button(action: { fileImporterHelper.showFilePicker = true }) { // ✅ Trigger file picker
+                    Button(action: { fileImporterHelper.showFilePicker = true }) {
                         HStack {
                             Image(systemName: "music.note.list")
                                 .frame(width: 25)
@@ -20,7 +20,7 @@ struct AddSheet: View {
                         }
                     }
                     .contentShape(Rectangle())
-                    .fileImporter( // ✅ Attach fileImporter here
+                    .fileImporter(
                         isPresented: $fileImporterHelper.showFilePicker,
                         allowedContentTypes: [UTType.audio],
                         allowsMultipleSelection: true,

@@ -3,8 +3,6 @@ import SwiftUI
 struct MusicSelector: View {
     @State private var selectedPlaylist: String = "All" // Default to All Music
     
-    
-    
 
     var body: some View {
         CustomCard {

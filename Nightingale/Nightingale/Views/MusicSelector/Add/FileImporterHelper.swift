@@ -3,7 +3,7 @@ import UniformTypeIdentifiers
 
 class FileImporterHelper: ObservableObject {
     @Published var showFilePicker = false
-    @Published var isSuccess = false
+    @Published var isSuccess = false // ✅ Notifies AddButton
     @Published var successMessage = "Add Music"
 
     private let musicLibrary = MusicLibrary.shared
@@ -18,7 +18,7 @@ class FileImporterHelper: ObservableObject {
 
                 let addedCount = urls.count
                 self.successMessage = addedCount == 0 ? "No new files" : "Added \(addedCount) file(s)!"
-                self.isSuccess = true
+                self.isSuccess = true // ✅ Trigger success state
 
                 // Reset success state after 2 seconds
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
