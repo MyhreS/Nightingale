@@ -1,16 +1,19 @@
 import SwiftUI
 
 struct AddButton: View {
-    @State private var showAddNewPlaylist = false
+    @State private var showAddSheet = false
     
     var body: some View {
-        Button(action: { showAddNewPlaylist = true }) {
+        Button(action: { showAddSheet = true }) {
             Image(systemName: "plus.circle.fill")
                 .foregroundColor(.blue)
                 .font(.title3)
         }
-        .sheet(isPresented: $showAddNewPlaylist) {
-            AddNewPlaylistSheet(isPresented: $showAddNewPlaylist)
+        .sheet(isPresented: $showAddSheet) {
+            AddSheet()
+            .presentationDetents([.height(150)])
+            .presentationDragIndicator(.visible)
         }
+        
     }
 }
