@@ -9,14 +9,6 @@ class PlaylistManager: ObservableObject {
     
     private init() {
         loadPlaylists()
-        
-        // Listen for changes in music library
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(validateConsistency),
-            name: NSNotification.Name("MusicLibraryChanged"),
-            object: nil
-        )
     }
     
     /// Creates a new playlist

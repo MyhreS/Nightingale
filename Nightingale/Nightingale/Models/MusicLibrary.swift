@@ -21,7 +21,6 @@ class MusicLibrary: ObservableObject {
         let newMusicFile = MusicFile(from: url, url: storedURL)
         musicConfig.addMusicFileToConfig(newMusicFile)
         print("✅ Added music file: \(newMusicFile.fileName)")
-        NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
     }
 
     
@@ -29,20 +28,17 @@ class MusicLibrary: ObservableObject {
         musicStorage.deleteFileFromStorage(musicFile.url)
         musicConfig.removeMusicFileFromConfig(musicFile)
         print("✅ Removed music file: \(musicFile.fileName)")
-        NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
     }    
     
     func removeAllMusic() {
         musicStorage.deleteAllFilesFromStorage()
         musicConfig.removeAllMusicFilesFromConfig()
         print("✅ Removed all music from library")
-        NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
     }
     
     func editMusicFile(_ editedMusicFile: MusicFile) {
         musicConfig.editMusicFile(editedMusicFile)
         print("Edited music file: \(editedMusicFile.fileName)")
-        NotificationCenter.default.post(name: NSNotification.Name("MusicLibraryChanged"), object: nil)
     }
     
     func getMusicFiles() -> [MusicFile] {
