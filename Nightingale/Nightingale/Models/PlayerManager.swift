@@ -20,7 +20,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         
         // Verify we have the latest version from the library
         let musicLibrary = MusicLibrary.shared
-        let checkedMusicFile = musicLibrary.getMusicFiles().first(where: { $0.id == musicFile.id })
+        let checkedMusicFile = musicLibrary.songs.first(where: { $0.id == musicFile.id })
         
         if let latest = checkedMusicFile {
             print("[PlayerManager] 🔍 Found latest version in library with startTime: \(latest.startTime)")
@@ -237,7 +237,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         // Find and set next song
         if let currentSong = currentMusicFile {
             let musicLibrary = MusicLibrary.shared
-            let allSongs = musicLibrary.getMusicFiles()
+            let allSongs = musicLibrary.songs
             
             // Check if song is in a playlist
             if let nextSong = findNextSongInSamePlaylist(currentSong) {

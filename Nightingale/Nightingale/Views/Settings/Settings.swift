@@ -6,7 +6,7 @@ struct Settings: View {
     @State private var resetFeedback = false
     
     private func resetPlayedStatus() {
-        let musicFiles = MusicLibrary.shared.getMusicFiles()
+        let musicFiles = MusicLibrary.shared.songs
 
         musicFiles.forEach { musicFile in
             var editedMusicFile = musicFile

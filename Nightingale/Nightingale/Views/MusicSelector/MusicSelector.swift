@@ -9,7 +9,7 @@ struct MusicSelector: View {
     private var filteredSongs: [MusicFile] {
         if selectedPlaylist == "All" {
             // Show all songs in a single list, sorted by playlist then name
-            return musicLibrary.getMusicFiles().sorted { (song1, song2) in
+            return musicLibrary.songs.sorted { (song1, song2) in
                 let playlist1 = playlistManager.playlistForSong(song1.id) ?? ""
                 let playlist2 = playlistManager.playlistForSong(song2.id) ?? ""
                 return (playlist1, song1.fileName) < (playlist2, song2.fileName)
@@ -62,7 +62,7 @@ struct MusicSelector: View {
 
                 if filteredSongs.isEmpty {
                     VStack {
-                        if musicLibrary.getMusicFiles().isEmpty {
+                        if musicLibrary.songs.isEmpty {
                             Text("No music added yet. Go to settings to add some!")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)

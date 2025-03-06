@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 class MusicLibrary: ObservableObject {
     static let shared = MusicLibrary()
@@ -6,7 +7,16 @@ class MusicLibrary: ObservableObject {
     private let musicStorage = MusicStorage.shared
     private let musicConfig = MusicConfig.shared
     
+    @Published var songs: [MusicFile] = []
+    private var cancellables = Set<AnyCancellable>()
+    
     init () {
+        musicConfig.$musicConfigItems
+                    .sink { [weak self] newMusicItems in
+                        self?.songs = newMusicItems
+                    }
+                    .store(in: &cancellables)
+        
         
         let result = validateConsistency()
         if !result {
@@ -41,10 +51,6 @@ class MusicLibrary: ObservableObject {
         print("Edited music file: \(editedMusicFile.fileName)")
     }
     
-    func getMusicFiles() -> [MusicFile] {
-        return musicConfig.getMusicFiles()
-    }
-    
     private func findFilesMissingInConfig(_ storedFileNames: [String], _ musicFiles: [MusicFile]) -> [String] {
         return storedFileNames.filter { storedFile in
             !musicFiles.contains(where: { $0.fileName == storedFile })
@@ -65,7 +71,7 @@ class MusicLibrary: ObservableObject {
     
     func validateConsistency() -> Bool {
         let storedFileNames = musicStorage.getStoredFileNames()
-        let musicFiles = musicConfig.getMusicFiles()
+        let musicFiles = musicConfig.getMusicConfigItems()
 
         let missingInConfig = findFilesMissingInConfig(storedFileNames, musicFiles)
         if !missingInConfig.isEmpty {
@@ -84,7 +90,7 @@ class MusicLibrary: ObservableObject {
         if !missingInStorage.isEmpty {
             print("Still found \(missingInStorage.count) files in config but not in storage after trying to add them.")
             return false
-        }
+        } 
 
         return true
     }

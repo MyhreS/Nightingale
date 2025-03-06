@@ -25,7 +25,7 @@ struct SongSettings: View {
                     }
                 }
                 
-                if musicLibrary.getMusicFiles().isEmpty {
+                if musicLibrary.songs.isEmpty {
                     Text("No songs added yet")
                         .foregroundColor(.gray)
                         .padding(.vertical)
@@ -38,7 +38,7 @@ struct SongSettings: View {
                     } else {
                         ScrollView {
                             VStack(spacing: 12) {
-                                ForEach(musicLibrary.getMusicFiles()) { song in
+                                ForEach(musicLibrary.songs) { song in
                                     SongRow(song: song, isSelected: false) {
                                         editingSong = song
                                     }
