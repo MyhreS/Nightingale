@@ -14,7 +14,7 @@ extension Color {
             )
         }
 
-        return self // Return original color if conversion fails
+        return self
     }
 }
 
@@ -28,7 +28,6 @@ struct Music: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                 
                 HStack(spacing: 10) {
-                    AddMusicButton()
                     RemoveMusicButton()
                 }
                 .frame(maxWidth: .infinity)

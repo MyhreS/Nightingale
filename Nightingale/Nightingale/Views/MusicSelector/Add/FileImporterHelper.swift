@@ -1,10 +1,16 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+enum ImportStatus {
+    case idle
+    case success
+    case failure
+}
+
 class FileImporterHelper: ObservableObject {
     @Published var showFilePicker = false
-    @Published var isSuccess = false // ✅ Notifies AddButton
-    @Published var successMessage = "Add Music"
+    @Published var triedToAddMusic = false
+    @Published var status: ImportStatus = .idle
 
     private let musicLibrary = MusicLibrary.shared
 
@@ -17,17 +23,19 @@ class FileImporterHelper: ObservableObject {
                 }
 
                 let addedCount = urls.count
-                self.successMessage = addedCount == 0 ? "No new files" : "Added \(addedCount) file(s)!"
-                self.isSuccess = true // ✅ Trigger success state
+                self.status = .success
 
-                // Reset success state after 2 seconds
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    self.isSuccess = false
-                    self.successMessage = "Add Music"
+                    self.status = .idle
                 }
 
             case .failure(let error):
                 print("❌ File selection error: \(error.localizedDescription)")
+                self.status = .failure
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    self.status = .idle
+                }
             }
 
             self.showFilePicker = false

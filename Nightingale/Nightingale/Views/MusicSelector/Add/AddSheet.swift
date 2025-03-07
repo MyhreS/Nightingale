@@ -3,7 +3,7 @@ import UniformTypeIdentifiers
 
 struct AddSheet: View {
     @State private var showCreatePlaylist = false
-    @ObservedObject var fileImporterHelper: FileImporterHelper // ✅ Use injected instance
+    @ObservedObject var fileImporterHelper: FileImporterHelper
 
     var body: some View {
         ZStack {
@@ -13,7 +13,7 @@ struct AddSheet: View {
                         HStack {
                             Image(systemName: "music.note.list")
                                 .frame(width: 25)
-                            Text("Add song")
+                            Text("Add music")
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.gray)
