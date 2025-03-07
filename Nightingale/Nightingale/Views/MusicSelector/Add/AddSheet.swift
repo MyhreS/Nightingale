@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 struct AddSheet: View {
     @State private var showCreatePlaylist = false
     @ObservedObject var fileImporterHelper: FileImporterHelper
+    @Binding var successfullyAddedPlaylist: Bool
 
     var body: some View {
         ZStack {
@@ -41,6 +42,9 @@ struct AddSheet: View {
                 }
             }
             .listStyle(.insetGrouped)
+        }
+        .sheet(isPresented: $showCreatePlaylist) {
+            CreatePlaylistSheet(isPresented: $showCreatePlaylist, successfullyAddedPlaylist: $successfullyAddedPlaylist)
         }
     }
 }

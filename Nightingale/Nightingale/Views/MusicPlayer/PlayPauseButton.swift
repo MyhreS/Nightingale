@@ -1,16 +1,16 @@
 import SwiftUI
 
 struct PlayPauseButton: View {
-    @ObservedObject var musicQueue = MusicQueue.shared
+    //@ObservedObject var musicQueue = MusicQueue.shared
     @ObservedObject var playerManager = PlayerManager.shared
     
     var body: some View {
         Button(action: {
             provideHapticFeedback()
             print("[PlayPauseButton] 👆 Button tapped, current isPlaying state: \(playerManager.isPlaying)")
-            if let song = musicQueue.currentSong {
-                playerManager.togglePlayback(for: song)
-            }
+            //if let song = musicQueue.currentSong {
+                //playerManager.togglePlayback(for: song)
+            //}
         }) {
             Image(systemName: playerManager.isPlaying ? "pause.fill" : "play.fill")
                 .resizable()

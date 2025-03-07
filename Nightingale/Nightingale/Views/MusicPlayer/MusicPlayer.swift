@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MusicPlayer: View {
     @ObservedObject private var playerManager = PlayerManager.shared
-    @ObservedObject private var musicQueue = MusicQueue.shared
+    //@ObservedObject private var musicQueue = MusicQueue.shared
     
     var body: some View {
         CustomCard {
@@ -25,6 +25,7 @@ struct MusicPlayer: View {
                                 .frame(height: 4)
                             
                             // Progress
+                            /*
                             if let currentSong = musicQueue.currentSong {
                                 // Start time indicator (filled portion before start)
                                 Capsule()
@@ -36,6 +37,7 @@ struct MusicPlayer: View {
                                     .fill(Color.blue)
                                     .frame(width: max(0, min(geometry.size.width * (playerManager.currentTime / currentSong.duration), geometry.size.width)), height: 4)
                             }
+                            */
                         }
                     }
                     .frame(height: 4)
@@ -48,11 +50,12 @@ struct MusicPlayer: View {
                             .monospacedDigit()
                         
                         Spacer()
-                        
+                        /*
                         Text(formatTime(musicQueue.currentSong?.duration ?? 0))
                             .font(.caption2)
                             .foregroundColor(.gray)
                             .monospacedDigit()
+                         */
                     }
                 }
                 .padding(.horizontal, 16)

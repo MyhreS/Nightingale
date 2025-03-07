@@ -14,7 +14,7 @@ struct EditMusic: View {
     @State private var showPlaylistPicker = false
     @State private var showStartTimeEditor = false
     private let playerManager = PlayerManager.shared
-    @ObservedObject private var playlistManager = PlaylistManager.shared
+    @ObservedObject private var playlistManager = PlaylistsManager.shared
     
     init(song: Song, onSave: @escaping (Song) -> Void) {
         self.song = song
@@ -24,7 +24,8 @@ struct EditMusic: View {
     }
     
     private var currentPlaylist: String? {
-        playlistManager.playlistForSong(song.id)
+        //playlistManager.playlistForSong(song.id)
+        return "Something"
     }
     
     var body: some View {
@@ -103,9 +104,6 @@ struct EditMusic: View {
             }
             .background(Color(uiColor: .systemGroupedBackground))
         }
-        .sheet(isPresented: $showPlaylistPicker) {
-            PlaylistPicker(song: song, isPresented: $showPlaylistPicker)
-        }
         .sheet(isPresented: $showStartTimeEditor) {
             StartTimeEditor(song: song, startTime: $startTime, isPresented: $showStartTimeEditor)
                 .onDisappear {
@@ -132,87 +130,6 @@ struct EditMusic: View {
     }
 }
 
-private struct PlaylistPicker: View {
-    let song: Song
-    @Binding var isPresented: Bool
-    @ObservedObject private var playlistManager = PlaylistManager.shared
-    
-    private var currentPlaylist: String? {
-        playlistManager.playlistForSong(song.id)
-    }
-    
-    var body: some View {
-        NavigationView {
-            VStack {
-                // Remove from playlist button
-                if let current = currentPlaylist {
-                    Button(action: {
-                        playlistManager.removeSongFromPlaylist(songId: song.id, playlist: current)
-                        isPresented = false
-                    }) {
-                        HStack {
-                            Image(systemName: "minus.circle.fill")
-                            Text("Remove from Playlist")
-                        }
-                        .foregroundColor(.red)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.red.opacity(0.1))
-                        .cornerRadius(10)
-                    }
-                    .padding(.horizontal)
-                    .padding(.top)
-                }
-                
-                let playlists = playlistManager.getPlaylists()
-                if playlists.isEmpty {
-                    VStack(spacing: 12) {
-                        Image(systemName: "music.note.list")
-                            .font(.largeTitle)
-                            .foregroundColor(.gray)
-                        Text("No Playlists Created")
-                            .font(.headline)
-                            .foregroundColor(.gray)
-                        Text("Create a playlist in the music selector")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
-                    .frame(maxHeight: .infinity)
-                } else {
-                    List {
-                        ForEach(playlists, id: \.self) { playlist in
-                            Button(action: {
-                                // Remove from current playlist if needed
-                                if let current = currentPlaylist, current != playlist {
-                                    playlistManager.removeSongFromPlaylist(songId: song.id, playlist: current)
-                                }
-                                // Add to new playlist
-                                playlistManager.addSongToPlaylist(songId: song.id, playlist: playlist)
-                                isPresented = false
-                            }) {
-                                HStack {
-                                    Text(playlist)
-                                    Spacer()
-                                    if currentPlaylist == playlist {
-                                        Image(systemName: "checkmark")
-                                            .foregroundColor(.blue)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Choose Playlist")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { isPresented = false }
-                }
-            }
-        }
-    }
-}
 
 private struct StartTimeEditor: View {
     let song: Song

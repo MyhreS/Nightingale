@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MusicItem: View {
-    @ObservedObject var musicQueue = MusicQueue.shared // Shared music queue
+    //@ObservedObject var musicQueue = MusicQueue.shared // Shared music queue
     @ObservedObject var musicLibrary = MusicLibrary.shared
     var musicFile: Song
     @State private var showEditSheet = false
@@ -66,7 +66,8 @@ struct MusicItem: View {
 
     /// Checks if this item is the next one to be played
     private func isNextToPlay() -> Bool {
-        return musicQueue.currentSong?.id == musicFile.id
+        //return musicQueue.currentSong?.id == musicFile.id
+        return true
     }
 
     /// Determines the background color of the icon
@@ -97,6 +98,6 @@ struct MusicItem: View {
         // Stop any current playback
         PlayerManager.shared.stop()
         // Add to queue (this will also update upcoming song)
-        musicQueue.addToQueue(musicFile)
+        //musicQueue.addToQueue(musicFile)
     }
 }

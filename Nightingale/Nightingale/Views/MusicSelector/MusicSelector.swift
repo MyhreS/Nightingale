@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MusicSelector: View {
+    @ObservedObject private var playlistManager = PlaylistsManager.shared
     @State private var selectedPlaylist: String = "All" // Default to All Music
     
 
@@ -15,7 +16,7 @@ struct MusicSelector: View {
                     Spacer()
                     AddButton()
                 }
-                PlaylistSelector(selectedPlaylist: $selectedPlaylist)
+                //PlaylistSelector(selectedPlaylist: $selectedPlaylist)
                 Playlist(selectedPlaylist: $selectedPlaylist)
             }
         }

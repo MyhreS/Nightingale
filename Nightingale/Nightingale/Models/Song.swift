@@ -4,26 +4,28 @@ import AVFoundation
 struct Song: Identifiable, Codable, Hashable {
     let id: String
     let from: URL
-    let fileName: String // ✅ Store only the file name
+    let fileName: String
     var startTime: Double
     var duration: Double
     var played: Bool
+    var playlist: String
 
-    /// ✅ Compute the full URL dynamically
+    /// Compute the full URL dynamically
     var url: URL {
         return MusicStorage.shared.getStorageURL(for: fileName)
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, from, fileName, duration, played, startTime
+        case id, from, fileName, duration, played, startTime, playlist
     }
     
     init(from: URL, url: URL) {
         self.id = UUID().uuidString
         self.from = from
-        self.fileName = url.lastPathComponent // ✅ Store just the file name
+        self.fileName = url.lastPathComponent
         self.startTime = 0.0
         self.played = false
+        self.playlist = ""
 
         // Get duration using AVFoundation
         if let audioAsset = try? AVAudioFile(forReading: url) {
@@ -40,10 +42,11 @@ struct Song: Identifiable, Codable, Hashable {
         
         id = try container.decode(String.self, forKey: .id)
         from = try container.decode(URL.self, forKey: .from)
-        fileName = try container.decode(String.self, forKey: .fileName) // ✅ Decode fileName instead of url
+        fileName = try container.decode(String.self, forKey: .fileName)
         duration = try container.decode(Double.self, forKey: .duration)
         played = try container.decodeIfPresent(Bool.self, forKey: .played) ?? false
         startTime = try container.decodeIfPresent(Double.self, forKey: .startTime) ?? 0.0
+        playlist = try container.decode(String.self, forKey: .playlist)
     }
     
     
@@ -52,10 +55,11 @@ struct Song: Identifiable, Codable, Hashable {
         
         try container.encode(id, forKey: .id)
         try container.encode(from, forKey: .from)
-        try container.encode(fileName, forKey: .fileName) // ✅ Store fileName, not url
+        try container.encode(fileName, forKey: .fileName)
         try container.encode(duration, forKey: .duration)
         try container.encode(played, forKey: .played)
         try container.encode(startTime, forKey: .startTime)
+        try container.encode(playlist, forKey: .playlist)
     }
     
     func hash(into hasher: inout Hasher) {

@@ -2,10 +2,11 @@ import SwiftUI
 
 struct Playlist: View {
     @ObservedObject var musicLibrary = MusicLibrary.shared
-    @ObservedObject var playlistManager = PlaylistManager.shared
+   // @ObservedObject var playlistManager = PlaylistManager.shared
     @Binding var selectedPlaylist: String
     
     private var filteredSongs: [Song] {
+        /*
         if selectedPlaylist == "All" {
             // Show all songs in a single list, sorted by playlist then name
             return musicLibrary.songs.sorted { (song1, song2) in
@@ -18,6 +19,8 @@ struct Playlist: View {
             return playlistManager.songsInPlaylist(selectedPlaylist)
                 .sorted { $0.fileName < $1.fileName }
         }
+        */
+        return musicLibrary.songs
     }
     
     var body: some View {

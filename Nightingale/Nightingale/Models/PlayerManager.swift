@@ -156,7 +156,8 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
             // If we've reached the end of the song, queue next and stop
             if player.currentTime >= player.duration {
                 if let nextSong = self.findNextSongInSamePlaylist(currentFile) {
-                    MusicQueue.shared.addToQueue(nextSong)
+                    //MusicQueue.shared.addToQueue(nextSong)
+                    
                 }
                 self.stop()
                 return
@@ -184,6 +185,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
 
     /// Finds the next song with the same playlist
     private func findNextSongInSamePlaylist(_ currentSong: Song) -> Song? {
+        /*
         let playlistManager = PlaylistManager.shared
         
         // Get the current playlist
@@ -222,10 +224,13 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         }
         
         return nil
+         */
+        return nil
     }
 
     /// Pauses the audio and queues the next song
     func pause() {
+        /*
         print("[PlayerManager] ⏸️ pause() called")
         audioPlayer?.pause()
         isPlaying = false  // This is correct, but let's add more logging
@@ -255,6 +260,8 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
         }
         
         print("[PlayerManager] ⏸️ Paused")
+     */
+        return
     }
 
     /// Stops playback completely (main player only, not preview)
