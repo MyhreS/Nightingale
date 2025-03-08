@@ -15,7 +15,7 @@ struct MusicSelector: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
-                    
+                    RemoveButton()
                     AddButton()
                 }
                 
