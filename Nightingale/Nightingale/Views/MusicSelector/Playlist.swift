@@ -27,7 +27,7 @@ struct Playlist: View {
         if filteredSongs.isEmpty {
             VStack {
                 if musicLibrary.songs.isEmpty {
-                    Text("No music added yet. Go to settings to add some!")
+                    Text("No music added yet. Click on the plus (+) button to add some!")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                         .padding(.leading, 0)

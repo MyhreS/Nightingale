@@ -19,9 +19,6 @@ struct Settings: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Music()
-                        .frame(maxWidth: .infinity)
-
                     DevelopmentToolsView(
                         clearFeedback: $clearFeedback,
                         resetFeedback: $resetFeedback,
