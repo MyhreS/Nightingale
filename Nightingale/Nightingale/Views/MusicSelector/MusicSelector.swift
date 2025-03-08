@@ -9,18 +9,20 @@ struct MusicSelector: View {
         CustomCard {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text("Playlist")
-                        .font(.headline)
-                        .fontWeight(.bold)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            PlaylistsSelector(selectedPlaylist: $selectedPlaylist)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
                     
-                    Spacer()
                     AddButton()
                 }
-                //PlaylistSelector(selectedPlaylist: $selectedPlaylist)
+                
                 Playlist(selectedPlaylist: $selectedPlaylist)
             }
+            .padding(0)
         }
-        .padding(10)
     }
 }
 

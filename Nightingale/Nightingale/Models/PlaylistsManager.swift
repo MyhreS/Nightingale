@@ -39,6 +39,7 @@ class PlaylistsManager: ObservableObject {
         guard !playlists.contains(name) else { return }
         playlists.append(name)
         updatePlaylistsInConfig()
+        print("Created playlist: \(name)")
         
     }
     
@@ -47,6 +48,7 @@ class PlaylistsManager: ObservableObject {
             playlists.remove(at: index)
             updatePlaylistsInConfig()
         }
+        print("Remove playlist: \(name)")
     }
 
     
