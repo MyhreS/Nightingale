@@ -5,7 +5,7 @@ struct AddSheet: View {
     @State private var showCreatePlaylist = false
     @ObservedObject var fileImporterHelper: FileImporterHelper
     @Binding var successfullyAddedPlaylist: Bool
-    private let musicLibrary = MusicLibrary.shared
+    @ObservedObject private var musicLibrary = MusicLibrary.shared
 
     var body: some View {
         ZStack {

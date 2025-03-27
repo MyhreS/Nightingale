@@ -12,7 +12,7 @@ class FileImporterHelper: ObservableObject {
     @Published var triedToAddMusic = false
     @Published var status: ImportStatus = .idle
 
-    private let musicLibrary = MusicLibrary.shared
+    @ObservedObject private var musicLibrary = MusicLibrary.shared
 
     func handleFileSelection(_ result: Result<[URL], Error>) {
         DispatchQueue.main.async {
@@ -22,7 +22,6 @@ class FileImporterHelper: ObservableObject {
                     self.musicLibrary.addMusicFile(url)
                 }
 
-                let addedCount = urls.count
                 self.status = .success
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {

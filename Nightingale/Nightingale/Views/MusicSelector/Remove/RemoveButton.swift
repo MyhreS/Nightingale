@@ -3,7 +3,7 @@ import SwiftUI
 struct RemoveButton: View {
     @State var showRemoveSheet: Bool = false
     @State var successfullyRemoved: Bool = false
-    private let musicLibrary = MusicLibrary.shared
+    @ObservedObject private var musicLibrary = MusicLibrary.shared
     
     var body: some View {
         Button(action: {showRemoveSheet = true}) {
