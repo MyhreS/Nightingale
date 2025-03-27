@@ -2,8 +2,6 @@ import SwiftUI
 
 struct StartTimeEditor: View {
     let song: Song
-    let onSave: (Song) -> Void
-    @Environment(\.dismiss) private var dismiss
 
     @State private var startTime: Double
     @State private var isPreviewPlaying = false
@@ -12,9 +10,8 @@ struct StartTimeEditor: View {
     @State private var timer: Timer?
     private let playerManager = PlayerManager.shared
 
-    init(song: Song, onSave: @escaping (Song) -> Void) {
+    init(song: Song) {
         self.song = song
-        self.onSave = onSave
         _startTime = State(initialValue: song.startTime)
         _currentPlayTime = State(initialValue: song.startTime)
         print("[StartTimeEditor] 🔄 Initialized with song: \(song.fileName), startTime: \(song.startTime)")
@@ -117,8 +114,6 @@ struct StartTimeEditor: View {
                         var updatedSong = song
                         updatedSong.startTime = startTime
                         print("[StartTimeEditor] ✅ Done button pressed, returning updated song")
-                        onSave(updatedSong)
-                        dismiss()
                     }
                 }
             }

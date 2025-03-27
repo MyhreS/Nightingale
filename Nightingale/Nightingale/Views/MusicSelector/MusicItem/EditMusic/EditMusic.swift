@@ -2,23 +2,11 @@ import SwiftUI
 import AVFoundation
 
 struct EditMusic: View {
-    @Environment(\.dismiss) private var dismiss
-    let song: Song
-    let onSave: (Song) -> Void
+    var song: Song
 
-    @State private var isPreviewPlaying = false
-    @State private var currentPlayTime: Double
-    @State private var showProgress = false
-    @State private var timer: Timer?
     @State private var showPlaylistPicker = false
     @State private var showStartTimeEditor = false
-    private let playerManager = PlayerManager.shared
 
-    init(song: Song, onSave: @escaping (Song) -> Void) {
-        self.song = song
-        self.onSave = onSave
-        self._currentPlayTime = State(initialValue: song.startTime)
-    }
 
     private var currentPlaylist: String? {
         return "Something"
@@ -28,9 +16,6 @@ struct EditMusic: View {
         ZStack {
             Color.clear
                 .contentShape(Rectangle())
-                .onTapGesture {
-                    dismiss()
-                }
 
             VStack(spacing: 0) {
                 HStack(spacing: 16) {
@@ -49,7 +34,7 @@ struct EditMusic: View {
                             .font(.headline)
                             .lineLimit(1)
 
-                        Text(currentPlaylist ?? "Not in playlist")
+                        Text(song.playlist.isEmpty ? "Not in playlist" : song.playlist)
                             .font(.subheadline)
                             .foregroundColor(.gray)
                     }
@@ -94,11 +79,7 @@ struct EditMusic: View {
             .background(Color(uiColor: .systemGroupedBackground))
         }
         .sheet(isPresented: $showStartTimeEditor) {
-            StartTimeEditor(song: song) { updatedSong in
-                print("[EditMusic] 🔄 Received updated song with startTime: \(updatedSong.startTime)")
-                MusicLibrary.shared.editMusicFile(updatedSong)
-                onSave(updatedSong)
-            }
+            StartTimeEditor(song: song)
         }
         .sheet(isPresented: $showPlaylistPicker) {
             PlaylistPickerSheet(song: song, currentPlaylist: currentPlaylist)

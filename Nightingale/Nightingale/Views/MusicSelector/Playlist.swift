@@ -32,8 +32,8 @@ struct Playlist: View {
                     .padding(0)
             }
         } else {
-            List(filteredSongs, id: \.self) { file in
-                MusicItem(musicFile: file)
+            List(filteredSongs, id: \.self) { song in
+                MusicItem(song: song)
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
