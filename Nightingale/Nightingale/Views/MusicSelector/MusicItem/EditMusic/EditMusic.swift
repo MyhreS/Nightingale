@@ -74,7 +74,7 @@ struct EditMusic: View {
             .background(Color(uiColor: .systemGroupedBackground))
         }
         .sheet(isPresented: $showStartTimeEditor) {
-            StartTimeEditor(song: song)
+            StartTimeEditor(song: $song)
         }
         .sheet(isPresented: $showPlaylistPicker) {
             PlaylistPickerSheet(song: $song)

@@ -1,20 +1,22 @@
 import SwiftUI
 
 struct StartTimeEditor: View {
-    let song: Song
+    @Binding var song: Song
+
+    @Environment(\.presentationMode) private var presentationMode
 
     @State private var startTime: Double
     @State private var isPreviewPlaying = false
     @State private var currentPlayTime: Double
     @State private var showProgress = false
     @State private var timer: Timer?
+
     private let playerManager = PlayerManager.shared
 
-    init(song: Song) {
-        self.song = song
-        _startTime = State(initialValue: song.startTime)
-        _currentPlayTime = State(initialValue: song.startTime)
-        print("[StartTimeEditor] 🔄 Initialized with song: \(song.fileName), startTime: \(song.startTime)")
+    init(song: Binding<Song>) {
+        _song = song
+        _startTime = State(initialValue: song.wrappedValue.startTime)
+        _currentPlayTime = State(initialValue: song.wrappedValue.startTime)
     }
 
     var body: some View {
@@ -26,71 +28,9 @@ struct StartTimeEditor: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 8)
 
-                HStack {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Start:")
-                            .font(.caption2)
-                            .foregroundColor(.gray)
-                        Text(formatTime(startTime))
-                            .monospacedDigit()
-                            .font(.system(.body, design: .rounded))
-                    }
-                    .frame(width: 80, alignment: .leading)
+                timeOverview
 
-                    Spacer()
-
-                    if showProgress {
-                        VStack(alignment: .center, spacing: 6) {
-                            Text("Played:")
-                                .font(.caption2)
-                                .foregroundColor(.gray)
-                            Text(formatTime(currentPlayTime))
-                                .monospacedDigit()
-                                .font(.system(.body, design: .rounded))
-                                .foregroundColor(.green)
-                        }
-                    }
-
-                    Spacer()
-
-                    VStack(alignment: .trailing, spacing: 6) {
-                        Text("Duration:")
-                            .font(.caption2)
-                            .foregroundColor(.gray)
-                        Text(formatTime(song.duration))
-                            .monospacedDigit()
-                            .font(.system(.body, design: .rounded))
-                            .foregroundColor(.gray)
-                    }
-                    .frame(width: 80, alignment: .trailing)
-                }
-                .padding(.vertical, 8)
-                .padding(.horizontal, 24)
-
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        Capsule()
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(height: 6)
-
-                        if showProgress {
-                            Capsule()
-                                .fill(Color.green.opacity(0.7))
-                                .frame(width: max(0, min(geometry.size.width * (currentPlayTime / song.duration), geometry.size.width)), height: 6)
-                        }
-
-                        Slider(value: $startTime, in: 0...song.duration)
-                            .accentColor(.blue)
-                            .onChange(of: startTime) { newValue in
-                                print("[StartTimeEditor] 🕒 Start time changed to: \(newValue)")
-                                if isPreviewPlaying {
-                                    stopPreview()
-                                }
-                            }
-                    }
-                }
-                .frame(height: 30)
-                .padding(.horizontal, 24)
+                sliderWithProgress
 
                 Button(action: togglePreview) {
                     Image(systemName: isPreviewPlaying ? "stop.fill" : "play.fill")
@@ -109,19 +49,96 @@ struct StartTimeEditor: View {
             .navigationTitle("Edit Start Time")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        var updatedSong = song
-                        updatedSong.startTime = startTime
-                        print("[StartTimeEditor] ✅ Done button pressed, returning updated song")
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
                     }
+                }
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Save") {
+                        song.startTime = startTime
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .disabled(song.startTime == startTime)
                 }
             }
         }
         .onDisappear {
-            print("[StartTimeEditor] 🔄 onDisappear called, final startTime: \(startTime)")
             stopPreview()
         }
+    }
+
+    private var timeOverview: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Start:")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+                Text(formatTime(startTime))
+                    .monospacedDigit()
+                    .font(.system(.body, design: .rounded))
+            }
+            .frame(width: 80, alignment: .leading)
+
+            Spacer()
+
+            if showProgress {
+                VStack(alignment: .center, spacing: 6) {
+                    Text("Played:")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                    Text(formatTime(currentPlayTime))
+                        .monospacedDigit()
+                        .font(.system(.body, design: .rounded))
+                        .foregroundColor(.green)
+                }
+            }
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 6) {
+                Text("Duration:")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+                Text(formatTime(song.duration))
+                    .monospacedDigit()
+                    .font(.system(.body, design: .rounded))
+                    .foregroundColor(.gray)
+            }
+            .frame(width: 80, alignment: .trailing)
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 24)
+    }
+
+    private var sliderWithProgress: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color.gray.opacity(0.2))
+                    .frame(height: 6)
+
+                if showProgress {
+                    Capsule()
+                        .fill(Color.green.opacity(0.7))
+                        .frame(
+                            width: max(0, min(geometry.size.width * (currentPlayTime / song.duration), geometry.size.width)),
+                            height: 6
+                        )
+                }
+
+                Slider(value: $startTime, in: 0...song.duration)
+                    .accentColor(.blue)
+                    .onChange(of: startTime) {
+                        if isPreviewPlaying {
+                            stopPreview()
+                        }
+                    }
+            }
+        }
+        .frame(height: 30)
+        .padding(.horizontal, 24)
     }
 
     private func formatTime(_ time: Double) -> String {
@@ -136,7 +153,6 @@ struct StartTimeEditor: View {
         currentPlayTime = startTime
         var previewSong = song
         previewSong.startTime = startTime
-        print("[StartTimeEditor] ▶️ Starting preview with startTime: \(previewSong.startTime)")
         playerManager.previewPlay(previewSong)
 
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
@@ -152,7 +168,6 @@ struct StartTimeEditor: View {
         isPreviewPlaying = false
         timer?.invalidate()
         timer = nil
-        print("[StartTimeEditor] ⏹️ Stopping preview")
         playerManager.stopPreview()
         showProgress = false
     }
