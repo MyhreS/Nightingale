@@ -1,25 +1,14 @@
 import SwiftUI
 
 struct Playlist: View {
-    @ObservedObject var musicLibrary = MusicLibrary.shared
+    @ObservedObject private var musicLibrary = MusicLibrary.shared
     @Binding var selectedPlaylist: String
     
     private var filteredSongs: [Song] {
-        /*
         if selectedPlaylist == "All" {
-            // Show all songs in a single list, sorted by playlist then name
-            return musicLibrary.songs.sorted { (song1, song2) in
-                let playlist1 = playlistManager.playlistForSong(song1.id) ?? ""
-                let playlist2 = playlistManager.playlistForSong(song2.id) ?? ""
-                return (playlist1, song1.fileName) < (playlist2, song2.fileName)
-            }
-        } else {
-            // Show songs from selected playlist
-            return playlistManager.songsInPlaylist(selectedPlaylist)
-                .sorted { $0.fileName < $1.fileName }
+            return musicLibrary.songs
         }
-        */
-        return musicLibrary.songs
+        return musicLibrary.songs.filter{$0.playlist == selectedPlaylist}
     }
     
     var body: some View {
