@@ -25,21 +25,20 @@ struct Playlist: View {
                         .foregroundColor(.gray)
                         .padding(.leading, 0)
                 }
-                
-                Rectangle()
-                    .fill(Color.clear)
-                    .frame(maxHeight: .infinity)
-                    .padding(0)
+
+                Spacer()
             }
         } else {
-            List($musicLibrary.songs, id: \.self) { $song in
-                if selectedPlaylist == "All" || song.playlist == selectedPlaylist {
-                    MusicItem(song: $song)
+            ScrollView {
+                LazyVStack(spacing: 8) {
+                    ForEach($musicLibrary.songs, id: \.self) { $song in
+                        if selectedPlaylist == "All" || song.playlist == selectedPlaylist {
+                            MusicItem(song: $song)
+                        }
+                    }
                 }
+                .padding(.horizontal)
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            .padding(.leading, 0)
         }
     }
 }

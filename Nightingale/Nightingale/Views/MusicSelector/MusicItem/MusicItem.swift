@@ -44,6 +44,7 @@ struct MusicItem: View {
         .buttonStyle(PlainButtonStyle())
         .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
+        
     }
 
 

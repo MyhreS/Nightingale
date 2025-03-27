@@ -6,18 +6,16 @@ struct DevelopmentToolsView: View {
     let resetPlayedStatus: () -> Void
 
     var body: some View {
-        CustomCard {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Development Tools")
-                    .font(.headline)
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Development Tools")
+                .font(.headline)
 
-                ClearLibraryButton(clearFeedback: $clearFeedback)
-                ResetPlayedStatusButton(resetFeedback: $resetFeedback, resetPlayedStatus: resetPlayedStatus)
+            ClearLibraryButton(clearFeedback: $clearFeedback)
+            ResetPlayedStatusButton(resetFeedback: $resetFeedback, resetPlayedStatus: resetPlayedStatus)
 
-                Text("Use this when rebuilding the app to clear stale configuration")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
+            Text("Use this when rebuilding the app to clear stale configuration")
+                .font(.caption)
+                .foregroundColor(.gray)
         }
     }
 }
