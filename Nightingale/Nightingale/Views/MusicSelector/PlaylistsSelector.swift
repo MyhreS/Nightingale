@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct PlaylistsSelector: View {
-    @ObservedObject var playlistManager = PlaylistsManager.shared
     @Binding var selectedPlaylist: String
     
     var body: some View {
@@ -12,12 +11,10 @@ struct PlaylistsSelector: View {
                     provideHapticFeedback()
                 }
                 
-                ForEach(playlistManager.playlists, id: \.self) { playlist in
-                    TagButton(tag: playlist, isSelected: selectedPlaylist == playlist) {
-                        selectedPlaylist = playlist
+                    TagButton(tag: "Some playlist", isSelected: selectedPlaylist == "Some playlist") {
+                        selectedPlaylist = "Some playlist"
                         provideHapticFeedback()
                     }
-                }
             }
             .padding(.horizontal, 5)
         }

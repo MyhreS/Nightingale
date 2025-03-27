@@ -3,7 +3,6 @@ import SwiftUI
 struct CreatePlaylistSheet: View {
     @Binding var isPresented: Bool
     @State private var playlistName: String = ""
-    @ObservedObject var playlistsManager = PlaylistsManager.shared
     @Binding var successfullyAddedPlaylist: Bool
 
     var body: some View {
@@ -15,7 +14,7 @@ struct CreatePlaylistSheet: View {
                 
                 Button(action: {
                     if !playlistName.isEmpty {
-                        playlistsManager.addPlaylist(playlistName)
+                        // playlistsManager.addPlaylist(playlistName)
                         successfullyAddedPlaylist = true
                         isPresented = false
 

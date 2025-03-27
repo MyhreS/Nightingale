@@ -2,7 +2,6 @@ import SwiftUI
 
 struct Playlist: View {
     @ObservedObject var musicLibrary = MusicLibrary.shared
-   // @ObservedObject var playlistManager = PlaylistManager.shared
     @Binding var selectedPlaylist: String
     
     private var filteredSongs: [Song] {

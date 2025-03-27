@@ -5,6 +5,7 @@ struct AddSheet: View {
     @State private var showCreatePlaylist = false
     @ObservedObject var fileImporterHelper: FileImporterHelper
     @Binding var successfullyAddedPlaylist: Bool
+    private let musicLibrary = MusicLibrary.shared
 
     var body: some View {
         ZStack {
@@ -39,6 +40,7 @@ struct AddSheet: View {
                         }
                     }
                     .contentShape(Rectangle())
+                    .disabled(musicLibrary.songs.isEmpty)
                 }
             }
             .listStyle(.insetGrouped)

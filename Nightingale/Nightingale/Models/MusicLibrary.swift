@@ -6,7 +6,6 @@ class MusicLibrary: ObservableObject {
     
     private let musicStorage = MusicStorage.shared
     private let musicConfig = MusicConfig.shared
-    private let playlistsManager = PlaylistsManager.shared
     
     @Published var songs: [Song] = []
     private var cancellables = Set<AnyCancellable>()

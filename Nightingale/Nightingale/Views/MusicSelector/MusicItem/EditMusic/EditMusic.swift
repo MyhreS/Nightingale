@@ -13,7 +13,6 @@ struct EditMusic: View {
     @State private var showPlaylistPicker = false
     @State private var showStartTimeEditor = false
     private let playerManager = PlayerManager.shared
-    @ObservedObject private var playlistManager = PlaylistsManager.shared
 
     init(song: Song, onSave: @escaping (Song) -> Void) {
         self.song = song
@@ -22,7 +21,6 @@ struct EditMusic: View {
     }
 
     private var currentPlaylist: String? {
-        //playlistManager.playlistForSong(song.id)
         return "Something"
     }
 

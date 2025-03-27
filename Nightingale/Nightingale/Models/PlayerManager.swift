@@ -186,7 +186,7 @@ class PlayerManager: NSObject, ObservableObject { // ✅ Inherit from NSObject
     /// Finds the next song with the same playlist
     private func findNextSongInSamePlaylist(_ currentSong: Song) -> Song? {
         /*
-        let playlistManager = PlaylistManager.shared
+
         
         // Get the current playlist
         guard let currentPlaylist = playlistManager.playlistForSong(currentSong.id) else {
