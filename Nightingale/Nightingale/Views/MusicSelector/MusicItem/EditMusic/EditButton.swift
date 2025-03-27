@@ -4,7 +4,7 @@ import SwiftUI
 
 struct EditButton: View {
     @State private var showEditSheet = false
-    var song: Song
+    @Binding var song: Song
     @ObservedObject private var musicLibrary = MusicLibrary.shared
 
     var body: some View {
@@ -16,7 +16,7 @@ struct EditButton: View {
         }
         .buttonStyle(PlainButtonStyle())
         .sheet(isPresented: $showEditSheet) {
-            EditMusic(song: song)
+            EditMusic(song: $song)
                 .presentationDetents([.height(250)])
                 .presentationDragIndicator(.visible)
         }

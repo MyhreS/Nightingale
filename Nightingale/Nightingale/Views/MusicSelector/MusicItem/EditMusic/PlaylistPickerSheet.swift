@@ -2,18 +2,34 @@ import SwiftUI
 
 struct PlaylistPickerSheet: View {
     @Environment(\.dismiss) private var dismiss
-    let song: Song
-    let currentPlaylist: String?
+    @Binding var song: Song
+    @ObservedObject private var musicLibrary = MusicLibrary.shared
+    @State private var selectedPlaylist: String?
+    
+    private var playlists: [String] {
+        let nonEmptyPlaylists = musicLibrary.songs.map { $0.playlist }.filter { !$0.isEmpty }
+        let uniquePlaylists = Set(nonEmptyPlaylists)
+        return uniquePlaylists.sorted()
+    }
+    
+    private func addSongToPlaylist(playlist: String) {
+        song.playlist = playlist
+        musicLibrary.editMusicFile(song)
+        dismiss()
+    }
     
     var body: some View {
         NavigationView {
-            List {
-                // Implement your playlist selection UI here
+            List(playlists, id: \.self) { playlist in
+                Button(action: {
+                    addSongToPlaylist(playlist: playlist)
+                }) {
+                    Text(playlist)
+                }
             }
             .navigationTitle("Select Playlist")
             .navigationBarItems(
-                leading: Button("Cancel") { dismiss() },
-                trailing: Button("Done") { dismiss() }
+                leading: Button("Cancel") { dismiss() }
             )
         }
     }

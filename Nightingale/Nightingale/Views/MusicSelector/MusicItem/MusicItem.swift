@@ -4,7 +4,7 @@ struct MusicItem: View {
     //@ObservedObject var musicQueue = MusicQueue.shared // Shared music queue
     @State private var queued = false;
     @ObservedObject private var musicLibrary = MusicLibrary.shared
-    var song: Song
+    @Binding var song: Song
     
     var body: some View {
         Button(action: {
@@ -31,7 +31,7 @@ struct MusicItem: View {
                     .lineLimit(nil)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                EditButton(song: song)
+                EditButton(song: $song)
             }
             .padding(10)
             .frame(maxWidth: .infinity)

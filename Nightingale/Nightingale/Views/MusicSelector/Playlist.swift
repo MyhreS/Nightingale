@@ -32,8 +32,10 @@ struct Playlist: View {
                     .padding(0)
             }
         } else {
-            List(filteredSongs, id: \.self) { song in
-                MusicItem(song: song)
+            List($musicLibrary.songs, id: \.self) { $song in
+                if selectedPlaylist == "All" || song.playlist == selectedPlaylist {
+                    MusicItem(song: $song)
+                }
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)

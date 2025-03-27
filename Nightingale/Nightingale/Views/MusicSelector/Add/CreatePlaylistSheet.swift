@@ -14,6 +14,7 @@ struct CreatePlaylistSheet: View {
                 TextField("Enter playlist name", text: $playlistName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
+                    .frame(maxWidth: .infinity)
 
                 List(musicLibrary.songs) { song in
                     Button(action: {

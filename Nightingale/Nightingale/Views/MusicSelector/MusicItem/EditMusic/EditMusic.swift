@@ -2,15 +2,10 @@ import SwiftUI
 import AVFoundation
 
 struct EditMusic: View {
-    var song: Song
+    @Binding var song: Song
 
     @State private var showPlaylistPicker = false
     @State private var showStartTimeEditor = false
-
-
-    private var currentPlaylist: String? {
-        return "Something"
-    }
 
     var body: some View {
         ZStack {
@@ -51,7 +46,7 @@ struct EditMusic: View {
                             HStack {
                                 Image(systemName: "music.note.list")
                                     .frame(width: 25)
-                                Text(currentPlaylist == nil ? "Add to Playlist" : "Current Playlist: \(currentPlaylist!)")
+                                Text(song.playlist.isEmpty ? "Add to Playlist" : "Current Playlist: \(song.playlist)")
                                 Spacer()
                                 Image(systemName: "chevron.right")
                                     .foregroundColor(.gray)
@@ -82,7 +77,7 @@ struct EditMusic: View {
             StartTimeEditor(song: song)
         }
         .sheet(isPresented: $showPlaylistPicker) {
-            PlaylistPickerSheet(song: song, currentPlaylist: currentPlaylist)
+            PlaylistPickerSheet(song: $song)
         }
     }
 
