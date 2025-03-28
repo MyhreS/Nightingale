@@ -7,67 +7,37 @@ struct MusicItem: View {
     @Binding var song: Song
     
     var body: some View {
-        Button(action: {
-            addToQueue(song)
-            provideHapticFeedback()
-        }) {
-            HStack(spacing: 10) {
-                // Music icon (squircle)
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(iconBackgroundColor())
-                        .frame(width: 40, height: 40)
+            Button(action: {
+                addToQueue(song)
+                provideHapticFeedback()
+            }) {
+                HStack(spacing: 10) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(Color.blue.opacity(0.2))
+                            .frame(width: 60, height: 60)
+                        Image(systemName: "music.note")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 30, height: 30)
+                            .foregroundColor(.blue)
+                    }
 
-                    Image(systemName: "music.note")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                        .foregroundColor(iconForegroundColor())
+
+                    Text(song.fileName)
+                        .font(queued ? .body.weight(.bold) : .body)
+                        .foregroundColor(queued ? .blue : .primary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    EditButton(song: $song)
                 }
-
-                // Song name
-                Text(song.fileName)
-                    .font(.body)
-                    .lineLimit(nil)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                EditButton(song: $song)
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
             }
-            .padding(10)
-            .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(queued ? Color.green.opacity(0.2) : Color.clear)
-            )
-            .contentShape(Rectangle())
+            .buttonStyle(PlainButtonStyle())
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
         }
-        .buttonStyle(PlainButtonStyle())
-        .listRowInsets(EdgeInsets())
-        .listRowBackground(Color.clear)
-        
-    }
-
-
-    private func iconBackgroundColor() -> Color {
-        if queued {
-            return Color.green.opacity(0.8)
-        } else if song.played {
-            return Color.gray.opacity(0.3)
-        } else {
-            return Color.blue.opacity(0.2)
-        }
-    }
-
-
-    private func iconForegroundColor() -> Color {
-        if queued {
-            return .white
-        } else if song.played {
-            return .gray
-        } else {
-            return .blue
-        }
-    }
 
 
     private func addToQueue(_ musicFile: Song) {
