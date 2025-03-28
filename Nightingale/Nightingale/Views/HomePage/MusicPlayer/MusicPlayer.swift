@@ -5,43 +5,31 @@ struct MusicPlayer: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 10) {
-                //CurrentQueued()
-                //PlayPauseButton()
+            HStack(spacing: 2) {
                 PlayStopToggleButton()
             }
-            .frame(maxWidth: .infinity, maxHeight: 70)
+            .frame(maxWidth: .infinity, maxHeight: 40)
 
             VStack(spacing: 4) {
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        Capsule()
-                            .fill(Color.white.opacity(0.3))
-                            .frame(height: 4)
-                    }
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.white.opacity(0.3))
+                        .frame(height: 2)
                 }
-                .frame(height: 4)
-
-                HStack {
-                    Text(formatTime(playerManager.currentTime))
-                        .font(.caption2)
-                        .foregroundColor(.white)
-                        .monospacedDigit()
-                    Spacer()
-                }
+                .frame(height: 2)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
+            .padding(.horizontal, 8)
+            .padding(.top, 4)
         }
-        .padding()
+        .padding(6)
         .background(
-            Color.gray.opacity(0.5)
-                .clipShape(RoundedRectangle(cornerRadius: 30)) // keep blur inside
+            Color(uiColor: .darkGray)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
         )
-        .clipShape(RoundedRectangle(cornerRadius: 30)) // keep child views within shape too
+        .clipShape(RoundedRectangle(cornerRadius: 10))
         .overlay(
-            RoundedRectangle(cornerRadius: 30)
-                .stroke(Color.gray.opacity(0.4), lineWidth: 1.5)
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.gray.opacity(0.4), lineWidth: 1)
         )
     }
 

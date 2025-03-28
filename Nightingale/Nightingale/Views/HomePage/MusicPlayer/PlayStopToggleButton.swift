@@ -12,7 +12,7 @@ struct PlayStopToggleButton: View {
             Image(systemName: isPlaying ? "stop.fill" : "play.fill")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 40, height: 40)
+                .frame(width: 20, height: 20)
                 .foregroundColor(.white)
         }
         .animation(.easeInOut(duration: 0.1), value: isPlaying)

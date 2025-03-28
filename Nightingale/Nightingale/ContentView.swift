@@ -38,8 +38,8 @@ struct ContentView: View {
         LinearGradient(
             gradient: Gradient(stops: [
                 .init(color: .clear, location: 0),
-                .init(color: Color.black.opacity(0.05), location: selectedTab == .home ? 0.2 : 0.15),
-                .init(color: .black, location: selectedTab == .home ? 0.4 : 0.2)
+                .init(color: Color.black.opacity(0.05), location: selectedTab == .home ? 0.15 : 0.15),
+                .init(color: .black, location: selectedTab == .home ? 0.25 : 0.2)
             ]),
             startPoint: .bottom,
             endPoint: .top
