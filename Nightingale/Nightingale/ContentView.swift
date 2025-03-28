@@ -2,9 +2,13 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedPlaylist: String = "All"
-    
+
     var body: some View {
         ZStack {
+        
+            Color(UIColor.darkGray).opacity(0.3)
+                .ignoresSafeArea()
+            
             VStack(spacing: 0) {
                 HStack {
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -17,26 +21,34 @@ struct ContentView: View {
                     AddButton()
                 }
                 .padding()
-                
-                ScrollView {
-                    VStack(spacing: 16) {
-                        Playlist(selectedPlaylist: $selectedPlaylist)
-                            .padding(.top, 10)
-                            .padding(.bottom, 140)
+
+                ZStack(alignment: .bottom) {
+                    ScrollView {
+                        VStack(spacing: 16) {
+                            Playlist(selectedPlaylist: $selectedPlaylist)
+                                .padding(.top, 10)
+                                .padding(.bottom, 140)
+                        }
+                        .padding(.horizontal, 0)
                     }
-                    .padding(.horizontal, 8)
                 }
-                
+
                 Spacer(minLength: 0)
             }
-            
-            VStack {
+
+            VStack(spacing: 0) {
                 Spacer()
                 MusicPlayer()
                     .padding(.horizontal)
-                    .padding(.bottom, 10)
+                    .padding(.bottom, 0)
+
+                BottomDrawer()
+                    .padding(.bottom, 20)
+
             }
         }
+        .ignoresSafeArea(edges: .bottom)
+        
     }
 }
 
