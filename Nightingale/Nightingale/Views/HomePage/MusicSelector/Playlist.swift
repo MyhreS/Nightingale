@@ -18,19 +18,16 @@ struct Playlist: View {
                     Text("No music added yet. Click on the plus (+) button to add some!")
                         .font(.subheadline)
                         .foregroundColor(.gray)
-                        .padding(.leading, 0)
                 } else {
                     Text("No songs in this playlist")
                         .font(.subheadline)
                         .foregroundColor(.gray)
-                        .padding(.leading, 0)
                 }
-
                 Spacer()
             }
         } else {
             ScrollView {
-                LazyVStack(spacing: 8) {
+                VStack(spacing: 8) {
                     ForEach($musicLibrary.songs, id: \.self) { $song in
                         if selectedPlaylist == "All" || song.playlist == selectedPlaylist {
                             MusicItem(song: $song)
