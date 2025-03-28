@@ -1,23 +1,27 @@
 import SwiftUI
 
 struct ResetPlayedStatusButton: View {
-    @Binding var resetFeedback: Bool
-    let resetPlayedStatus: () -> Void
+    @State private var success = false
 
     var body: some View {
         Button(action: {
-            resetPlayedStatus()
-            withAnimation {
-                resetFeedback = true
+            for var song in MusicLibrary.shared.songs {
+                song.played = false
+                MusicLibrary.shared.editMusicFile(song)
             }
+
+            withAnimation {
+                success = true
+            }
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 withAnimation {
-                    resetFeedback = false
+                    success = false
                 }
             }
         }) {
             HStack {
-                if resetFeedback {
+                if success {
                     Image(systemName: "checkmark.circle.fill")
                     Text("Status Reset!")
                 } else {
@@ -25,9 +29,9 @@ struct ResetPlayedStatusButton: View {
                     Text("Reset Played Status")
                 }
             }
-            .foregroundColor(resetFeedback ? .green : .blue)
+            .foregroundColor(success ? .green : .blue)
             .padding()
-            .background(resetFeedback ? Color.green.opacity(0.1) : Color.blue.opacity(0.1))
+            .background(success ? Color.green.opacity(0.1) : Color.blue.opacity(0.1))
             .cornerRadius(10)
             .frame(maxWidth: .infinity)
         }

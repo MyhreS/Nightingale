@@ -1,23 +1,22 @@
 import SwiftUI
 
-
 struct ClearLibraryButton: View {
-    @Binding var clearFeedback: Bool
+    @State private var success = false
 
     var body: some View {
         Button(action: {
             MusicLibrary.shared.removeAllMusic()
             withAnimation {
-                clearFeedback = true
+                success = true
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 withAnimation {
-                    clearFeedback = false
+                    success = false
                 }
             }
         }) {
             HStack {
-                if clearFeedback {
+                if success {
                     Image(systemName: "checkmark.circle.fill")
                     Text("Library Cleared!")
                 } else {
@@ -25,9 +24,9 @@ struct ClearLibraryButton: View {
                     Text("Clear Music Library")
                 }
             }
-            .foregroundColor(clearFeedback ? .green : .red)
+            .foregroundColor(success ? .green : .red)
             .padding()
-            .background(clearFeedback ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
+            .background(success ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
             .cornerRadius(10)
             .frame(maxWidth: .infinity)
         }
