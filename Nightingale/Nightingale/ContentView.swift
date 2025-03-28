@@ -10,11 +10,16 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            Color(UIColor.darkGray).opacity(0.3)
-                .ignoresSafeArea()
+            Color(UIColor.darkGray).opacity(0.3).ignoresSafeArea()
+            fadedMainContent()
+            FixedBottomElements(selectedTab: $selectedTab)
+        }
+        .ignoresSafeArea(edges: .bottom)
+    }
 
-            // Page content
-            Group {
+    func fadedMainContent() -> some View {
+        GeometryReader { geo in
+            ZStack {
                 switch selectedTab {
                 case .home:
                     HomePage()
@@ -22,21 +27,39 @@ struct ContentView: View {
                     SettingsPage()
                 }
             }
-
-            // Fixed bottom elements
-            VStack(spacing: 0) {
-                Spacer()
-                if selectedTab == .home {
-                    MusicPlayer()
-                        .padding(.horizontal)
-                        .padding(.bottom, 0)
-                }
-
-                BottomDrawer(selectedTab: $selectedTab)
-                    .padding(.bottom, 20)
-            }
+            .mask(
+                fadeMask(height: geo.size.height)
+                    .frame(height: geo.size.height)
+            )
         }
-        .ignoresSafeArea(edges: .bottom)
+    }
+
+    func fadeMask(height: CGFloat) -> LinearGradient {
+        LinearGradient(
+            gradient: Gradient(stops: [
+                .init(color: .clear, location: 0),
+                .init(color: Color.black.opacity(0.05), location: 0.2),
+                .init(color: .black, location: 0.4)
+            ]),
+            startPoint: .bottom,
+            endPoint: .top
+        )
+    }
+}
+
+struct FixedBottomElements: View {
+    @Binding var selectedTab: Tab
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Spacer()
+            if selectedTab == .home {
+                MusicPlayer()
+                    .padding(.horizontal)
+            }
+            BottomDrawer(selectedTab: $selectedTab)
+                .padding(.bottom, 20)
+        }
     }
 }
 

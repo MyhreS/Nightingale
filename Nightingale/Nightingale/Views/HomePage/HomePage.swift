@@ -5,39 +5,12 @@ struct HomePage: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            TopBar(selectedPlaylist: $selectedPlaylist)
-            GeometryReader { geo in
-                ScrollView {
-                    Content(selectedPlaylist: $selectedPlaylist)
-                }
-                .mask(
-                    bottomFadeMask(height: geo.size.height)
-                        .frame(height: geo.size.height)
-                )
-            }
+            topBar()
+            playlistContent()
         }
     }
-}
 
-func bottomFadeMask(height: CGFloat) -> LinearGradient {
-    let stops = [
-        // Bottom is fully invisible
-        Gradient.Stop(color: .clear, location: 0),
-        // 10px up = almost invisible
-        Gradient.Stop(color: Color.black.opacity(0.05), location: 0.2),
-        // Top = fully visible
-        Gradient.Stop(color: .black, location: 0.4)
-    ]
-    return LinearGradient(
-        gradient: Gradient(stops: stops),
-        startPoint: .bottom,
-        endPoint: .top
-    )
-}
-
-struct TopBar: View {
-    @Binding var selectedPlaylist: String
-    var body: some View {
+    func topBar() -> some View {
         HStack {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
@@ -50,16 +23,15 @@ struct TopBar: View {
         }
         .padding()
     }
-}
 
-struct Content: View {
-    @Binding var selectedPlaylist: String
-    var body: some View {
-        VStack(spacing: 16) {
-            Playlist(selectedPlaylist: $selectedPlaylist)
-                .padding(.top, 10)
-                .padding(.bottom, 200)
+    func playlistContent() -> some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                Playlist(selectedPlaylist: $selectedPlaylist)
+                    .padding(.top, 10)
+                    .padding(.bottom, 200)
+            }
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
     }
 }
