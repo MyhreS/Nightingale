@@ -1,54 +1,42 @@
 import SwiftUI
 
+enum Tab {
+    case home
+    case settings
+}
+
 struct ContentView: View {
-    @State private var selectedPlaylist: String = "All"
+    @State private var selectedTab: Tab = .home
 
     var body: some View {
         ZStack {
-        
             Color(UIColor.darkGray).opacity(0.3)
                 .ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                HStack {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            PlaylistsSelector(selectedPlaylist: $selectedPlaylist)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    RemoveButton()
-                    AddButton()
-                }
-                .padding()
 
-                ZStack(alignment: .bottom) {
-                    ScrollView {
-                        VStack(spacing: 16) {
-                            Playlist(selectedPlaylist: $selectedPlaylist)
-                                .padding(.top, 10)
-                                .padding(.bottom, 160)
-                        }
-                        .padding(.horizontal, 0)
-                    }
+            // Page content
+            Group {
+                switch selectedTab {
+                case .home:
+                    HomePage()
+                case .settings:
+                    SettingsPage()
                 }
-
-                Spacer(minLength: 0)
             }
 
+            // Fixed bottom elements
             VStack(spacing: 0) {
                 Spacer()
-                MusicPlayer()
-                    .padding(.horizontal)
-                    .padding(.bottom, 0)
+                if selectedTab == .home {
+                    MusicPlayer()
+                        .padding(.horizontal)
+                        .padding(.bottom, 0)
+                }
 
-                BottomDrawer()
-                    .padding(.bottom, 25)
-
+                BottomDrawer(selectedTab: $selectedTab)
+                    .padding(.bottom, 20)
             }
         }
         .ignoresSafeArea(edges: .bottom)
-        
     }
 }
 
