@@ -43,7 +43,7 @@ struct ContentView: View {
                     .padding(.bottom, 0)
 
                 BottomDrawer()
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 25)
 
             }
         }
