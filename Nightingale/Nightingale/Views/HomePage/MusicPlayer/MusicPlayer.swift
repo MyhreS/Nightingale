@@ -6,8 +6,9 @@ struct MusicPlayer: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 10) {
-                CurrentQueued()
-                PlayPauseButton()
+                //CurrentQueued()
+                //PlayPauseButton()
+                PlayStopToggleButton()
             }
             .frame(maxWidth: .infinity, maxHeight: 70)
 
