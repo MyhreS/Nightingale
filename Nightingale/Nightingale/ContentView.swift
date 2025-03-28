@@ -27,7 +27,7 @@ struct ContentView: View {
                         VStack(spacing: 16) {
                             Playlist(selectedPlaylist: $selectedPlaylist)
                                 .padding(.top, 10)
-                                .padding(.bottom, 140)
+                                .padding(.bottom, 160)
                         }
                         .padding(.horizontal, 0)
                     }
