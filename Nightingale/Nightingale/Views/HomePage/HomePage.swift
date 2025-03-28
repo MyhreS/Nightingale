@@ -18,8 +18,8 @@ struct HomePage: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            RemoveButton()
-            AddButton()
+
+            MoreButton()
         }
         .padding()
     }
