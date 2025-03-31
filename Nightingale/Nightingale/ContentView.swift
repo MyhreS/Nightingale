@@ -10,7 +10,7 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            Color(UIColor.darkGray).opacity(0.3).ignoresSafeArea()
+            Color(UIColor.darkGray).opacity(0.2).ignoresSafeArea()
             fadedMainContent()
             FixedBottomElements(selectedTab: $selectedTab)
         }
