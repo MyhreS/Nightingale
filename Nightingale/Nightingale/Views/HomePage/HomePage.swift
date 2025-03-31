@@ -11,18 +11,24 @@ struct HomePage: View {
     }
 
     func topBar() -> some View {
-        HStack {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    PlaylistsSelector(selectedPlaylist: $selectedPlaylist)
+            HStack {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        PlaylistsSelector(selectedPlaylist: $selectedPlaylist)
+                    }
                 }
-            }
-            .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity)
 
-            MoreButton()
+                MoreButton()
+            }
+            .padding()
+            .overlay(
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 1),
+                alignment: .bottom
+            )
         }
-        .padding()
-    }
 
     func playlistContent() -> some View {
         ScrollView {
