@@ -27,7 +27,7 @@ struct HomePage: View {
                 Rectangle()
                     .fill(Color.gray.opacity(0.3))
                     .frame(height: 1)
-                    .opacity(scrollOffset > 20 ? 1 : 0),
+                    .opacity(scrollOffset > 5 ? 1 : 0),
                 alignment: .bottom
             )
         }
