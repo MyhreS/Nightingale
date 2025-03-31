@@ -11,8 +11,9 @@ struct EditButton: View {
         Button(action: {
             showEditSheet = true
         }) {
-            Image(systemName: "slider.horizontal.3")
-                .foregroundColor(.blue)
+            Image(systemName: "ellipsis")
+                .font(.title3)
+                .foregroundColor(.gray)
         }
         .buttonStyle(PlainButtonStyle())
         .sheet(isPresented: $showEditSheet) {
