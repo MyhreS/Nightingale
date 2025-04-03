@@ -11,7 +11,7 @@ struct StartTimeEditor: View {
     @State private var showProgress = false
     @State private var timer: Timer?
 
-    private let playerManager = PlayerManager.shared
+    @StateObject private var audioPlayer = AudioPlayer()
 
     init(song: Binding<Song>) {
         _song = song
@@ -153,7 +153,7 @@ struct StartTimeEditor: View {
         currentPlayTime = startTime
         var previewSong = song
         previewSong.startTime = startTime
-        playerManager.previewPlay(previewSong)
+        audioPlayer.play(previewSong)
 
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             if currentPlayTime < song.duration {
@@ -168,7 +168,7 @@ struct StartTimeEditor: View {
         isPreviewPlaying = false
         timer?.invalidate()
         timer = nil
-        playerManager.stopPreview()
+        audioPlayer.stop()
         showProgress = false
     }
 

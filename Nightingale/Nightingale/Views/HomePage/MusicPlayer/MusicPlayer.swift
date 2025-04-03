@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MusicPlayer: View {
-    @ObservedObject private var playerManager = PlayerManager.shared
+    //@ObservedObject private var playerManager = PlayerManager.shared
 
     var body: some View {
         VStack(spacing: 0) {
