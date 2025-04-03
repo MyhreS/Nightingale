@@ -7,11 +7,11 @@ class AudioPlayer: NSObject, ObservableObject {
     private var timer: Timer?
     @Published var isPlaying = false
 
-    func play(_ musicFile: Song) {
+    func play(_ song: Song) {
         stop()
 
         do {
-            let soundURL = musicFile.url
+            let soundURL = song.url
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
 
@@ -20,7 +20,7 @@ class AudioPlayer: NSObject, ObservableObject {
 
             player.delegate = self
             player.prepareToPlay()
-            player.currentTime = musicFile.startTime
+            player.currentTime = song.startTime
             player.play()
 
             isPlaying = true
@@ -43,10 +43,6 @@ class AudioPlayer: NSObject, ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self,
                   self.isPlaying else { return }
-
-            //if player.currentTime >= player.duration {
-                //self.stop()
-            //}
         }
     }
 }
