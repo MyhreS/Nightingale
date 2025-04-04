@@ -1,10 +1,17 @@
 import SwiftUI
 
 struct MusicItem: View {
-    //@ObservedObject var musicQueue = MusicQueue.shared // Shared music queue
-    @State private var queued = false;
     @ObservedObject private var musicLibrary = MusicLibrary.shared
+    @ObservedObject private var audioQueue = AudioQueue.shared
+    
     @Binding var song: Song
+    
+    private var queued: Bool {
+        if (song.id == audioQueue.song?.id) {
+            return true
+        }
+        return false
+    }
     
     var body: some View {
             Button(action: {
@@ -40,10 +47,8 @@ struct MusicItem: View {
         }
 
 
-    private func addToQueue(_ musicFile: Song) {
-        print("[MusicItem] 🎵 Adding song to queue: \(musicFile.fileName), startTime: \(musicFile.startTime)")
-        queued = true;
-        // PlayerManager.shared.stop()
-        //musicQueue.addToQueue(musicFile)
+    private func addToQueue(_ song: Song) {
+        print("[MusicItem] 🎵 Adding song to queue: \(song.fileName), startTime: \(song.startTime)")
+        audioQueue.addSong(song)
     }
 }

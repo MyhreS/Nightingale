@@ -6,12 +6,12 @@ struct StartTimeEditor: View {
     @Environment(\.presentationMode) private var presentationMode
 
     @State private var startTime: Double
-    @State private var isPreviewPlaying = false
+    @State private var isPlaying = false
     @State private var currentPlayTime: Double
     @State private var showProgress = false
     @State private var timer: Timer?
 
-    @StateObject private var audioPlayer = AudioPlayer()
+    private var audioPlayer = AudioPlayer()
 
     init(song: Binding<Song>) {
         _song = song
@@ -33,7 +33,7 @@ struct StartTimeEditor: View {
                 sliderWithProgress
 
                 Button(action: togglePreview) {
-                    Image(systemName: isPreviewPlaying ? "stop.fill" : "play.fill")
+                    Image(systemName: isPlaying ? "stop.fill" : "play.fill")
                         .font(.title)
                         .foregroundColor(.blue)
                         .frame(width: 70, height: 70)
@@ -131,7 +131,7 @@ struct StartTimeEditor: View {
                 Slider(value: $startTime, in: 0...song.duration)
                     .accentColor(.blue)
                     .onChange(of: startTime) {
-                        if isPreviewPlaying {
+                        if isPlaying {
                             stopPreview()
                         }
                     }
@@ -149,7 +149,7 @@ struct StartTimeEditor: View {
 
     private func startPreview() {
         showProgress = true
-        isPreviewPlaying = true
+        isPlaying = true
         currentPlayTime = startTime
         var previewSong = song
         previewSong.startTime = startTime
@@ -165,7 +165,7 @@ struct StartTimeEditor: View {
     }
 
     private func stopPreview() {
-        isPreviewPlaying = false
+        isPlaying = false
         timer?.invalidate()
         timer = nil
         audioPlayer.stop()
@@ -173,7 +173,7 @@ struct StartTimeEditor: View {
     }
 
     private func togglePreview() {
-        if isPreviewPlaying {
+        if isPlaying {
             stopPreview()
         } else {
             currentPlayTime = startTime
