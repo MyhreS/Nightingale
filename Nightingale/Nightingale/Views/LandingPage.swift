@@ -2,22 +2,31 @@ import SwiftUI
 
 struct LandingPage: View {
     @StateObject private var auth = SoundCloudAuth.shared
-    @State private var selectedTab: Tab = .home
     
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(.systemGray6).ignoresSafeArea()
-                VStack(spacing: 16) {
+                LinearGradient (
+                    colors: [.orange.opacity(0.8), .orange.opacity(0.3)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing,
+                )
+                .ignoresSafeArea()
+                
+                Button(action: loadTracks) {
+                    HStack {
+                        Text("Load tracks")
+                            .fontWeight(.semibold)
+                    }
+                    .frame(maxWidth: .infinity)
                 }
-                .padding()
             }
         }
         
     }
     
 
-    private func toggleTab() {
-        selectedTab = (selectedTab == .home) ? .settings : .home
+    private func loadTracks() {
+        
     }
 }
