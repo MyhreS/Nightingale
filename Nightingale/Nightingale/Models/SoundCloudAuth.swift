@@ -20,6 +20,13 @@ struct PKCE {
     }
 }
 
+func maskToken(token: String?) -> String {
+    guard let t = token, !t.isEmpty else {return ""}
+    let visible = t.prefix(4)
+    let remaining = max(0, min(8, t.count - 4))
+    return visible + String(repeating: "•", count: remaining)
+}
+
 public final class SoundCloudAuth: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
     public static let shared = SoundCloudAuth()
 
@@ -42,13 +49,16 @@ public final class SoundCloudAuth: NSObject, ObservableObject, ASWebAuthenticati
         super.init()
         if let a = KeychainStore.get("soundcloud_access_token") {
             accessToken = a
+            print("[SoundCloudAuth] Loaded access token: \(maskToken(token: a))")
         }
         if let r = KeychainStore.get("soundcloud_refresh_token") {
             refreshToken = r
+            print("[SoundCloudAuth] Loaded refresh token: \(maskToken(token: r))")
         }
         if let e = KeychainStore.get("soundcloud_expires_at"),
            let t = TimeInterval(e) {
             expiresAt = Date(timeIntervalSince1970: t)
+            print("[SoundCloudAuth] Expires at \(Date(timeIntervalSince1970: t))")
         }
     }
 
@@ -67,8 +77,7 @@ public final class SoundCloudAuth: NSObject, ObservableObject, ASWebAuthenticati
 
     public lazy var clientSecret: String = {
         let v = Self.loadInfoValue("SOUND_CLOUD_CLIENT_SECRET")
-        let masked = v.isEmpty ? "" : String(repeating: "•", count: max(4, min(12, v.count)))
-        print("[SoundCloudAuth] Loaded Client Secret: \(masked)")
+        print("[SoundCloudAuth] Loaded Client Secret: \(maskToken(token: v))")
         return v
     }()
 
