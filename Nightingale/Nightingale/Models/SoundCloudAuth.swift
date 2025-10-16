@@ -26,6 +26,11 @@ public final class SoundCloudAuth: NSObject, ObservableObject, ASWebAuthenticati
     @Published public private(set) var accessToken: String?
     @Published public private(set) var refreshToken: String?
     @Published public private(set) var expiresAt: Date?
+    
+    public var isAuthenticated: Bool {
+        guard let token = accessToken, !token.isEmpty, let expiry = expiresAt else {return false}
+        return Date() < expiry
+    }
 
     var pendingPKCE: PKCE?
     var pendingState: String?
