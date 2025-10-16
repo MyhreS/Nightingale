@@ -10,10 +10,6 @@ struct NightingaleApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .onOpenURL { url in
-                    print("[App] onOpenURL received:", url.absoluteString)
-                    SoundCloudAuth.shared.handleRedirect(url: url)
-                }
                 .preferredColorScheme(.dark)
         }
     }
