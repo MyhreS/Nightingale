@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 enum Tab {
     case home
@@ -6,6 +7,7 @@ enum Tab {
 }
 
 struct ContentView: View {
+    @StateObject private var auth = SoundCloudAuth.shared
     @State private var selectedTab: Tab = .home
 
     var body: some View {
@@ -29,6 +31,24 @@ struct ContentView: View {
                     Text("Current tab: \(selectedTab == .home ? "Home" : "Settings")")
                         .font(.callout)
                         .foregroundStyle(.secondary)
+
+                    Group {
+                        Divider().padding(.vertical, 8)
+                        Text("SoundCloud Auth")
+                            .font(.headline)
+                        Text("Client ID: \(auth.clientID.isEmpty ? "<missing>" : auth.clientID)")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
+                        let secretMasked = auth.clientSecret.isEmpty ? "<missing>" : String(repeating: "•", count: max(4, min(12, auth.clientSecret.count)))
+                        Text("Client Secret: \(secretMasked)")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                        Text("Redirect URI: \(auth.redirectURI.isEmpty ? "<missing>" : auth.redirectURI)")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
+                    }
                 }
                 .padding()
             }
