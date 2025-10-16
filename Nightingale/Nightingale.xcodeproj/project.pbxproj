@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		436B8AC72EA0DE9A007E6706 /* SoundCloudAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436B8AC62EA0DE9A007E6706 /* SoundCloudAuth.swift */; };
 		436B8ACB2EA0E259007E6706 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 436B8ACA2EA0E259007E6706 /* Secrets.xcconfig */; };
 /* End PBXBuildFile section */
 
@@ -33,7 +32,6 @@
 		434A85A62D535F29000C4AB5 /* NightingaleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NightingaleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		434A85B02D535F29000C4AB5 /* NightingaleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NightingaleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		434A86E22D5637EC000C4AB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		436B8AC62EA0DE9A007E6706 /* SoundCloudAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundCloudAuth.swift; sourceTree = "<group>"; };
 		436B8ACA2EA0E259007E6706 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -102,7 +100,6 @@
 				434A85A92D535F29000C4AB5 /* NightingaleTests */,
 				434A85B32D535F29000C4AB5 /* NightingaleUITests */,
 				434A85972D535F27000C4AB5 /* Products */,
-				436B8AC62EA0DE9A007E6706 /* SoundCloudAuth.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -263,7 +260,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				436B8AC72EA0DE9A007E6706 /* SoundCloudAuth.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,6 +429,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Nightingale/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -465,6 +463,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Nightingale/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

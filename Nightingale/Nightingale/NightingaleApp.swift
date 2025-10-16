@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 @main
 struct NightingaleApp: App {
@@ -9,7 +10,11 @@ struct NightingaleApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-            .preferredColorScheme(.dark)
+                .onOpenURL { url in
+                    print("[App] onOpenURL received:", url.absoluteString)
+                    SoundCloudAuth.shared.handleRedirect(url: url)
+                }
+                .preferredColorScheme(.dark)
         }
     }
 }

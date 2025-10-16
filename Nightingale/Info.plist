@@ -14,14 +14,5 @@
 	<array>
 		<string>audio</string>
 	</array>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>nightingale</string>
-			</array>
-		</dict>
-	</array>
 </dict>
 </plist>
