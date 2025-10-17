@@ -11,8 +11,8 @@ struct LandingPage: View {
                     endPoint: .bottomTrailing
                 ).ignoresSafeArea()
                 
-                Button(action: searchSomething) {
-                    Text("Fetch Track Info")
+                Button(action: searchTracks) {
+                    Text("Search Tracks")
                         .font(.headline)
                         .fontWeight(.semibold)
                         .padding(.vertical, 14)
@@ -36,11 +36,10 @@ struct LandingPage: View {
         }
     }
     
-    func searchSomething() {
+    func searchTracks() {
         Task {
             do {
                 let tracks = try await SoundCloud.search(query: "Goo Goo Dolls Slide", limit: 5)
-                print("Found \(tracks.count) tracks:")
                 if let first = tracks.first {
                     TrackPrinter.printSummary(for: first)
                 }

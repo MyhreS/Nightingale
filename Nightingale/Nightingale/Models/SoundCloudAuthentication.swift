@@ -8,8 +8,7 @@ final class SoundCloudAuthentication {
     private var refreshToken: String?
     private var expiresAt: Date?
     
-    private var isFetching = false
-    private let fetchLock = NSLock()
+    private var fetchTask: Task<String, Error>?
     
     private let tokenURL = URL(string: "https://secure.soundcloud.com/oauth/token")!
     
@@ -32,34 +31,37 @@ final class SoundCloudAuthentication {
             return accessToken!
         }
         
-        fetchLock.lock()
-        if isFetching {
-            fetchLock.unlock()
-            try await Task.sleep(nanoseconds: 100_000_000)
-            return try await getValidAccessToken()
-        }
-        isFetching = true
-        fetchLock.unlock()
-        
-        defer {
-            fetchLock.lock()
-            isFetching = false
-            fetchLock.unlock()
+        if let existingTask = fetchTask {
+            log("Waiting for existing token fetch")
+            return try await existingTask.value
         }
         
-        if shouldRefresh() {
-            log("Refreshing token")
-            try await refreshToken()
-        } else {
-            log("Fetching new client credentials token")
-            try await fetchClientCredentialsToken()
+        let task = Task<String, Error> {
+            if shouldRefresh() {
+                log("Refreshing token")
+                try await refreshToken()
+            } else {
+                log("Fetching new client credentials token")
+                try await fetchClientCredentialsToken()
+            }
+            
+            guard let token = accessToken else {
+                throw SoundCloudError.authenticationFailed("Failed to obtain access token")
+            }
+            
+            return token
         }
         
-        guard let token = accessToken else {
-            throw SoundCloudError.authenticationFailed("Failed to obtain access token")
-        }
+        fetchTask = task
         
-        return token
+        do {
+            let token = try await task.value
+            fetchTask = nil
+            return token
+        } catch {
+            fetchTask = nil
+            throw error
+        }
     }
     
     func getAuthorizationHeader() async throws -> String {

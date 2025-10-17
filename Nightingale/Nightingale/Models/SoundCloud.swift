@@ -12,12 +12,12 @@ enum SoundCloud {
         try await api.search(query: query, limit: limit)
     }
     
-    static func getTrack(url: String) async throws -> SCTrack {
-        try await api.resolveURL(url)
-    }
-    
     static func getTrack(id: Int) async throws -> SCTrack {
         try await api.getTrack(id: id)
+    }
+    
+    static func getTrack(url: String) async throws -> SCTrack {
+        try await api.resolveURL(url)
     }
 }
 
