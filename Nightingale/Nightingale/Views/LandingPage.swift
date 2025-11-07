@@ -39,10 +39,12 @@ struct LandingPage: View {
     func searchTracks() {
         Task {
             do {
-                let tracks = try await SoundCloud.search(query: "Goo Goo Dolls Slide", limit: 5)
-                if let first = tracks.first {
-                    TrackPrinter.printSummary(for: first)
-                }
+                let track = try await SoundCloud.getTrack(id: 90787841)
+                TrackPrinter.printSummary(for: track)
+
+                // if let first = tracks.first {
+                //     TrackPrinter.printSummary(for: first)
+                // }
             } catch {
                 print("Error: \(error.localizedDescription)")
             }
