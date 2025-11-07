@@ -1,6 +1,22 @@
 import SwiftUI
+import SoundCloud
 
 struct LandingPage: View {
+    private let sc: SoundCloud
+    @State private var isAuthenticated = false
+
+    init() {
+        let secrets = SecretsKeeper.shared
+        let config = SoundCloud.Config(
+            clientId: secrets.getClientId(),
+            clientSecret: secrets.getClientSecret(),
+            redirectURI: secrets.getRedirectUri()
+        )
+        self.sc = SoundCloud(config)
+    }
+    
+    
+    
     
     var body: some View {
         NavigationStack {
@@ -10,44 +26,79 @@ struct LandingPage: View {
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 ).ignoresSafeArea()
-                
-                Button(action: searchTracks) {
-                    Text("Search Tracks")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .padding(.vertical, 14)
-                        .padding(.horizontal, 24)
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            LinearGradient(
-                                colors: [.orange, .yellow],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        .shadow(color: .orange.opacity(0.4), radius: 6, x: 0, y: 4)
+                if isAuthenticated {
+                    LoggedInPage(sc:sc)
+                } else {
+                    AuthenticateButton(action: authenticateUser)
+                        .padding()
                 }
-                .buttonStyle(.plain)
-                .padding()
+                
+                
+                
             }
             .navigationTitle("Discover")
         }
+        .task {
+            await updateAuthState()
+        }
     }
     
-    func searchTracks() {
+    func authenticateUser() {
         Task {
             do {
-                let track = try await SoundCloud.getTrack(id: 90787841)
-                TrackPrinter.printSummary(for: track)
-
-                // if let first = tracks.first {
-                //     TrackPrinter.printSummary(for: first)
-                // }
+                _ = try await sc.authenticate()
+                isAuthenticated = true
             } catch {
-                print("Error: \(error.localizedDescription)")
+                isAuthenticated = false
+                print("❌ \(error)")
             }
+        }
+    }
+    
+    func updateAuthState() async {
+        do {
+            _ = try await sc.currentUser()
+            isAuthenticated = true
+        } catch {
+            isAuthenticated = false
+        }
+    }
+}
+
+struct AuthenticateButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text("Authenticate")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .padding(.vertical, 14)
+                .padding(.horizontal, 24)
+                .frame(maxWidth: .infinity)
+                .background(
+                    LinearGradient(
+                        colors: [.orange, .yellow],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .foregroundColor(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .shadow(color: .orange.opacity(0.4), radius: 6, x: 0, y: 4)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct LoggedInPage: View {
+    let sc: SoundCloud
+    @State private var tracks: [Track] = []
+    @State private var loading = false
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("Hello soundcloud")
         }
     }
 }

@@ -1,0 +1,24 @@
+{
+  "originHash" : "79bde433c2bcccacd41a974ebdd90a9bc8bf60e9e6365cf090678b69de041a91",
+  "pins" : [
+    {
+      "identity" : "keychain-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/evgenyneu/keychain-swift",
+      "state" : {
+        "revision" : "d108a1fa6189e661f91560548ef48651ed8d93b9",
+        "version" : "20.0.0"
+      }
+    },
+    {
+      "identity" : "soundcloud-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/superturboryan/SoundCloud-Swift/",
+      "state" : {
+        "revision" : "06d0dc2d7ba2b18e290e184bcb77797d949dcd7c",
+        "version" : "2.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}

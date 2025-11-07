@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		436B8ACB2EA0E259007E6706 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 436B8ACA2EA0E259007E6706 /* Secrets.xcconfig */; };
+		43B13ECB2EBDEC4F00949F4A /* SoundCloud in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13ECA2EBDEC4F00949F4A /* SoundCloud */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43B13ECB2EBDEC4F00949F4A /* SoundCloud in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,6 +135,7 @@
 			);
 			name = Nightingale;
 			packageProductDependencies = (
+				43B13ECA2EBDEC4F00949F4A /* SoundCloud */,
 			);
 			productName = Nightingale;
 			productReference = 434A85962D535F27000C4AB5 /* Nightingale.app */;
@@ -217,6 +220,7 @@
 			mainGroup = 434A858D2D535F27000C4AB5;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				43B13EC92EBDEC4F00949F4A /* XCRemoteSwiftPackageReference "SoundCloud-Swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 434A85972D535F27000C4AB5 /* Products */;
@@ -596,6 +600,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		43B13EC92EBDEC4F00949F4A /* XCRemoteSwiftPackageReference "SoundCloud-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/superturboryan/SoundCloud-Swift/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		43B13ECA2EBDEC4F00949F4A /* SoundCloud */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 43B13EC92EBDEC4F00949F4A /* XCRemoteSwiftPackageReference "SoundCloud-Swift" */;
+			productName = SoundCloud;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 434A858E2D535F27000C4AB5 /* Project object */;
 }
