@@ -15,9 +15,6 @@ struct LandingPage: View {
         self.sc = SoundCloud(config)
     }
     
-    
-    
-    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -32,9 +29,6 @@ struct LandingPage: View {
                     AuthenticateButton(action: authenticateUser)
                         .padding()
                 }
-                
-                
-                
             }
             .navigationTitle("Discover")
         }
@@ -91,14 +85,3 @@ struct AuthenticateButton: View {
     }
 }
 
-struct LoggedInPage: View {
-    let sc: SoundCloud
-    @State private var tracks: [Track] = []
-    @State private var loading = false
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            Text("Hello soundcloud")
-        }
-    }
-}
