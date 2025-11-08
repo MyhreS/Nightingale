@@ -3,7 +3,14 @@ import SoundCloud
 
 struct LandingPage: View {
     private let sc: SoundCloud
-    @State private var isAuthenticated = false
+
+    enum AuthState {
+        case checking
+        case authenticated
+        case unauthenticated
+    }
+
+    @State private var authState: AuthState = .checking
 
     init() {
         let secrets = SecretsKeeper.shared
@@ -22,17 +29,28 @@ struct LandingPage: View {
                     colors: [.orange.opacity(0.8), .orange.opacity(0.3)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
-                ).ignoresSafeArea()
-                if isAuthenticated {
-                    LoggedInPage(sc:sc)
-                } else {
-                    AuthenticateButton(action: authenticateUser)
-                        .padding()
-                }
+                )
+                .ignoresSafeArea()
+
+                content
             }
         }
         .task {
             await updateAuthState()
+        }
+    }
+
+    var content: some View {
+        Group {
+            switch authState {
+            case .checking:
+                EmptyView()
+            case .authenticated:
+                LoggedInPage(sc: sc)
+            case .unauthenticated:
+                AuthenticateButton(action: authenticateUser)
+                    .padding()
+            }
         }
     }
     
@@ -40,9 +58,9 @@ struct LandingPage: View {
         Task {
             do {
                 _ = try await sc.authenticate()
-                isAuthenticated = true
+                authState = .authenticated
             } catch {
-                isAuthenticated = false
+                authState = .unauthenticated
                 print("❌ \(error)")
             }
         }
@@ -51,9 +69,9 @@ struct LandingPage: View {
     func updateAuthState() async {
         do {
             _ = try await sc.currentUser()
-            isAuthenticated = true
+            authState = .authenticated
         } catch {
-            isAuthenticated = false
+            authState = .unauthenticated
         }
     }
 }
@@ -83,4 +101,3 @@ struct AuthenticateButton: View {
         .buttonStyle(.plain)
     }
 }
-
