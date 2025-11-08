@@ -30,7 +30,6 @@ struct LandingPage: View {
                         .padding()
                 }
             }
-            .navigationTitle("Discover")
         }
         .task {
             await updateAuthState()
