@@ -128,13 +128,6 @@ struct SongDetailOverlay: View {
                     .padding(.horizontal, 8)
                     
                     VStack(alignment: .leading, spacing: 10) {
-                        Button {
-                            onPlay()
-                        } label: {
-                            Label("Play (not implemented)", systemImage: "play.fill")
-                                .font(.subheadline)
-                        }
-                        
                         if let songUrl = URL(string: song.linkToSong) {
                             Link(destination: songUrl) {
                                 Label("Open song on SoundCloud", systemImage: "music.note")
