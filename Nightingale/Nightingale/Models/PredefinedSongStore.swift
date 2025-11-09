@@ -1,8 +1,14 @@
 import Foundation
 
-struct PredefinedSong: Codable, Identifiable {
+struct PredefinedSong: Codable, Identifiable, Equatable {
     let id: String
     let name: String
+    let artworkURL: String
+    let duration: Int
+    let playbackUrl: String
+    let linkToSong: String
+    let linkToArtist: String
+    let artistName: String
 }
 
 enum PredefinedSongStore {

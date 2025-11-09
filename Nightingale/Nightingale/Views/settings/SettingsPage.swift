@@ -69,6 +69,12 @@ struct SettingsPage: View {
                 for track in res.items {
                     print("Track name: \(track.title)")
                     print("Track ID: \(track.id)")
+                    print("Track artwork URL: \(track.artworkUrl ?? "")")
+                    print("Track duration: \(track.duration)")
+                    print("Track playback URL: \(track.playbackUrl ?? "")")
+                    print("Track permalink: \(track.permalinkUrl)")
+                    print("Track user permalinkURL: \(track.user.permalinkUrl)")
+                    print("Tracks user name: \(track.user.username)")
                     print("-")
                 }
             } catch {

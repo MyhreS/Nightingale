@@ -1,10 +1,22 @@
 [
   {
     "id": "soundcloud:tracks:256112905",
-    "name": "Slide"
+    "name": "Slide",
+    "artworkURL": "https://i1.sndcdn.com/artworks-IAWLNb1G4wMv-0-large.jpg",
+    "duration": 212114,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:256112905/stream",
+    "linkToSong": "https://soundcloud.com/thegoogoodolls/slide?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/thegoogoodolls?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "Goo Goo Dolls"
   },
   {
     "id": "soundcloud:tracks:1817026815",
-    "name": "Black Betty (Dan Absent Remix)"
+    "name": "Black Betty (Dan Absent Remix)",
+    "artworkURL": "https://i1.sndcdn.com/artworks-ScieKa5tQHoRPiWI-JEvsoA-large.jpg",
+    "duration": 120085,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:1817026815/stream",
+    "linkToSong": "https://soundcloud.com/danabsent/black-betty-dan-absent-remix?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/danabsent?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "Dan Absent"
   }
 ]
