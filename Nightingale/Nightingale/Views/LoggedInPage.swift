@@ -8,8 +8,8 @@ struct LoggedInPage: View {
     }
     
     let sc: SoundCloud
+    let user: User
     @State private var selectedTab: Tab = .home
-    
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -25,13 +25,9 @@ struct LoggedInPage: View {
         Group {
             switch selectedTab {
             case .home:
-                VStack(spacing: 16) {
-                    Text("Home")
-                }
+                HomePage(sc: sc)
             case .settings:
-                VStack(spacing: 16) {
-                    Text("Settings")
-                }
+                SettingsPage(sc: sc, user: user)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

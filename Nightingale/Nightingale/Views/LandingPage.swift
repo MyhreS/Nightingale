@@ -11,6 +11,7 @@ struct LandingPage: View {
     }
 
     @State private var authState: AuthState = .checking
+    @State private var user: User?
 
     init() {
         let secrets = SecretsKeeper.shared
@@ -46,7 +47,11 @@ struct LandingPage: View {
             case .checking:
                 EmptyView()
             case .authenticated:
-                LoggedInPage(sc: sc)
+                if let user {
+                    LoggedInPage(sc: sc, user: user)
+                } else {
+                    Text("Missing user info")
+                }
             case .unauthenticated:
                 AuthenticateButton(action: authenticateUser)
                     .padding()
@@ -57,10 +62,14 @@ struct LandingPage: View {
     func authenticateUser() {
         Task {
             do {
-                _ = try await sc.authenticate()
+                try await sc.authenticate()
+                let current = try await sc.currentUser()
+                user = current
                 authState = .authenticated
+                
             } catch {
                 authState = .unauthenticated
+                user = nil
                 print("❌ \(error)")
             }
         }
@@ -68,9 +77,10 @@ struct LandingPage: View {
     
     func updateAuthState() async {
         do {
-            _ = try await sc.currentUser()
+            user = try await sc.currentUser()
             authState = .authenticated
         } catch {
+            user = nil
             authState = .unauthenticated
         }
     }
