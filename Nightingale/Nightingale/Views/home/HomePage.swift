@@ -2,15 +2,20 @@ import SwiftUI
 import SoundCloud
 
 struct HomePage: View {
-    let sc: SoundCloud
-    let songs = PredefinedSongStore.loadPredefinedSongs()
+    @StateObject private var player: MusicPlayer
+    let songs: [PredefinedSong]
     @State private var selectedSong: PredefinedSong?
 
+    init(sc: SoundCloud) {
+        _player = StateObject(wrappedValue: MusicPlayer(sc: sc))
+        songs = PredefinedSongStore.loadPredefinedSongs()
+    }
+
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottomTrailing) {
             PageLayout(title: "Music") {
                 ScrollView {
-                    LazyVStack(spacing: 16) {
+                    LazyVStack(spacing: 8) {
                         ForEach(songs) { song in
                             SongRow(
                                 song: song,
@@ -20,9 +25,10 @@ struct HomePage: View {
                         }
                     }
                     .padding(.vertical, 4)
+                    .padding(.bottom, 16)
                 }
             }
-            
+
             if let song = selectedSong {
                 SongDetailOverlay(
                     song: song,
@@ -31,11 +37,21 @@ struct HomePage: View {
                 .transition(.scale.combined(with: .opacity))
                 .zIndex(1000)
             }
+
+            if player.currentSong != nil {
+                MiniPlayerButton(
+                    isPlaying: player.isPlaying,
+                    action: { player.togglePlayPause() }
+                )
+                .padding(.trailing, 20)
+                .padding(.bottom, 80)
+                .zIndex(900)
+            }
         }
     }
-    
+
     func handleSongTap(_ song: PredefinedSong) {
-        print("Not implemented: \(song.name) (\(song.id))")
+        player.play(song: song)
     }
 }
 
@@ -165,5 +181,22 @@ struct SongDetailOverlay: View {
     
     func onPlay() {
         print("Not implemented: \(song.name) (\(song.id))")
+    }
+}
+
+struct MiniPlayerButton: View {
+    let isPlaying: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                .font(.system(size: 30, weight: .bold))
+                .padding(26)
+                .background(.ultraThinMaterial)
+                .clipShape(Circle())
+                .shadow(radius: 8)
+        }
+        .buttonStyle(.plain)
     }
 }

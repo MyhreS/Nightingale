@@ -1,5 +1,75 @@
 [
   {
+    "id": "soundcloud:tracks:302178242",
+    "name": "September (Remix)",
+    "artworkURL": "https://i1.sndcdn.com/artworks-7NbipeelcUyI-0-large.jpg",
+    "duration": 165799,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:302178242/stream",
+    "linkToSong": "https://soundcloud.com/djsls/september-remix?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/djsls?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "DJ SLS"
+  },
+  {
+    "id": "soundcloud:tracks:162796823",
+    "name": "ACDC - Highway To Hell",
+    "artworkURL": "https://i1.sndcdn.com/artworks-000093401997-n3poaj-large.jpg",
+    "duration": 214929,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:162796823/stream",
+    "linkToSong": "https://soundcloud.com/simonpvo/acdc-highway-to-hell?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/simonpvo?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "Philbert Audio"
+  },
+  {
+    "id": "soundcloud:tracks:254111788",
+    "name": "Harder, Better, Faster, Stronger",
+    "artworkURL": "https://i1.sndcdn.com/artworks-ZLe9hCqN2D4n-0-large.jpg",
+    "duration": 226456,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:254111788/stream",
+    "linkToSong": "https://soundcloud.com/daftpunkofficialmusic/harder-better-faster?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/daftpunkofficialmusic?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "Daft Punk"
+  },
+  {
+    "id": "soundcloud:tracks:107069417",
+    "name": "Immigrant Song",
+    "artworkURL": "https://i1.sndcdn.com/artworks-000056134112-jrlqpv-large.jpg",
+    "duration": 142929,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:107069417/stream",
+    "linkToSong": "https://soundcloud.com/boot-led-zeppelin/immigrant-song?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/boot-led-zeppelin?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "Boot Led Zeppelin"
+  },
+  {
+    "id": "soundcloud:tracks:244071573",
+    "name": "We Will Rock You (Queen)",
+    "artworkURL": "https://i1.sndcdn.com/artworks-000557985465-jj0gk2-large.jpg",
+    "duration": 125711,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:244071573/stream",
+    "linkToSong": "https://soundcloud.com/the-honeyrunners/we-will-rock-you-queen?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/the-honeyrunners?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "The Honeyrunners"
+  },
+  {
+    "id": "soundcloud:tracks:9768751",
+    "name": "Stamp on the Ground - Italo Brothers",
+    "artworkURL": "https://i1.sndcdn.com/artworks-000069570935-u7h77z-large.jpg",
+    "duration": 198160,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:9768751/stream",
+    "linkToSong": "https://soundcloud.com/thelastzed/01-italobrothers-stamp-on-the-ground?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/thelastzed?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "TheLastZed"
+  },
+  {
+    "id": "soundcloud:tracks:73115584",
+    "name": "Eye Of The Tiger",
+    "artworkURL": "https://i1.sndcdn.com/artworks-000037274951-ic4al1-large.jpg",
+    "duration": 240296,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:73115584/stream",
+    "linkToSong": "https://soundcloud.com/cleopatra-recs/eye-of-the-tiger?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/cleopatra-recs?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "Cleopatra Records"
+  },
+  {
     "id": "soundcloud:tracks:256112905",
     "name": "Slide",
     "artworkURL": "https://i1.sndcdn.com/artworks-IAWLNb1G4wMv-0-large.jpg",
