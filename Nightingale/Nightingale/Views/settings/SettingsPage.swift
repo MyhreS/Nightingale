@@ -38,6 +38,7 @@ struct SettingsPage: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text(displayName)
                     .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(.primary)
                 Text("@\(user.username)")
                     .font(.system(size: 14))
                     .foregroundStyle(.secondary)
@@ -46,10 +47,7 @@ struct SettingsPage: View {
             Spacer()
         }
         .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(.tertiarySystemFill))
-        )
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     var displayName: String {
@@ -100,16 +98,14 @@ struct SettingsPage: View {
                             .foregroundStyle(.orange)
                         Text("Print most liked tracks IDs")
                             .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(.primary)
                         
                         Spacer()
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 14)
                     .frame(maxWidth: .infinity, minHeight: 56)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(Color(.tertiarySystemFill))
-                    )
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
                 .buttonStyle(.plain)
             }
