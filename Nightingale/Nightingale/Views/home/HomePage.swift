@@ -6,9 +6,10 @@ struct HomePage: View {
     let songs: [PredefinedSong]
     @State private var selectedPreviewSong: PredefinedSong?
     @State private var selectedGroup: SongGroup = .goal
+    @State private var playedTimeStamps: [String: Date] = [:]
     
     var filteredSongs: [PredefinedSong] {
-        songs.filter { $0.group == selectedGroup}
+        songs.filter { $0.group == selectedGroup }
     }
 
     init(sc: SoundCloud) {
@@ -28,6 +29,7 @@ struct HomePage: View {
                                 SongRow(
                                     song: song,
                                     isSelected: player.currentSong == song,
+                                    isPlayed: isSongRecentlyPlayed(song),
                                     onTap: { handleSongTap(song) },
                                     onLongPress: { selectedPreviewSong = song }
                                 )
@@ -58,9 +60,37 @@ struct HomePage: View {
                 .zIndex(900)
             }
         }
+        .onAppear {
+            player.onSongFinished = { finished in
+                advanceToNextSong(after: finished)
+            }
+        }
+        .onDisappear {
+            player.onSongFinished = nil
+        }
     }
 
     func handleSongTap(_ song: PredefinedSong) {
+        playedTimeStamps[song.id] = Date()
         player.play(song: song)
+    }
+    
+    func isSongRecentlyPlayed(_ song: PredefinedSong) -> Bool {
+        guard let lastPlayed = playedTimeStamps[song.id] else { return false }
+        let interval = Date().timeIntervalSince(lastPlayed)
+        return interval < 3 * 60 * 60
+    }
+
+    func advanceToNextSong(after song: PredefinedSong) {
+        let groupSongs = songs.filter { $0.group == song.group }
+        guard !groupSongs.isEmpty else { return }
+        guard let index = groupSongs.firstIndex(of: song) else { return }
+
+        let nextIndex = (index + 1) % groupSongs.count
+        let nextSong = groupSongs[nextIndex]
+
+        selectedGroup = song.group
+        playedTimeStamps[nextSong.id] = Date()
+        player.play(song: nextSong)
     }
 }

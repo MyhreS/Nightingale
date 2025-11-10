@@ -7,6 +7,8 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     @Published var currentSong: PredefinedSong?
     @Published var isPlaying = false
 
+    var onSongFinished: ((PredefinedSong) -> Void)?
+
     private let sc: SoundCloud
     private var player: AVPlayer?
     private var endObserver: Any?
@@ -131,8 +133,12 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
 
     private func handlePlaybackEnded() {
+        let finishedSong = currentSong
         DispatchQueue.main.async {
             self.isPlaying = false
+            if let finishedSong {
+                self.onSongFinished?(finishedSong)
+            }
         }
     }
 

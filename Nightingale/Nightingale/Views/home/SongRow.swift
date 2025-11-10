@@ -3,6 +3,7 @@ import SwiftUI
 struct SongRow: View {
     let song: PredefinedSong
     let isSelected: Bool
+    let isPlayed: Bool
     let onTap: () -> Void
     let onLongPress: () -> Void
     
@@ -28,6 +29,12 @@ struct SongRow: View {
                 }
                 
                 Spacer()
+                
+                if isPlayed {
+                    Circle()
+                        .fill(Color.orange)
+                        .frame(width: 8, height: 8)
+                }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
