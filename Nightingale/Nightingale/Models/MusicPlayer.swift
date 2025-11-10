@@ -3,6 +3,7 @@ import SoundCloud
 import Combine
 import AVFoundation
 
+@MainActor
 final class MusicPlayer: ObservableObject, @unchecked Sendable {
     @Published var currentSong: PredefinedSong?
     @Published var isPlaying = false
@@ -22,10 +23,6 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         self.sc = sc
     }
 
-    deinit {
-        removeObservers()
-    }
-
     func play(song: PredefinedSong) {
         Task {
             await playAsync(song: song, startAt: Double(song.startSeconds))
@@ -33,18 +30,14 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
 
     func togglePlayPause() {
-        guard let player = player else { return }
+        guard let player else { return }
 
         if isPlaying {
             player.pause()
-            DispatchQueue.main.async {
-                self.isPlaying = false
-            }
+            isPlaying = false
         } else {
             player.play()
-            DispatchQueue.main.async {
-                self.isPlaying = true
-            }
+            isPlaying = true
         }
     }
 
@@ -59,7 +52,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
             configureAudioSession()
             isAudioSessionConfigured = true
         }
-        
+
         do {
             let streamInfo = try await sc.streamInfo(for: song.id)
             let headers = try await sc.authorizationHeader
@@ -72,9 +65,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
                 return
             }
 
-            DispatchQueue.main.async {
-                self.prepareAndStartPlayback(url: url, song: song, headers: headers, startAt: seconds)
-            }
+            prepareAndStartPlayback(url: url, song: song, headers: headers, startAt: seconds)
         } catch {
             print("MusicPlayer: failed to start playback: \(error)")
         }
@@ -100,13 +91,15 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         if seconds != 0 {
             let time = CMTime(seconds: seconds, preferredTimescale: 1_000)
             player?.seek(to: time, completionHandler: { [weak self] _ in
-                self?.startPlayback()
+                Task { @MainActor [weak self] in
+                    self?.startPlayback()
+                }
             })
         } else {
             startPlayback()
         }
     }
-
+    
     private func setupPlayer(with item: AVPlayerItem) {
         removeObservers()
 
@@ -131,42 +124,48 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
             object: item,
             queue: .main
         ) { [weak self] _ in
-            self?.handlePlaybackEnded()
+            Task { @MainActor [weak self] in
+                self?.handlePlaybackEnded()
+            }
         }
 
         let interval = CMTime(seconds: 0.2, preferredTimescale: 600)
-        timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
-            guard let self, let currentItem = player.currentItem else {
-                return
-            }
+        timeObserver = player.addPeriodicTimeObserver(
+            forInterval: interval,
+            queue: .main
+        ) { [weak self, weak player] time in
+            Task { @MainActor [weak self, weak player] in
+                guard let self,
+                      let player,
+                      let currentItem = player.currentItem
+                else {
+                    return
+                }
 
-            let durationSeconds = currentItem.duration.seconds
-            guard durationSeconds.isFinite, durationSeconds > 0 else {
-                self.progress = 0
-                return
-            }
+                let durationSeconds = currentItem.duration.seconds
+                guard durationSeconds.isFinite, durationSeconds > 0 else {
+                    self.progress = 0
+                    return
+                }
 
-            let effectiveDuration = max(durationSeconds - self.startOffsetSeconds, 1)
-            let current = max(time.seconds - self.startOffsetSeconds, 0)
-            let raw = current / effectiveDuration
-            self.progress = min(max(raw, 0), 1)
+                let effectiveDuration = max(durationSeconds - self.startOffsetSeconds, 1)
+                let current = max(time.seconds - self.startOffsetSeconds, 0)
+                let raw = current / effectiveDuration
+                self.progress = min(max(raw, 0), 1)
+            }
         }
     }
 
     private func startPlayback() {
         player?.play()
-        DispatchQueue.main.async {
-            self.isPlaying = true
-        }
+        isPlaying = true
     }
 
     private func handlePlaybackEnded() {
         let finishedSong = currentSong
-        DispatchQueue.main.async {
-            self.isPlaying = false
-            if let finishedSong {
-                self.onSongFinished?(finishedSong)
-            }
+        isPlaying = false
+        if let finishedSong {
+            onSongFinished?(finishedSong)
         }
     }
 
