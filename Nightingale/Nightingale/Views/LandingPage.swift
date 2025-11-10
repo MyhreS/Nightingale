@@ -90,7 +90,7 @@ struct AuthenticateButton: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        HapticButton(action: action) {
             Text("Authenticate")
                 .font(.headline)
                 .fontWeight(.semibold)

@@ -92,7 +92,7 @@ struct SettingsPage: View {
                 Text("Admin")
                     .font(.headline)
 
-                Button(action: onPrintLikedTracks) {
+                HapticButton(action: onPrintLikedTracks) {
                     HStack(spacing: 8) {
                         Image(systemName: "list.bullet.rectangle")
                             .font(.system(size: 18, weight: .semibold))

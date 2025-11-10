@@ -23,7 +23,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
 
     func play(song: PredefinedSong) {
         Task {
-            await playAsync(song: song, startAt: 35)
+            await playAsync(song: song, startAt: Double(song.startSeconds))
         }
     }
 

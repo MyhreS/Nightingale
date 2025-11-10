@@ -72,7 +72,7 @@ struct FooterButton: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        HapticButton(action: action) {
             VStack(spacing: 4) {
                 Image(systemName: systemImage)
                     .font(.system(size: 18, weight: .semibold))

@@ -4,7 +4,12 @@ import SoundCloud
 struct HomePage: View {
     @StateObject private var player: MusicPlayer
     let songs: [PredefinedSong]
-    @State private var selectedSong: PredefinedSong?
+    @State private var selectedPreviewSong: PredefinedSong?
+    @State private var selectedGroup: SongGroup = .goal
+    
+    var filteredSongs: [PredefinedSong] {
+        songs.filter { $0.group == selectedGroup}
+    }
 
     init(sc: SoundCloud) {
         _player = StateObject(wrappedValue: MusicPlayer(sc: sc))
@@ -14,25 +19,30 @@ struct HomePage: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             PageLayout(title: "Music") {
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        ForEach(songs) { song in
-                            SongRow(
-                                song: song,
-                                onTap: { handleSongTap(song) },
-                                onLongPress: { selectedSong = song }
-                            )
+                VStack(spacing: 12) {
+                    SongGroupSelector(groups: SongGroup.allCases, selectedGroup: $selectedGroup)
+                    
+                    ScrollView {
+                        LazyVStack(spacing: 8) {
+                            ForEach(filteredSongs) { song in
+                                SongRow(
+                                    song: song,
+                                    isSelected: player.currentSong == song,
+                                    onTap: { handleSongTap(song) },
+                                    onLongPress: { selectedPreviewSong = song }
+                                )
+                            }
                         }
+                        .padding(.vertical, 4)
+                        .padding(.bottom, 16)
                     }
-                    .padding(.vertical, 4)
-                    .padding(.bottom, 16)
                 }
             }
 
-            if let song = selectedSong {
+            if let song = selectedPreviewSong {
                 SongDetailOverlay(
                     song: song,
-                    onClose: { selectedSong = nil }
+                    onClose: { selectedPreviewSong = nil }
                 )
                 .transition(.scale.combined(with: .opacity))
                 .zIndex(1000)
@@ -57,11 +67,12 @@ struct HomePage: View {
 
 struct SongRow: View {
     let song: PredefinedSong
+    let isSelected: Bool
     let onTap: () -> Void
     let onLongPress: () -> Void
     
     var body: some View {
-        Button(action: onTap) {
+        HapticButton(action: onTap) {
             HStack(spacing: 12) {
                 AsyncImage(url: URL(string: song.artworkURL)) { image in
                     image
@@ -92,7 +103,7 @@ struct SongRow: View {
             .padding(.vertical, 10)
             .background(
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(Color(.secondarySystemBackground))
+                    .fill(isSelected ? Color.orange.opacity(0.2) : Color(.secondarySystemBackground))
             )
         }
         .buttonStyle(.plain)
@@ -189,7 +200,7 @@ struct MiniPlayerButton: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        HapticButton(action: action) {
             Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                 .font(.system(size: 30, weight: .bold))
                 .padding(26)
