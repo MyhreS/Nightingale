@@ -34,7 +34,7 @@ struct LoggedInPage: View {
     }
     
     var footer: some View {
-        HStack {
+        HStack(spacing: 0) {
             FooterButton(
                 title: "Home",
                 systemImage: "house.fill",
@@ -51,15 +51,15 @@ struct LoggedInPage: View {
                 selectedTab = .settings
             }
         }
-        .padding(.horizontal, 24)
-        .padding(.top, 10)
-        .padding(.bottom, 16)
+        .padding(.horizontal, 32)
+        .padding(.top, 12)
+        .padding(.bottom, 20)
         .frame(maxWidth: .infinity)
         .background(.ultraThinMaterial)
         .overlay(
             Rectangle()
                 .frame(height: 0.5)
-                .foregroundStyle(.gray.opacity(0.4)),
+                .foregroundStyle(.gray.opacity(0.3)),
             alignment: .top
         )
     }
@@ -73,13 +73,13 @@ struct FooterButton: View {
 
     var body: some View {
         HapticButton(action: action) {
-            VStack(spacing: 4) {
+            VStack(spacing: 6) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: 22, weight: .semibold))
                 Text(title)
-                    .font(.caption)
+                    .font(.system(size: 11, weight: .medium))
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, minHeight: 44)
             .foregroundStyle(isSelected ? .orange : .gray)
         }
         .buttonStyle(.plain)

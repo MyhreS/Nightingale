@@ -20,11 +20,11 @@ struct HomePage: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             PageLayout(title: "Music") {
-                VStack(spacing: 12) {
+                VStack(spacing: 16) {
                     SongGroupSelector(groups: SongGroup.allCases, selectedGroup: $selectedGroup)
                     
                     ScrollView {
-                        LazyVStack(spacing: 8) {
+                        LazyVStack(spacing: 10) {
                             ForEach(filteredSongs) { song in
                                 SongRow(
                                     song: song,
@@ -35,8 +35,8 @@ struct HomePage: View {
                                 )
                             }
                         }
-                        .padding(.vertical, 4)
-                        .padding(.bottom, 16)
+                        .padding(.vertical, 6)
+                        .padding(.bottom, 20)
                     }
                 }
             }

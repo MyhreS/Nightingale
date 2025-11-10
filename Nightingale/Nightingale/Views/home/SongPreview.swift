@@ -13,59 +13,65 @@ struct SongPreview: View {
                     onClose()
                 }
             
-            VStack(spacing: 20) {
+            VStack(spacing: 24) {
                     AsyncImage(url: URL(string: song.artworkURL)) { image in
                         image
                             .resizable()
                             .scaledToFill()
                     } placeholder: {
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(Color.orange.opacity(0.2))
+                            .fill(Color.orange.opacity(0.15))
                     }
-                    .frame(width: 220, height: 220)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .frame(width: 240, height: 240)
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 4)
                     
-                    VStack(spacing: 6) {
+                    VStack(spacing: 8) {
                         Text(song.name)
-                            .font(.headline)
+                            .font(.system(size: 18, weight: .semibold))
                             .multilineTextAlignment(.center)
+                            .lineSpacing(2)
                         
                         Text("by \(song.artistName)")
-                            .font(.subheadline)
+                            .font(.system(size: 15))
                             .foregroundStyle(.secondary)
                         
                         Text(formattedDuration)
-                            .font(.caption)
+                            .font(.system(size: 13))
                             .foregroundStyle(.secondary)
+                            .padding(.top, 2)
                     }
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, 12)
                     
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 14) {
                         if let songUrl = URL(string: song.linkToSong) {
                             Link(destination: songUrl) {
                                 Label("Open song on SoundCloud", systemImage: "music.note")
-                                    .font(.subheadline)
+                                    .font(.system(size: 15))
+                                    .frame(minHeight: 44)
                             }
                         }
                         
                         if let artistUrl = URL(string: song.linkToArtist) {
                             Link(destination: artistUrl) {
                                 Label("Open artist on SoundCloud", systemImage: "person.fill")
-                                    .font(.subheadline)
+                                    .font(.system(size: 15))
+                                    .frame(minHeight: 44)
                             }
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding()
-                .frame(maxWidth: 320)
+                .padding(24)
+                .frame(maxWidth: 340)
                 .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(Color.white.opacity(0.25), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
                 )
-                .padding(.horizontal, 16)
+                .shadow(color: .black.opacity(0.25), radius: 20, x: 0, y: 10)
+                .padding(.horizontal, 20)
         }
     }
     

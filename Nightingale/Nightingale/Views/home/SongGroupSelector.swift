@@ -6,7 +6,7 @@ struct SongGroupSelector: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: 10) {
                 ForEach(groups) { group in
                     GroupChip(
                         title: group.displayName,
@@ -16,7 +16,8 @@ struct SongGroupSelector: View {
                     }
                 }
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, 6)
+            .padding(.horizontal, 2)
         }
     }
 }
@@ -29,12 +30,12 @@ struct GroupChip: View {
     var body: some View {
         HapticButton(action: action) {
             Text(title)
-                .font(.subheadline)
-                .fontWeight(isSelected ? .semibold : .regular)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .font(.system(size: 15, weight: isSelected ? .semibold : .regular))
+                .padding(.horizontal, 18)
+                .padding(.vertical, 10)
+                .frame(minHeight: 44)
                 .background(
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
                         .fill(isSelected ? Color.orange.opacity(0.2) : Color(.secondarySystemBackground))
                 )
                 .foregroundStyle(isSelected ? .orange : .primary)

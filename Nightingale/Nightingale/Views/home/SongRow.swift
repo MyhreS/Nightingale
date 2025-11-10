@@ -9,35 +9,37 @@ struct SongRow: View {
     
     var body: some View {
         HapticButton(action: onTap) {
-            HStack(spacing: 12) {
+            HStack(spacing: 14) {
                 CachedAsyncImage(url: URL(string: song.artworkURL)) { image in
                     artworkView(for: image)
                 }
-                .frame(width: 44, height: 44)
+                .frame(width: 52, height: 52)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 5) {
                     Text(song.name)
-                        .font(.headline)
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(.primary)
+                        .lineLimit(1)
                     
                     Text("by \(song.artistName)")
-                        .font(.caption)
+                        .font(.system(size: 13))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .truncationMode(.tail)
                 }
                 
-                Spacer()
+                Spacer(minLength: 12)
                 
                 if isPlayed {
                     Circle()
                         .fill(Color.orange)
-                        .frame(width: 8, height: 8)
+                        .frame(width: 10, height: 10)
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .frame(minHeight: 68)
             .background(
                 RoundedRectangle(cornerRadius: 14)
                     .fill(isSelected ? Color.orange.opacity(0.2) : Color(.secondarySystemBackground))
@@ -59,11 +61,11 @@ struct SongRow: View {
                     .scaledToFill()
             } else {
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.orange.opacity(0.2))
+                    .fill(Color.orange.opacity(0.15))
                     .overlay(
                         Image(systemName: "music.note")
-                            .font(.caption)
-                            .foregroundStyle(.orange.opacity(0.6))
+                            .font(.system(size: 18))
+                            .foregroundStyle(.orange.opacity(0.5))
                     )
                     .redacted(reason: .placeholder)
             }

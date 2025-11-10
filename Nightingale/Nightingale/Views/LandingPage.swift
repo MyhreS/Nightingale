@@ -91,12 +91,12 @@ struct AuthenticateButton: View {
 
     var body: some View {
         HapticButton(action: action) {
-            Text("Authenticate")
+            Text("Log in with SoundCloud")
                 .font(.headline)
                 .fontWeight(.semibold)
-                .padding(.vertical, 14)
-                .padding(.horizontal, 24)
-                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .padding(.horizontal, 32)
+                .frame(maxWidth: .infinity, minHeight: 52)
                 .background(
                     LinearGradient(
                         colors: [.orange, .yellow],
@@ -105,8 +105,8 @@ struct AuthenticateButton: View {
                     )
                 )
                 .foregroundColor(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .shadow(color: .orange.opacity(0.4), radius: 6, x: 0, y: 4)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .shadow(color: .orange.opacity(0.5), radius: 8, x: 0, y: 4)
         }
         .buttonStyle(.plain)
     }
