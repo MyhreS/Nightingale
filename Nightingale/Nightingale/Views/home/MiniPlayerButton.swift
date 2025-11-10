@@ -12,6 +12,10 @@ struct MiniPlayerButton: View {
                 .padding(26)
                 .background(.ultraThinMaterial)
                 .clipShape(Circle())
+                .overlay(
+                    Circle()
+                        .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                )
                 .shadow(radius: 8)
         }
         .buttonStyle(.plain)
