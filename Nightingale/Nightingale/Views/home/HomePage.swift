@@ -7,6 +7,7 @@ struct HomePage: View {
     @State private var selectedPreviewSong: PredefinedSong?
     @State private var selectedGroup: SongGroup = .goal
     @State private var playedTimeStamps: [String: Date] = [:]
+    @State private var lastTapTime: Date?
     
     var filteredSongs: [PredefinedSong] {
         songs.filter { $0.group == selectedGroup }
@@ -72,6 +73,16 @@ struct HomePage: View {
     }
 
     func handleSongTap(_ song: PredefinedSong) {
+        let now = Date()
+
+        if let lastTap = lastTapTime {
+            let timeSinceLastTap = now.timeIntervalSince(lastTap)
+            guard timeSinceLastTap >= 2.0 else {
+                return
+            }
+        }
+        lastTapTime = now
+
         player.play(song: song)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
