@@ -29,7 +29,7 @@ struct HomePage: View {
                             ForEach(filteredSongs) { song in
                                 SongRow(
                                     song: song,
-                                    isSelected: player.currentSong == song,
+                                    isSelected: isSongSelected(song),
                                     isPlayed: isSongRecentlyPlayed(song),
                                     onTap: { handleSongTap(song) },
                                     onLongPress: { selectedPreviewSong = song }
@@ -85,6 +85,16 @@ struct HomePage: View {
 
         player.play(song: song)
         playedTimeStamps[song.id] = Date()
+    }
+    
+    func isSongSelected(_ song: PredefinedSong) -> Bool {
+        if player.currentSong == song {
+            return true
+        }
+        
+        guard let lastPlayed = playedTimeStamps[song.id] else { return false }
+        let interval = Date().timeIntervalSince(lastPlayed)
+        return interval < 1.0
     }
     
     func isSongRecentlyPlayed(_ song: PredefinedSong) -> Bool {

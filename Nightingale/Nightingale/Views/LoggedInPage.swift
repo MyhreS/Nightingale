@@ -10,6 +10,7 @@ struct LoggedInPage: View {
     let sc: SoundCloud
     let user: User
     @State private var selectedTab: Tab = .home
+    @State private var hasPrefetchedURLs = false
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -19,6 +20,19 @@ struct LoggedInPage: View {
             footer
         }
         .ignoresSafeArea(edges: .bottom)
+        .onAppear {
+            prefetchStreamURLs()
+        }
+    }
+    
+    func prefetchStreamURLs() {
+        guard !hasPrefetchedURLs else { return }
+        hasPrefetchedURLs = true
+        
+        Task {
+            let songs = PredefinedSongStore.loadPredefinedSongs()
+            await StreamURLCache.shared.prefetchAll(songs: songs, using: sc)
+        }
     }
     
     var tabContent: some View {

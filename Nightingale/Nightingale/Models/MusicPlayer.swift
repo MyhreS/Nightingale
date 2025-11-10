@@ -48,21 +48,34 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
 
     private func playAsync(song: PredefinedSong, startAt seconds: Double) async {
+        currentSong = song
+        
         if !isAudioSessionConfigured {
             configureAudioSession()
             isAudioSessionConfigured = true
         }
 
         do {
-            let streamInfo = try await sc.streamInfo(for: song.id)
-            let headers = try await sc.authorizationHeader
-
-            guard
-                let url = URL(string: streamInfo.httpMp3128URL)
-                    ?? URL(string: streamInfo.hlsMp3128URL)
-            else {
-                print("MusicPlayer: invalid stream URLs")
-                return
+            let url: URL
+            let headers: [String: String]
+            
+            if let cached = StreamURLCache.shared.getURL(for: song.id) {
+                print("MusicPlayer: using cached URL for \(song.name)")
+                url = cached.url
+                headers = cached.headers
+            } else {
+                print("MusicPlayer: fetching fresh URL for \(song.name)")
+                let streamInfo = try await sc.streamInfo(for: song.id)
+                let fetchedHeaders = try await sc.authorizationHeader
+                
+                guard let fetchedUrl = URL(string: streamInfo.httpMp3128URL) ?? URL(string: streamInfo.hlsMp3128URL) else {
+                    print("MusicPlayer: invalid stream URLs")
+                    return
+                }
+                
+                url = fetchedUrl
+                headers = fetchedHeaders
+                StreamURLCache.shared.setURL(for: song.id, url: url, headers: headers)
             }
 
             prepareAndStartPlayback(url: url, song: song, headers: headers, startAt: seconds)
