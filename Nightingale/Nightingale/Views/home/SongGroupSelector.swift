@@ -34,8 +34,17 @@ struct GroupChip: View {
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
                 .frame(minHeight: 44)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-                .foregroundStyle(isSelected ? .orange : .primary)
+                .background(
+                    isSelected ? 
+                        AnyShapeStyle(Color.orange.opacity(0.25)) : 
+                        AnyShapeStyle(.thickMaterial),
+                    in: RoundedRectangle(cornerRadius: 20, style: .continuous)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .strokeBorder(isSelected ? Color.orange.opacity(0.6) : Color.clear, lineWidth: 1.5)
+                )
+                .foregroundStyle(isSelected ? .orange : .white)
         }
         .buttonStyle(.plain)
     }

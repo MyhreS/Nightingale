@@ -39,11 +39,20 @@ struct SongRow: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .frame(minHeight: 68)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+        .background(
+            isSelected ? 
+                Color.orange.opacity(0.15) : 
+                Color(.systemBackground).opacity(0.7),
+            in: RoundedRectangle(cornerRadius: 14)
+        )
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(isSelected ? Color.orange.opacity(0.5) : Color.clear, lineWidth: 2)
+                .strokeBorder(
+                    isSelected ? Color.orange.opacity(0.7) : Color.primary.opacity(0.15), 
+                    lineWidth: isSelected ? 2 : 1
+                )
         )
+        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
         .contentShape(Rectangle())
         .onTapGesture {
             onTap()

@@ -69,11 +69,11 @@ struct LoggedInPage: View {
         .padding(.top, 12)
         .padding(.bottom, 20)
         .frame(maxWidth: .infinity)
-        .background(.ultraThinMaterial)
+        .background(.thickMaterial)
         .overlay(
             Rectangle()
-                .frame(height: 0.5)
-                .foregroundStyle(.gray.opacity(0.3)),
+                .frame(height: 1)
+                .foregroundStyle(.gray.opacity(0.5)),
             alignment: .top
         )
     }

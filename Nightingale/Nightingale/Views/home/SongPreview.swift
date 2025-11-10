@@ -56,9 +56,13 @@ struct SongPreview: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
                                 .frame(minHeight: 44)
-                                .background(Color(.tertiarySystemFill))
+                                .background(Color.orange.opacity(0.15))
                                 .foregroundStyle(.orange)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .strokeBorder(Color.orange.opacity(0.3), lineWidth: 1)
+                                )
                             }
                         }
                         
@@ -74,9 +78,13 @@ struct SongPreview: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
                                 .frame(minHeight: 44)
-                                .background(Color(.tertiarySystemFill))
+                                .background(Color.orange.opacity(0.15))
                                 .foregroundStyle(.orange)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .strokeBorder(Color.orange.opacity(0.3), lineWidth: 1)
+                                )
                             }
                         }
                     }
@@ -84,13 +92,13 @@ struct SongPreview: View {
                 }
                 .padding(24)
                 .frame(maxWidth: 340)
-                .background(.ultraThinMaterial)
+                .background(.thickMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 28, style: .continuous)
-                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        .stroke(Color.white.opacity(0.3), lineWidth: 1.5)
                 )
-                .shadow(color: .black.opacity(0.25), radius: 20, x: 0, y: 10)
+                .shadow(color: .black.opacity(0.35), radius: 24, x: 0, y: 12)
                 .padding(.horizontal, 20)
         }
     }
