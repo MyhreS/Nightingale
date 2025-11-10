@@ -80,7 +80,8 @@ struct FooterButton: View {
                     .font(.system(size: 11, weight: .medium))
             }
             .frame(maxWidth: .infinity, minHeight: 44)
-            .foregroundStyle(isSelected ? .orange : .gray)
+            .foregroundStyle(isSelected ? .orange : .secondary)
+            .opacity(isSelected ? 1.0 : 0.7)
         }
         .buttonStyle(.plain)
     }

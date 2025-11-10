@@ -43,24 +43,44 @@ struct SongPreview: View {
                     }
                     .padding(.horizontal, 12)
                     
-                    VStack(alignment: .leading, spacing: 14) {
+                    VStack(spacing: 12) {
                         if let songUrl = URL(string: song.linkToSong) {
                             Link(destination: songUrl) {
-                                Label("Open song on SoundCloud", systemImage: "music.note")
-                                    .font(.system(size: 15))
-                                    .frame(minHeight: 44)
+                                HStack {
+                                    Label("Open song on SoundCloud", systemImage: "music.note")
+                                        .font(.system(size: 15, weight: .medium))
+                                    Spacer()
+                                    Image(systemName: "arrow.up.right")
+                                        .font(.system(size: 12, weight: .semibold))
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .frame(minHeight: 44)
+                                .background(Color(.tertiarySystemFill))
+                                .foregroundStyle(.orange)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             }
                         }
                         
                         if let artistUrl = URL(string: song.linkToArtist) {
                             Link(destination: artistUrl) {
-                                Label("Open artist on SoundCloud", systemImage: "person.fill")
-                                    .font(.system(size: 15))
-                                    .frame(minHeight: 44)
+                                HStack {
+                                    Label("Open artist on SoundCloud", systemImage: "person.fill")
+                                        .font(.system(size: 15, weight: .medium))
+                                    Spacer()
+                                    Image(systemName: "arrow.up.right")
+                                        .font(.system(size: 12, weight: .semibold))
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .frame(minHeight: 44)
+                                .background(Color(.tertiarySystemFill))
+                                .foregroundStyle(.orange)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             }
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity)
                 }
                 .padding(24)
                 .frame(maxWidth: 340)

@@ -32,17 +32,18 @@ struct SongRow: View {
                 Spacer(minLength: 12)
                 
                 if isPlayed {
-                    Circle()
-                        .fill(Color.orange)
-                        .frame(width: 10, height: 10)
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(.orange)
                 }
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
             .frame(minHeight: 68)
-            .background(
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+            .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(isSelected ? Color.orange.opacity(0.2) : Color(.secondarySystemBackground))
+                    .strokeBorder(isSelected ? Color.orange.opacity(0.5) : Color.clear, lineWidth: 2)
             )
         }
         .buttonStyle(.plain)

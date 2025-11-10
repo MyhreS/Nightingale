@@ -57,7 +57,7 @@ struct HomePage: View {
                     action: { player.togglePlayPause() }
                 )
                 .padding(.trailing, 20)
-                .padding(.bottom, 80)
+                .padding(.bottom, 110)
                 .zIndex(900)
             }
         }

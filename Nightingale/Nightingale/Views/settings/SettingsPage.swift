@@ -24,30 +24,31 @@ struct SettingsPage: View {
     }
 
     var userHeader: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 14) {
             ZStack {
                 Circle()
-                    .fill(Color.orange.opacity(0.2))
-                    .frame(width: 52, height: 52)
+                    .fill(Color.orange.opacity(0.15))
+                    .frame(width: 56, height: 56)
 
                 Text(initials)
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(.orange)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 5) {
                 Text(displayName)
-                    .font(.headline)
+                    .font(.system(size: 17, weight: .semibold))
                 Text("@\(user.username)")
-                    .font(.subheadline)
+                    .font(.system(size: 14))
                     .foregroundStyle(.secondary)
             }
+            
+            Spacer()
         }
-        .padding()
+        .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.secondarySystemBackground))
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color(.tertiarySystemFill))
         )
     }
 
@@ -90,20 +91,24 @@ struct SettingsPage: View {
         var body: some View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Admin")
-                    .font(.headline)
+                    .font(.system(size: 17, weight: .semibold))
 
                 HapticButton(action: onPrintLikedTracks) {
-                    HStack(spacing: 8) {
+                    HStack(spacing: 12) {
                         Image(systemName: "list.bullet.rectangle")
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(.orange)
                         Text("Print most liked tracks IDs")
-                            .font(.subheadline)
+                            .font(.system(size: 15, weight: .medium))
+                        
+                        Spacer()
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .frame(maxWidth: .infinity, minHeight: 56)
                     .background(
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(Color(.secondarySystemBackground))
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(Color(.tertiarySystemFill))
                     )
                 }
                 .buttonStyle(.plain)

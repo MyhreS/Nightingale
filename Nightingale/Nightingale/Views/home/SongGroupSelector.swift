@@ -30,14 +30,11 @@ struct GroupChip: View {
     var body: some View {
         HapticButton(action: action) {
             Text(title)
-                .font(.system(size: 15, weight: isSelected ? .semibold : .regular))
+                .font(.system(size: 15, weight: isSelected ? .semibold : .medium))
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
                 .frame(minHeight: 44)
-                .background(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(isSelected ? Color.orange.opacity(0.2) : Color(.secondarySystemBackground))
-                )
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
                 .foregroundStyle(isSelected ? .orange : .primary)
         }
         .buttonStyle(.plain)
