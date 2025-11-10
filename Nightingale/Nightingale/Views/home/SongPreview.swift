@@ -20,25 +20,26 @@ struct SongPreview: View {
                             .scaledToFill()
                     } placeholder: {
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(Color.orange.opacity(0.15))
+                            .fill(Color(white: 0.15))
                     }
                     .frame(width: 240, height: 240)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                    .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 4)
+                    .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 4)
                     
                     VStack(spacing: 8) {
                         Text(song.name)
                             .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(.white)
                             .multilineTextAlignment(.center)
                             .lineSpacing(2)
                         
                         Text("by \(song.artistName)")
                             .font(.system(size: 15))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color(white: 0.6))
                         
                         Text(formattedDuration)
                             .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color(white: 0.5))
                             .padding(.top, 2)
                     }
                     .padding(.horizontal, 12)
@@ -56,12 +57,12 @@ struct SongPreview: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
                                 .frame(minHeight: 44)
-                                .background(Color.orange.opacity(0.15))
-                                .foregroundStyle(.orange)
+                                .background(Color(white: 0.12))
+                                .foregroundStyle(.white)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .strokeBorder(Color.orange.opacity(0.3), lineWidth: 1)
+                                        .strokeBorder(Color(white: 0.25), lineWidth: 1)
                                 )
                             }
                         }
@@ -78,12 +79,12 @@ struct SongPreview: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
                                 .frame(minHeight: 44)
-                                .background(Color.orange.opacity(0.15))
-                                .foregroundStyle(.orange)
+                                .background(Color(white: 0.12))
+                                .foregroundStyle(.white)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .strokeBorder(Color.orange.opacity(0.3), lineWidth: 1)
+                                        .strokeBorder(Color(white: 0.25), lineWidth: 1)
                                 )
                             }
                         }
@@ -92,13 +93,13 @@ struct SongPreview: View {
                 }
                 .padding(24)
                 .frame(maxWidth: 340)
-                .background(.thickMaterial)
+                .background(Color(white: 0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 28, style: .continuous)
-                        .stroke(Color.white.opacity(0.3), lineWidth: 1.5)
+                        .stroke(Color(white: 0.2), lineWidth: 1.5)
                 )
-                .shadow(color: .black.opacity(0.35), radius: 24, x: 0, y: 12)
+                .shadow(color: .black.opacity(0.5), radius: 24, x: 0, y: 12)
                 .padding(.horizontal, 20)
         }
     }

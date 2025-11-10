@@ -69,11 +69,11 @@ struct LoggedInPage: View {
         .padding(.top, 12)
         .padding(.bottom, 20)
         .frame(maxWidth: .infinity)
-        .background(.thickMaterial)
+        .background(Color(white: 0.08))
         .overlay(
             Rectangle()
                 .frame(height: 1)
-                .foregroundStyle(.gray.opacity(0.5)),
+                .foregroundStyle(Color(white: 0.2)),
             alignment: .top
         )
     }
@@ -94,8 +94,8 @@ struct FooterButton: View {
                     .font(.system(size: 11, weight: .medium))
             }
             .frame(maxWidth: .infinity, minHeight: 44)
-            .foregroundStyle(isSelected ? .orange : .secondary)
-            .opacity(isSelected ? 1.0 : 0.7)
+            .foregroundStyle(isSelected ? .white : Color(white: 0.5))
+            .opacity(isSelected ? 1.0 : 0.8)
         }
         .buttonStyle(.plain)
     }

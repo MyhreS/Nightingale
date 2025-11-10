@@ -14,17 +14,17 @@ struct MiniPlayerButton: View {
         HapticButton(action: action) {
             ZStack {
                 Circle()
-                    .fill(.thickMaterial)
+                    .fill(Color(white: 0.12))
                     .frame(width: 72, height: 72)
                 
                 Circle()
-                    .stroke(Color.black.opacity(0.2), lineWidth: 1)
+                    .stroke(Color(white: 0.2), lineWidth: 1)
                     .frame(width: 72, height: 72)
                 
                 Circle()
                     .trim(from: 0, to: clampedProgress)
                     .stroke(
-                        Color.orange,
+                        Color.white,
                         style: StrokeStyle(lineWidth: 4, lineCap: .round)
                     )
                     .frame(width: 72, height: 72)
@@ -32,9 +32,9 @@ struct MiniPlayerButton: View {
                 
                 Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                     .font(.system(size: 28, weight: .bold))
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(.white)
             }
-            .shadow(color: .orange.opacity(0.4), radius: 16, x: 0, y: 6)
+            .shadow(color: .black.opacity(0.3), radius: 12, x: 0, y: 4)
         }
         .buttonStyle(.plain)
     }

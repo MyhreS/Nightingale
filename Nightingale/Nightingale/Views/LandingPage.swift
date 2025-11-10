@@ -26,12 +26,8 @@ struct LandingPage: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                LinearGradient(
-                    colors: [.orange.opacity(0.8), .orange.opacity(0.3)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+                Color.black
+                    .ignoresSafeArea()
 
                 content
             }
@@ -97,15 +93,15 @@ struct WelcomeScreen: View {
                 VStack(spacing: 16) {
                     Image(systemName: "music.note.list")
                         .font(.system(size: 64, weight: .bold))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.white)
                     
                     Text("Nightingale")
                         .font(.system(size: 36, weight: .bold))
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(.white)
                     
                     Text("Game Day Music, Simplified")
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color(white: 0.6))
                 }
                 
                 VStack(spacing: 20) {
@@ -141,7 +137,7 @@ struct WelcomeScreen: View {
                     
                     Text("Plug and play—just log in and you're ready")
                         .font(.system(size: 14))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color(white: 0.5))
                         .multilineTextAlignment(.center)
                 }
                 
@@ -162,33 +158,33 @@ struct FeatureCard: View {
         HStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.system(size: 28, weight: .semibold))
-                .foregroundStyle(.orange)
+                .foregroundStyle(.white)
                 .frame(width: 50, height: 50)
                 .background(
                     Circle()
-                        .fill(Color.orange.opacity(0.15))
+                        .fill(Color(white: 0.15))
                 )
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.white)
                 
                 Text(description)
                     .font(.system(size: 14))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color(white: 0.6))
                     .fixedSize(horizontal: false, vertical: true)
             }
             
             Spacer(minLength: 0)
         }
         .padding(16)
-        .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .background(Color(white: 0.1), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.2), lineWidth: 1)
+                .strokeBorder(Color(white: 0.2), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 2)
     }
 }
 
@@ -203,16 +199,10 @@ struct AuthenticateButton: View {
                 .padding(.vertical, 16)
                 .padding(.horizontal, 32)
                 .frame(maxWidth: .infinity, minHeight: 52)
-                .background(
-                    LinearGradient(
-                        colors: [.orange, .yellow],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .foregroundColor(.white)
+                .background(Color.white)
+                .foregroundColor(.black)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .shadow(color: .orange.opacity(0.5), radius: 8, x: 0, y: 4)
+                .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
         }
         .buttonStyle(.plain)
     }

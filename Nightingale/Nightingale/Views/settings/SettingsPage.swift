@@ -27,32 +27,32 @@ struct SettingsPage: View {
         HStack(spacing: 14) {
             ZStack {
                 Circle()
-                    .fill(Color.orange.opacity(0.15))
+                    .fill(Color(white: 0.15))
                     .frame(width: 56, height: 56)
 
                 Text(initials)
                     .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(.white)
             }
 
             VStack(alignment: .leading, spacing: 5) {
                 Text(displayName)
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.white)
                 Text("@\(user.username)")
                     .font(.system(size: 14))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color(white: 0.6))
             }
             
             Spacer()
         }
         .padding(16)
-        .background(Color(.systemBackground).opacity(0.7), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
+                .strokeBorder(Color(white: 0.2), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
     }
 
     var displayName: String {
@@ -100,22 +100,22 @@ struct SettingsPage: View {
                     HStack(spacing: 12) {
                         Image(systemName: "list.bullet.rectangle")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(.white)
                         Text("Print most liked tracks IDs")
                             .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(.white)
                         
                         Spacer()
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 14)
                     .frame(maxWidth: .infinity, minHeight: 56)
-                    .background(Color(.systemBackground).opacity(0.7), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                     .overlay(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
+                            .strokeBorder(Color(white: 0.2), lineWidth: 1)
                     )
-                    .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
                 }
                 .buttonStyle(.plain)
             }
