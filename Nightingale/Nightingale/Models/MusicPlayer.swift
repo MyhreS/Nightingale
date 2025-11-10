@@ -16,10 +16,10 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     private var statusObserver: NSKeyValueObservation?
     private var timeObserver: Any?
     private var startOffsetSeconds: Double = 0
+    private var isAudioSessionConfigured = false
 
     init(sc: SoundCloud) {
         self.sc = sc
-        configureAudioSession()
     }
 
     deinit {
@@ -55,6 +55,11 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
 
     private func playAsync(song: PredefinedSong, startAt seconds: Double) async {
+        if !isAudioSessionConfigured {
+            configureAudioSession()
+            isAudioSessionConfigured = true
+        }
+        
         do {
             let streamInfo = try await sc.streamInfo(for: song.id)
             let headers = try await sc.authorizationHeader
