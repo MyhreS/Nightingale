@@ -72,8 +72,11 @@ struct HomePage: View {
     }
 
     func handleSongTap(_ song: PredefinedSong) {
-        playedTimeStamps[song.id] = Date()
         player.play(song: song)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            playedTimeStamps[song.id] = Date()
+        }
     }
     
     func isSongRecentlyPlayed(_ song: PredefinedSong) -> Bool {
