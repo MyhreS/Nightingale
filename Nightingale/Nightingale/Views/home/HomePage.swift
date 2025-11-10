@@ -53,6 +53,7 @@ struct HomePage: View {
             if player.currentSong != nil {
                 MiniPlayerButton(
                     isPlaying: player.isPlaying,
+                    progress: player.progress,
                     action: { player.togglePlayPause() }
                 )
                 .padding(.trailing, 20)

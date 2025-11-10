@@ -6,6 +6,7 @@ import AVFoundation
 final class MusicPlayer: ObservableObject, @unchecked Sendable {
     @Published var currentSong: PredefinedSong?
     @Published var isPlaying = false
+    @Published var progress: Double = 0
 
     var onSongFinished: ((PredefinedSong) -> Void)?
 
@@ -13,6 +14,8 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     private var player: AVPlayer?
     private var endObserver: Any?
     private var statusObserver: NSKeyValueObservation?
+    private var timeObserver: Any?
+    private var startOffsetSeconds: Double = 0
 
     init(sc: SoundCloud) {
         self.sc = sc
@@ -51,7 +54,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         player.seek(to: time)
     }
 
-    private func playAsync(song: PredefinedSong, startAt seconds: Double?) async {
+    private func playAsync(song: PredefinedSong, startAt seconds: Double) async {
         do {
             let streamInfo = try await sc.streamInfo(for: song.id)
             let headers = try await sc.authorizationHeader
@@ -76,9 +79,11 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         url: URL,
         song: PredefinedSong,
         headers: [String: String],
-        startAt seconds: Double?
+        startAt seconds: Double
     ) {
         currentSong = song
+        startOffsetSeconds = seconds
+        progress = 0
 
         let asset = AVURLAsset(
             url: url,
@@ -87,7 +92,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         let item = AVPlayerItem(asset: asset)
         setupPlayer(with: item)
 
-        if let seconds {
+        if seconds != 0 {
             let time = CMTime(seconds: seconds, preferredTimescale: 1_000)
             player?.seek(to: time, completionHandler: { [weak self] _ in
                 self?.startPlayback()
@@ -123,6 +128,24 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         ) { [weak self] _ in
             self?.handlePlaybackEnded()
         }
+
+        let interval = CMTime(seconds: 0.2, preferredTimescale: 600)
+        timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
+            guard let self, let currentItem = player.currentItem else {
+                return
+            }
+
+            let durationSeconds = currentItem.duration.seconds
+            guard durationSeconds.isFinite, durationSeconds > 0 else {
+                self.progress = 0
+                return
+            }
+
+            let effectiveDuration = max(durationSeconds - self.startOffsetSeconds, 1)
+            let current = max(time.seconds - self.startOffsetSeconds, 0)
+            let raw = current / effectiveDuration
+            self.progress = min(max(raw, 0), 1)
+        }
     }
 
     private func startPlayback() {
@@ -156,6 +179,10 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         if let endObserver {
             NotificationCenter.default.removeObserver(endObserver)
             self.endObserver = nil
+        }
+        if let timeObserver, let player {
+            player.removeTimeObserver(timeObserver)
+            self.timeObserver = nil
         }
         statusObserver = nil
     }
