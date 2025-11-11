@@ -78,7 +78,7 @@ struct HomePage: View {
 
         if let lastTap = lastTapTime {
             let timeSinceLastTap = now.timeIntervalSince(lastTap)
-            guard timeSinceLastTap >= 2.0 else {
+            guard timeSinceLastTap >= 1.0 else {
                 return
             }
         }

@@ -24,6 +24,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
 
     func play(song: PredefinedSong) {
+        print("Playing song \(song.name)")
         Task {
             await playAsync(song: song, startAt: Double(song.startSeconds))
         }
@@ -94,6 +95,8 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         headers: [String: String],
         startAt seconds: Double
     ) {
+        print("🎵 prepareAndStartPlayback for \(song.name)")
+        print("   - startAt: \(seconds) seconds")
         startOffsetSeconds = seconds
 
         let asset = AVURLAsset(
@@ -104,35 +107,43 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         setupPlayer(with: item)
 
         if seconds != 0 {
+            print("⏭️ Seeking to \(seconds) seconds")
             let time = CMTime(seconds: seconds, preferredTimescale: 1_000)
-            player?.seek(to: time, completionHandler: { [weak self] _ in
+            player?.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] finished in
+                print("🎯 Seek completed: finished=\(finished)")
                 Task { @MainActor [weak self] in
                     self?.startPlayback()
                 }
-            })
+            }
         } else {
+            print("▶️ No seek needed, starting immediately")
             startPlayback()
         }
     }
     
     private func setupPlayer(with item: AVPlayerItem) {
         removeObservers()
+        
+        print("�� setupPlayer called")
 
         statusObserver = item.observe(\.status, options: [.initial, .new]) { item, _ in
             switch item.status {
             case .readyToPlay:
-                print("MusicPlayer: ready to play")
+                print("✅ MusicPlayer: item ready to play")
             case .failed:
-                print("MusicPlayer: item failed: \(String(describing: item.error))")
+                print("❌ MusicPlayer: item failed: \(String(describing: item.error))")
             case .unknown:
-                print("MusicPlayer: item status unknown")
+                print("❓ MusicPlayer: item status unknown")
             @unknown default:
-                print("MusicPlayer: item status unknown default")
+                print("❓ MusicPlayer: item status unknown default")
             }
         }
 
         let player = AVPlayer(playerItem: item)
+        player.automaticallyWaitsToMinimizeStalling = false  // ADD THIS LINE
         self.player = player
+        
+        print("�� New player created, automaticallyWaitsToMinimizeStalling: \(player.automaticallyWaitsToMinimizeStalling)")
 
         endObserver = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
@@ -172,8 +183,40 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
 
     private func startPlayback() {
-        player?.play()
-        isPlaying = true
+        guard let player = player else {
+            print("⚠️ startPlayback: player is nil")
+            return
+        }
+        
+        guard let currentItem = player.currentItem else {
+            print("⚠️ startPlayback: currentItem is nil")
+            return
+        }
+        
+        print("▶️ startPlayback: attempting to play")
+        print("   - item status: \(currentItem.status.rawValue)")
+        print("   - player rate: \(player.rate)")
+        print("   - player timeControlStatus: \(player.timeControlStatus.rawValue)")
+        print("   - current time: \(player.currentTime().seconds)")
+        
+        if currentItem.status != .readyToPlay {
+            print("⚠️ startPlayback: item not ready, status = \(currentItem.status)")
+            return
+        }
+        
+        player.play()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self, weak player] in
+            guard let player = player else { return }
+            print("✅ After play() - rate: \(player.rate), timeControlStatus: \(player.timeControlStatus.rawValue)")
+            
+            if player.rate == 0 && player.timeControlStatus != .playing {
+                print("🔴 PLAYBACK DID NOT START! Forcing play again...")
+                player.play()
+            }
+            
+            self?.isPlaying = player.rate > 0
+        }
     }
 
     private func handlePlaybackEnded() {
@@ -195,10 +238,16 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
 
     private func stopAndCleanup() {
-        player?.pause()
+        print("🛑 stopAndCleanup called")
+        if let player = player {
+            print("   - player rate before pause: \(player.rate)")
+            player.pause()
+            print("   - player paused")
+        }
         removeObservers()
         player = nil
         startOffsetSeconds = 0
+        print("   - cleanup complete")
     }
 
     private func removeObservers() {
