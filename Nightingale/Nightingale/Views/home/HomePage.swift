@@ -5,7 +5,7 @@ struct HomePage: View {
     @StateObject private var player: MusicPlayer
     let songs: [PredefinedSong]
     @State private var selectedPreviewSong: PredefinedSong?
-    @State private var selectedGroup: SongGroup = .goal
+    @State private var selectedGroup: SongGroup = .faceoff
     @State private var playedTimeStamps: [String: Date] = [:]
     @State private var lastTapTime: Date?
     

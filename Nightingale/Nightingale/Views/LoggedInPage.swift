@@ -40,7 +40,7 @@ struct LoggedInPage: View {
         Group {
             switch selectedTab {
             case .home:
-                HomePage(sc: sc, user: user)
+                HomePage(sc: sc)
             case .settings:
                 SettingsPage(sc: sc, user: user, onLogOut: onLogOut)
             }

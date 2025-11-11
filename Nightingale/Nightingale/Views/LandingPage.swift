@@ -44,7 +44,7 @@ struct LandingPage: View {
                 EmptyView()
             case .authenticated:
                 if let user {
-                    LoggedInPage(sc: sc, user: user)
+                    LoggedInPage(sc: sc, user: user, onLogOut: logOut)
                 } else {
                     Text("Missing user info")
                 }

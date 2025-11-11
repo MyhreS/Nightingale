@@ -2,20 +2,20 @@ import Foundation
 
 enum SongGroup: String, Codable, CaseIterable, Identifiable {
     case faceoff
+    case penalty
     case goal
-    case warmup
+    case crowd
     case intro
-    case fun
     
     var id: String { rawValue}
     
     var displayName: String {
         switch self {
         case .faceoff: return "Face-off"
+        case .penalty: return "Penalty"
         case .goal: return "Goal"
-        case .warmup: return "Warm-up"
+        case .crowd: return "Crowd"
         case .intro: return "Intro"
-        case .fun: return "Fun"
         }
     }
 }

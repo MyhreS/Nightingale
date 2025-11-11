@@ -17,9 +17,9 @@ struct SettingsPage: View {
                 
                 logOutButton
 
-                // if isAdmin {
-                //     AdminSettings(onPrintLikedTracks: printUserLikedTracksIds)
-                // +
+                if isAdmin {
+                    AdminSettings(onPrintLikedTracks: printUserLikedTracksIds)
+                }
 
                 Spacer()
             }
