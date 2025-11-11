@@ -48,7 +48,11 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
 
     private func playAsync(song: PredefinedSong, startAt seconds: Double) async {
+        stopAndCleanup()
+        
         currentSong = song
+        isPlaying = false
+        progress = 0
         
         if !isAudioSessionConfigured {
             configureAudioSession()
@@ -90,9 +94,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         headers: [String: String],
         startAt seconds: Double
     ) {
-        currentSong = song
         startOffsetSeconds = seconds
-        progress = 0
 
         let asset = AVURLAsset(
             url: url,
@@ -190,6 +192,13 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         } catch {
             print("MusicPlayer: audio session error: \(error)")
         }
+    }
+
+    private func stopAndCleanup() {
+        player?.pause()
+        removeObservers()
+        player = nil
+        startOffsetSeconds = 0
     }
 
     private func removeObservers() {

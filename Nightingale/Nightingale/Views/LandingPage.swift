@@ -112,12 +112,6 @@ struct WelcomeScreen: View {
                 
                 VStack(spacing: 20) {
                     FeatureCard(
-                        icon: "waveform",
-                        title: "Curated for Hockey",
-                        description: "Specially selected remixes and tracks perfect for game day moments"
-                    )
-                    
-                    FeatureCard(
                         icon: "bolt.fill",
                         title: "Start at the Best Part",
                         description: "Songs automatically jump to the most energetic sections"

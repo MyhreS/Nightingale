@@ -2,6 +2,7 @@ import SwiftUI
 import SoundCloud
 
 struct HomePage: View {
+    @EnvironmentObject var firebaseAPI: FirebaseAPI
     @StateObject private var player: MusicPlayer
     let songs: [PredefinedSong]
     @State private var selectedPreviewSong: PredefinedSong?
@@ -37,7 +38,7 @@ struct HomePage: View {
                             }
                         }
                         .padding(.vertical, 6)
-                        .padding(.bottom, 20)
+                        .padding(.bottom, 70)
                     }
                 }
             }

@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		436B8ACB2EA0E259007E6706 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 436B8ACA2EA0E259007E6706 /* Secrets.xcconfig */; };
 		43B13ECB2EBDEC4F00949F4A /* SoundCloud in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13ECA2EBDEC4F00949F4A /* SoundCloud */; };
+		43B13EFD2EC3798700949F4A /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13EFC2EC3798700949F4A /* FirebaseAI */; };
+		43B13EFF2EC3798700949F4A /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13EFE2EC3798700949F4A /* FirebaseAILogic */; };
+		43B13F012EC3798700949F4A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13F002EC3798700949F4A /* FirebaseAnalytics */; };
+		43B13F032EC3798700949F4A /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13F022EC3798700949F4A /* FirebaseAnalyticsCore */; };
+		43B13F052EC3798700949F4A /* FirebaseAnalyticsIdentitySupport in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13F042EC3798700949F4A /* FirebaseAnalyticsIdentitySupport */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,7 +77,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43B13EFF2EC3798700949F4A /* FirebaseAILogic in Frameworks */,
 				43B13ECB2EBDEC4F00949F4A /* SoundCloud in Frameworks */,
+				43B13F052EC3798700949F4A /* FirebaseAnalyticsIdentitySupport in Frameworks */,
+				43B13F032EC3798700949F4A /* FirebaseAnalyticsCore in Frameworks */,
+				43B13F012EC3798700949F4A /* FirebaseAnalytics in Frameworks */,
+				43B13EFD2EC3798700949F4A /* FirebaseAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,6 +146,11 @@
 			name = Nightingale;
 			packageProductDependencies = (
 				43B13ECA2EBDEC4F00949F4A /* SoundCloud */,
+				43B13EFC2EC3798700949F4A /* FirebaseAI */,
+				43B13EFE2EC3798700949F4A /* FirebaseAILogic */,
+				43B13F002EC3798700949F4A /* FirebaseAnalytics */,
+				43B13F022EC3798700949F4A /* FirebaseAnalyticsCore */,
+				43B13F042EC3798700949F4A /* FirebaseAnalyticsIdentitySupport */,
 			);
 			productName = Nightingale;
 			productReference = 434A85962D535F27000C4AB5 /* Nightingale.app */;
@@ -221,6 +236,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				43B13EC92EBDEC4F00949F4A /* XCRemoteSwiftPackageReference "SoundCloud-Swift" */,
+				43B13EFB2EC3798700949F4A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 434A85972D535F27000C4AB5 /* Products */;
@@ -610,6 +626,14 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		43B13EFB2EC3798700949F4A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -617,6 +641,31 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 43B13EC92EBDEC4F00949F4A /* XCRemoteSwiftPackageReference "SoundCloud-Swift" */;
 			productName = SoundCloud;
+		};
+		43B13EFC2EC3798700949F4A /* FirebaseAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 43B13EFB2EC3798700949F4A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAI;
+		};
+		43B13EFE2EC3798700949F4A /* FirebaseAILogic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 43B13EFB2EC3798700949F4A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAILogic;
+		};
+		43B13F002EC3798700949F4A /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 43B13EFB2EC3798700949F4A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		43B13F022EC3798700949F4A /* FirebaseAnalyticsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 43B13EFB2EC3798700949F4A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsCore;
+		};
+		43B13F042EC3798700949F4A /* FirebaseAnalyticsIdentitySupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 43B13EFB2EC3798700949F4A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsIdentitySupport;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

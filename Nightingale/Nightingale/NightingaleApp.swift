@@ -3,6 +3,8 @@ import UIKit
 
 @main
 struct NightingaleApp: App {
+    @StateObject private var firebaseAPI = FirebaseAPI.shared
+    
     init() {
         UIApplication.shared.isIdleTimerDisabled = true
     }
@@ -11,6 +13,7 @@ struct NightingaleApp: App {
         WindowGroup {
             ContentView()
                 .preferredColorScheme(.dark)
+                .environmentObject(firebaseAPI)
         }
     }
 }
