@@ -54,6 +54,7 @@ struct LandingPage: View {
         }
     }
     
+    func logOut() {
         sc.signOut()
         authState = .unauthenticated
         user = nil
