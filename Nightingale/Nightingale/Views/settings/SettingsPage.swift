@@ -4,6 +4,7 @@ import SoundCloud
 struct SettingsPage: View {
     let sc: SoundCloud
     let user: User
+    let onLogOut: () -> Void
 
     var isAdmin: Bool {
         user.id == "soundcloud:users:1531282276"
@@ -13,14 +14,41 @@ struct SettingsPage: View {
         PageLayout(title: "Settings") {
             VStack(alignment: .leading, spacing: 20) {
                 userHeader
+                
+                logOutButton
 
-                if isAdmin {
-                    AdminSettings(onPrintLikedTracks: printUserLikedTracksIds)
-                }
+                // if isAdmin {
+                //     AdminSettings(onPrintLikedTracks: printUserLikedTracksIds)
+                // +
 
                 Spacer()
             }
         }
+    }
+    
+    var logOutButton: some View {
+        HapticButton(action: onLogOut) {
+            HStack(spacing: 12) {
+                Image(systemName: "rectangle.portrait.and.arrow.right")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(.white)
+                Text("Log Out")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(.white)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(Color(white: 0.2), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+        }
+        .buttonStyle(.plain)
     }
 
     var userHeader: some View {

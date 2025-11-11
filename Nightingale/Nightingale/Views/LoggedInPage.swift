@@ -9,6 +9,7 @@ struct LoggedInPage: View {
     
     let sc: SoundCloud
     let user: User
+    let onLogOut: () -> Void
     @State private var selectedTab: Tab = .home
     @State private var hasPrefetchedURLs = false
     
@@ -39,9 +40,9 @@ struct LoggedInPage: View {
         Group {
             switch selectedTab {
             case .home:
-                HomePage(sc: sc)
+                HomePage(sc: sc, user: user)
             case .settings:
-                SettingsPage(sc: sc, user: user)
+                SettingsPage(sc: sc, user: user, onLogOut: onLogOut)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

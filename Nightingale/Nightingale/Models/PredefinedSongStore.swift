@@ -1,6 +1,7 @@
 import Foundation
 
 enum SongGroup: String, Codable, CaseIterable, Identifiable {
+    case faceoff
     case goal
     case warmup
     case intro
@@ -10,6 +11,7 @@ enum SongGroup: String, Codable, CaseIterable, Identifiable {
     
     var displayName: String {
         switch self {
+        case .faceoff: return "Face-off"
         case .goal: return "Goal"
         case .warmup: return "Warm-up"
         case .intro: return "Intro"
@@ -29,6 +31,7 @@ struct PredefinedSong: Codable, Identifiable, Equatable {
     let artistName: String
     let group: SongGroup
     let startSeconds: Int
+    let goPlussSong: Bool
     
 }
 
