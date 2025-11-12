@@ -639,7 +639,7 @@
   {
     "id": "soundcloud:tracks:166943191",
     "name": "Ping Pong Vs Tremor Vs Astronomia Vs  La La La Song Vs I Like To Move It Vs Hardstyle Tremor",
-    "artworkURL": "",
+    "artworkURL": "https://i1.sndcdn.com/artworks-3MqIeWqe26APyTeA-VwDCEQ-large.jpg",
     "duration": 292860,
     "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:166943191/stream",
     "linkToSong": "https://soundcloud.com/officialmusa/ping-pong-vs-tremor-vs-astronomia-vs-la-la-la-song-vs-i-like-to-move-it-vs-hardstyle-tremor?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
@@ -660,6 +660,58 @@
     "artistName": "Jorge Quintero",
     "group": "intro",
     "startSeconds": 0,
+    "goPlussSong": false
+  },
+  {
+    "id": "soundcloud:tracks:203874018",
+    "name": "I Wanna Rock",
+    "artworkURL": "https://i1.sndcdn.com/artworks-og2ehmP0ZTH4-0-large.jpg",
+    "duration": 179801,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:203874018/stream",
+    "linkToSong": "https://soundcloud.com/twistedsister/i-wanna-rock?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/twistedsister?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "Twisted Sister",
+    "group": "faceoff",
+    "startSeconds": 0,
+    "goPlussSong": false
+  },
+  {
+    "id": "soundcloud:tracks:256079842",
+    "name": "Burn It to the Ground",
+    "artworkURL": "https://i1.sndcdn.com/artworks-1dUn4oTj7Z93-0-large.jpg",
+    "duration": 212376,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:256079842/stream",
+    "linkToSong": "https://soundcloud.com/nickelback/burn-it-to-the-ground-1?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/nickelback?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "Nickelback",
+    "group": "faceoff",
+    "startSeconds": 1,
+    "goPlussSong": false
+  },
+  {
+    "id": "soundcloud:tracks:1091068756",
+    "name": "INDUSTRY BABY (feat. Jack Harlow)",
+    "artworkURL": "https://i1.sndcdn.com/artworks-xW7hE6mlVmNW-0-large.jpg",
+    "duration": 212036,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:1091068756/stream",
+    "linkToSong": "https://soundcloud.com/secret-service-862007284/industry-baby?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/secret-service-862007284?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "secret service",
+    "group": "faceoff",
+    "startSeconds": 29,
+    "goPlussSong": false
+  },
+  {
+    "id": "soundcloud:tracks:361665965",
+    "name": "The Power",
+    "artworkURL": "https://i1.sndcdn.com/artworks-HZVpNWOogO1Z-0-large.jpg",
+    "duration": 229042,
+    "playbackUrl": "https://api.soundcloud.com/tracks/soundcloud:tracks:361665965/stream",
+    "linkToSong": "https://soundcloud.com/snap27105/the-power?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "linkToArtist": "https://soundcloud.com/snap27105?utm_medium=api&utm_campaign=social_sharing&utm_source=id_318401",
+    "artistName": "Snap 27",
+    "group": "faceoff",
+    "startSeconds": 12,
     "goPlussSong": false
   }
 ]
