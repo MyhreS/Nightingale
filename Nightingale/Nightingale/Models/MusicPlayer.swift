@@ -88,8 +88,9 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
 
     private func resolveRedirectedURL(url: URL, headers: [String: String]) async throws -> URL {
-        final class RedirectCatcher: NSObject, URLSessionTaskDelegate {
-            var redirectedURL: URL?
+        final class RedirectCatcher: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+            private let lock = NSLock()
+            private var redirectedURLStorage: URL?
 
             func urlSession(
                 _ session: URLSession,
@@ -98,8 +99,21 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
                 newRequest request: URLRequest,
                 completionHandler: @escaping (URLRequest?) -> Void
             ) {
-                redirectedURL = request.url
+                setRedirectedURL(request.url)
                 completionHandler(nil)
+            }
+
+            func setRedirectedURL(_ url: URL?) {
+                lock.lock()
+                redirectedURLStorage = url
+                lock.unlock()
+            }
+
+            func redirectedURL() -> URL? {
+                lock.lock()
+                let url = redirectedURLStorage
+                lock.unlock()
+                return url
             }
         }
 
@@ -112,7 +126,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
 
         _ = try await session.data(for: req)
 
-        if let redirected = delegate.redirectedURL {
+        if let redirected = delegate.redirectedURL() {
             return redirected
         }
 
@@ -135,26 +149,30 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
 }
 
 extension MusicPlayer: AudioPlayerDelegate {
-    func audioPlayerDidStartPlaying(player: AudioPlayer, with entryId: AudioEntryId) {
-        guard let t = pendingStartTime else {return}
-        pendingStartTime = nil
-        player.seek(to: t)
+    nonisolated func audioPlayerDidStartPlaying(player: AudioPlayer, with entryId: AudioEntryId) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            guard let t = pendingStartTime else { return }
+            pendingStartTime = nil
+            player.seek(to: t)
+        }
     }
-    
-    func audioPlayerStateChanged(player: AudioPlayer, with state: AudioPlayerState, previous: AudioPlayerState) {}
-    func audioPlayerDidFinishPlaying(
+
+    nonisolated func audioPlayerStateChanged(player: AudioPlayer, with state: AudioPlayerState, previous: AudioPlayerState) {}
+
+    nonisolated func audioPlayerDidFinishPlaying(
         player: AudioPlayer,
         entryId: AudioEntryId,
         stopReason: AudioPlayerStopReason,
         progress: Double,
         duration: Double
     ) {}
-    
-    func audioPlayerDidFinishBuffering(player: AudioPlayer, with entryId: AudioEntryId) {}
 
-    func audioPlayerDidReadMetadata(player: AudioPlayer, metadata: [String : String]) {}
+    nonisolated func audioPlayerDidFinishBuffering(player: AudioPlayer, with entryId: AudioEntryId) {}
 
-    func audioPlayerDidCancel(player: AudioPlayer, queuedItems: [AudioEntryId]) {}
+    nonisolated func audioPlayerDidReadMetadata(player: AudioPlayer, metadata: [String : String]) {}
 
-    func audioPlayerUnexpectedError(player: AudioPlayer, error: AudioPlayerError) {}
+    nonisolated func audioPlayerDidCancel(player: AudioPlayer, queuedItems: [AudioEntryId]) {}
+
+    nonisolated func audioPlayerUnexpectedError(player: AudioPlayer, error: AudioPlayerError) {}
 }
