@@ -18,13 +18,17 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
 
     private var playTask: Task<Void, Never>?
     private var isAudioSessionConfigured = false
+    
+    private var pendingStartTime: Double?
 
     init(sc: SoundCloud) {
         self.sc = sc
+        player.delegate = self
     }
 
     func play(song: PredefinedSong) {
         playTask?.cancel()
+        pendingStartTime = max(0, Double(song.startSeconds))
 
         playTask = Task { [weak self] in
             guard let self else { return }
@@ -41,7 +45,8 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
                 }
 
                 configureAudioSessionIfNeeded()
-                player.play(url: finalURL)
+                player.play(url: finalURL, headers: details.headers)
+                isPlaying = true
             } catch {
                 if Task.isCancelled { return }
                 print("Failed to play:", error)
@@ -127,4 +132,29 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         }
     }
 
+}
+
+extension MusicPlayer: AudioPlayerDelegate {
+    func audioPlayerDidStartPlaying(player: AudioPlayer, with entryId: AudioEntryId) {
+        guard let t = pendingStartTime else {return}
+        pendingStartTime = nil
+        player.seek(to: t)
+    }
+    
+    func audioPlayerStateChanged(player: AudioPlayer, with state: AudioPlayerState, previous: AudioPlayerState) {}
+    func audioPlayerDidFinishPlaying(
+        player: AudioPlayer,
+        entryId: AudioEntryId,
+        stopReason: AudioPlayerStopReason,
+        progress: Double,
+        duration: Double
+    ) {}
+    
+    func audioPlayerDidFinishBuffering(player: AudioPlayer, with entryId: AudioEntryId) {}
+
+    func audioPlayerDidReadMetadata(player: AudioPlayer, metadata: [String : String]) {}
+
+    func audioPlayerDidCancel(player: AudioPlayer, queuedItems: [AudioEntryId]) {}
+
+    func audioPlayerUnexpectedError(player: AudioPlayer, error: AudioPlayerError) {}
 }
