@@ -30,7 +30,8 @@ struct HomePage: View {
                             ForEach(filteredSongs) { song in
                                 SongRow(
                                     song: song,
-                                    isSelected: isSongSelected(song),
+//                                    isSelected: isSongSelected(song),
+                                    isSelected: false,
                                     isPlayed: isSongRecentlyPlayed(song),
                                     onTap: { handleSongTap(song) },
                                     onLongPress: { selectedPreviewSong = song }
@@ -52,51 +53,42 @@ struct HomePage: View {
                 .zIndex(1000)
             }
 
-            if player.currentSong != nil {
-                MiniPlayerButton(
-                    isPlaying: player.isPlaying,
-                    progress: player.progress,
-                    action: { player.togglePlayPause() }
-                )
-                .padding(.trailing, 20)
-                .padding(.bottom, 100)
-                .zIndex(900)
-            }
+//            if player.currentSong != nil {
+//                MiniPlayerButton(
+//                    isPlaying: player.isPlaying,
+//                    progress: player.progress,
+//                    action: { player.togglePlayPause() }
+//                )
+//                .padding(.trailing, 20)
+//                .padding(.bottom, 100)
+//                .zIndex(900)
+//            }
         }
-        .onAppear {
-            player.onSongFinished = { finished in
-                advanceToNextSong(after: finished)
-            }
-        }
-        .onDisappear {
-            player.onSongFinished = nil
-        }
+//        .onAppear {
+//            player.onSongFinished = { finished in
+//                advanceToNextSong(after: finished)
+//            }
+//        }
+//        .onDisappear {
+//            player.onSongFinished = nil
+//        }
     }
 
     func handleSongTap(_ song: PredefinedSong) {
-        let now = Date()
-
-        if let lastTap = lastTapTime {
-            let timeSinceLastTap = now.timeIntervalSince(lastTap)
-            guard timeSinceLastTap >= 1.0 else {
-                return
-            }
-        }
-        lastTapTime = now
 
         player.play(song: song)
         playedTimeStamps[song.id] = Date()
     }
     
-    func isSongSelected(_ song: PredefinedSong) -> Bool {
-        if player.currentSong == song {
-            return true
-        }
-        
-        guard let lastPlayed = playedTimeStamps[song.id] else { return false }
-        let interval = Date().timeIntervalSince(lastPlayed)
-        return interval < 1.0
-    }
+//    func isSongSelected(_ song: PredefinedSong) -> Bool {
+//        if player.currentSong == song {
+//            return true
+//        }
+//        
+//        guard let lastPlayed = playedTimeStamps[song.id] else { return false }
+//        let interval = Date().timeIntervalSince(lastPlayed)
+//        return interval < 1.0
+//    }
     
     func isSongRecentlyPlayed(_ song: PredefinedSong) -> Bool {
         guard let lastPlayed = playedTimeStamps[song.id] else { return false }

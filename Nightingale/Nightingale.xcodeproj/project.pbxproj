@@ -14,6 +14,7 @@
 		43B13F012EC3798700949F4A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13F002EC3798700949F4A /* FirebaseAnalytics */; };
 		43B13F032EC3798700949F4A /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13F022EC3798700949F4A /* FirebaseAnalyticsCore */; };
 		43B13F052EC3798700949F4A /* FirebaseAnalyticsIdentitySupport in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13F042EC3798700949F4A /* FirebaseAnalyticsIdentitySupport */; };
+		43E489E22EF0035E003EECEB /* AudioStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = 43E489E12EF0035E003EECEB /* AudioStreaming */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +82,7 @@
 				43B13ECB2EBDEC4F00949F4A /* SoundCloud in Frameworks */,
 				43B13F052EC3798700949F4A /* FirebaseAnalyticsIdentitySupport in Frameworks */,
 				43B13F032EC3798700949F4A /* FirebaseAnalyticsCore in Frameworks */,
+				43E489E22EF0035E003EECEB /* AudioStreaming in Frameworks */,
 				43B13F012EC3798700949F4A /* FirebaseAnalytics in Frameworks */,
 				43B13EFD2EC3798700949F4A /* FirebaseAI in Frameworks */,
 			);
@@ -151,6 +153,7 @@
 				43B13F002EC3798700949F4A /* FirebaseAnalytics */,
 				43B13F022EC3798700949F4A /* FirebaseAnalyticsCore */,
 				43B13F042EC3798700949F4A /* FirebaseAnalyticsIdentitySupport */,
+				43E489E12EF0035E003EECEB /* AudioStreaming */,
 			);
 			productName = Nightingale;
 			productReference = 434A85962D535F27000C4AB5 /* Nightingale.app */;
@@ -237,6 +240,7 @@
 			packageReferences = (
 				43B13EC92EBDEC4F00949F4A /* XCRemoteSwiftPackageReference "SoundCloud-Swift" */,
 				43B13EFB2EC3798700949F4A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				43E489E02EF0035E003EECEB /* XCRemoteSwiftPackageReference "AudioStreaming" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 434A85972D535F27000C4AB5 /* Products */;
@@ -634,6 +638,14 @@
 				minimumVersion = 12.5.0;
 			};
 		};
+		43E489E02EF0035E003EECEB /* XCRemoteSwiftPackageReference "AudioStreaming" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dimitris-c/AudioStreaming.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -666,6 +678,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 43B13EFB2EC3798700949F4A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalyticsIdentitySupport;
+		};
+		43E489E12EF0035E003EECEB /* AudioStreaming */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 43E489E02EF0035E003EECEB /* XCRemoteSwiftPackageReference "AudioStreaming" */;
+			productName = AudioStreaming;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
