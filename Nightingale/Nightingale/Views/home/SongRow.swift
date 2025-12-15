@@ -30,10 +30,10 @@ struct SongRow: View {
             
             Spacer(minLength: 12)
             
-            if isPlayed {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(Color(white: 0.6))
+            if isPlayed && !isSelected {
+                Text("Played")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
             }
         }
         .padding(.horizontal, 14)

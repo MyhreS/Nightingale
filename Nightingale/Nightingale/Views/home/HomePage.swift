@@ -8,7 +8,6 @@ struct HomePage: View {
     @State private var selectedPreviewSong: PredefinedSong?
     @State private var selectedGroup: SongGroup = .faceoff
     @State private var playedTimeStamps: [String: Date] = [:]
-    @State private var lastTapTime: Date?
     
     var filteredSongs: [PredefinedSong] {
         songs.filter { $0.group == selectedGroup }
@@ -68,6 +67,25 @@ struct HomePage: View {
                 .padding(.bottom, 100)
                 .zIndex(900)
             }
+            
+        }
+        .overlay(alignment: .bottomLeading) {
+            GoalButton(action: { playGoalSong() })
+                .padding(.leading, 20)
+                .padding(.bottom, 100)
+                .zIndex(900)
+        }
+        .overlay(alignment: .bottomTrailing) {
+            if player.currentSong != nil {
+                MiniPlayerButton(
+                    isPlaying: player.isPlaying,
+                    progress: progressFraction,
+                    action: { player.togglePlayPause() }
+                )
+                .padding(.trailing, 20)
+                .padding(.bottom, 100)
+                .zIndex(900)
+            }
         }
         .onAppear {
             player.onSongFinished = { finished in
@@ -78,9 +96,18 @@ struct HomePage: View {
             player.onSongFinished = nil
         }
     }
+    
+    func playGoalSong() {
+        let goalSongs = songs.filter({ $0.group == .goal })
+        guard !goalSongs.isEmpty else { return }
+        
+        guard let song = goalSongs.randomElement() else {return}
+        player.play(song: song)
+        playedTimeStamps[song.id] = Date()
+        selectedGroup = .goal
+    }
 
     func handleSongTap(_ song: PredefinedSong) {
-
         player.play(song: song)
         playedTimeStamps[song.id] = Date()
     }
