@@ -12,6 +12,13 @@ struct StreamDetails {
 @MainActor
 final class MusicPlayer: ObservableObject, @unchecked Sendable {
     @Published var isPlaying = false
+    @Published var progressSeconds: Double = 0
+    @Published var durationSeconds: Double = 0
+    @Published var currentSong: PredefinedSong?
+    
+    var onSongFinished: ((PredefinedSong) -> Void)?
+    private var progressCancellable: AnyCancellable?
+    private var currentEntryId: String?
 
     private let player = AudioPlayer()
     private let sc: SoundCloud
@@ -28,6 +35,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
 
     func play(song: PredefinedSong) {
         playTask?.cancel()
+        currentSong = song
         pendingStartTime = max(0, Double(song.startSeconds))
 
         playTask = Task { [weak self] in
@@ -45,8 +53,10 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
                 }
 
                 configureAudioSessionIfNeeded()
+                currentEntryId = finalURL.absoluteString
                 player.play(url: finalURL, headers: details.headers)
                 isPlaying = true
+                startProgressUpdates()
             } catch {
                 if Task.isCancelled { return }
                 print("Failed to play:", error)
@@ -58,9 +68,11 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         if isPlaying {
             player.pause()
             isPlaying = false
+            stopProgressUpdates()
         } else {
             player.resume()
             isPlaying = true
+            startProgressUpdates()
         }
     }
 
@@ -68,6 +80,11 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         playTask?.cancel()
         player.stop()
         isPlaying = false
+        stopProgressUpdates()
+        progressSeconds = 0
+        durationSeconds = 0
+        currentSong = nil
+        currentEntryId = nil
     }
 
     private func getSongStreamDetails(song: PredefinedSong) async throws -> StreamDetails {
@@ -145,6 +162,26 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
             print("Audio session error:", error)
         }
     }
+    
+    private func startProgressUpdates() {
+        if progressCancellable != nil {return}
+        
+        progressCancellable = Timer.publish(every: 0.25, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.refreshProgress()
+            }
+    }
+    
+    private func stopProgressUpdates() {
+        progressCancellable?.cancel()
+        progressCancellable = nil
+    }
+    
+    private func refreshProgress() {
+        progressSeconds = player.progress
+        durationSeconds = player.duration
+    }
 
 }
 
@@ -166,7 +203,20 @@ extension MusicPlayer: AudioPlayerDelegate {
         stopReason: AudioPlayerStopReason,
         progress: Double,
         duration: Double
-    ) {}
+    ) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            guard stopReason == .eof else { return }
+            guard entryId.id == currentEntryId else { return }
+
+            refreshProgress()
+            isPlaying = false
+            stopProgressUpdates()
+
+            guard let finishedSong = currentSong else { return }
+            onSongFinished?(finishedSong)
+        }
+    }
 
     nonisolated func audioPlayerDidFinishBuffering(player: AudioPlayer, with entryId: AudioEntryId) {}
 

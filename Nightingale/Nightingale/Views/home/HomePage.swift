@@ -13,6 +13,12 @@ struct HomePage: View {
     var filteredSongs: [PredefinedSong] {
         songs.filter { $0.group == selectedGroup }
     }
+    
+    var progressFraction: Double {
+        let d = player.durationSeconds
+        guard d > 0 else {return 0}
+        return min(max(player.progressSeconds / d, 0), 1)
+    }
 
     init(sc: SoundCloud) {
         _player = StateObject(wrappedValue: MusicPlayer(sc: sc))
@@ -30,8 +36,7 @@ struct HomePage: View {
                             ForEach(filteredSongs) { song in
                                 SongRow(
                                     song: song,
-//                                    isSelected: isSongSelected(song),
-                                    isSelected: false,
+                                    isSelected: isSongSelected(song),
                                     isPlayed: isSongRecentlyPlayed(song),
                                     onTap: { handleSongTap(song) },
                                     onLongPress: { selectedPreviewSong = song }
@@ -53,25 +58,25 @@ struct HomePage: View {
                 .zIndex(1000)
             }
 
-//            if player.currentSong != nil {
-//                MiniPlayerButton(
-//                    isPlaying: player.isPlaying,
-//                    progress: player.progress,
-//                    action: { player.togglePlayPause() }
-//                )
-//                .padding(.trailing, 20)
-//                .padding(.bottom, 100)
-//                .zIndex(900)
-//            }
+            if player.currentSong != nil {
+                MiniPlayerButton(
+                    isPlaying: player.isPlaying,
+                    progress: progressFraction,
+                    action: { player.togglePlayPause() }
+                )
+                .padding(.trailing, 20)
+                .padding(.bottom, 100)
+                .zIndex(900)
+            }
         }
-//        .onAppear {
-//            player.onSongFinished = { finished in
-//                advanceToNextSong(after: finished)
-//            }
-//        }
-//        .onDisappear {
-//            player.onSongFinished = nil
-//        }
+        .onAppear {
+            player.onSongFinished = { finished in
+                advanceToNextSong(after: finished)
+            }
+        }
+        .onDisappear {
+            player.onSongFinished = nil
+        }
     }
 
     func handleSongTap(_ song: PredefinedSong) {
@@ -80,15 +85,15 @@ struct HomePage: View {
         playedTimeStamps[song.id] = Date()
     }
     
-//    func isSongSelected(_ song: PredefinedSong) -> Bool {
-//        if player.currentSong == song {
-//            return true
-//        }
-//        
-//        guard let lastPlayed = playedTimeStamps[song.id] else { return false }
-//        let interval = Date().timeIntervalSince(lastPlayed)
-//        return interval < 1.0
-//    }
+    func isSongSelected(_ song: PredefinedSong) -> Bool {
+        if player.currentSong == song {
+            return true
+        }
+        
+        guard let lastPlayed = playedTimeStamps[song.id] else { return false }
+        let interval = Date().timeIntervalSince(lastPlayed)
+        return interval < 1.0
+    }
     
     func isSongRecentlyPlayed(_ song: PredefinedSong) -> Bool {
         guard let lastPlayed = playedTimeStamps[song.id] else { return false }
