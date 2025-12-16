@@ -1,5 +1,4 @@
 import Foundation
-import SoundCloud
 import Combine
 import AVFoundation
 import AudioStreaming
@@ -21,17 +20,15 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     private var currentEntryId: String?
 
     private let player = AudioPlayer()
-    private let sc: SoundCloud
-    private let firebaseAPI: FirebaseAPI
+    private let streamCache: StreamDetailsCache
 
     private var playTask: Task<Void, Never>?
     private var isAudioSessionConfigured = false
     
     private var pendingStartTime: Double?
 
-    init(sc: SoundCloud, firebaseAPI: FirebaseAPI) {
-        self.sc = sc
-        self.firebaseAPI = firebaseAPI
+    init(streamCache: StreamDetailsCache) {
+        self.streamCache = streamCache
         player.delegate = self
     }
 
@@ -44,19 +41,18 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
             guard let self else { return }
 
             do {
-                let details = try await getSongStreamDetails(song: song)
-                let finalURL = try await resolveRedirectedURL(url: details.url, headers: details.headers)
+                let details = try await streamCache.getStreamDetails(for: song)
 
                 if Task.isCancelled { return }
 
-                guard finalURL.pathExtension.lowercased() != "m3u8" else {
+                guard details.url.pathExtension.lowercased() != "m3u8" else {
                     print("HLS (.m3u8) not supported by AudioStreaming. Use AVPlayer for this.")
                     return
                 }
 
                 configureAudioSessionIfNeeded()
-                currentEntryId = finalURL.absoluteString
-                player.play(url: finalURL, headers: details.headers)
+                currentEntryId = details.url.absoluteString
+                player.play(url: details.url, headers: details.headers)
                 isPlaying = true
                 startProgressUpdates()
             } catch {
@@ -87,70 +83,6 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         durationSeconds = 0
         currentSong = nil
         currentEntryId = nil
-    }
-
-    private func getSongStreamDetails(song: Song) async throws -> StreamDetails {
-        switch song.streamingSource {
-        case .soundcloud:
-            let streamInfo = try await sc.streamInfo(for: song.id)
-            let headers = try await sc.authorizationHeader
-            
-            guard let url = URL(string: streamInfo.httpMp3128URL) ?? URL(string: streamInfo.hlsMp3128URL) else {
-                throw URLError(.badURL)
-            }
-            return StreamDetails(url: url, headers: headers)
-            
-        case .firebase:
-            let url = try await firebaseAPI.fetchStorageDownloadURL(path: song.id)
-            return StreamDetails(url: url, headers: [:])
-        }
-    }
-    
-
-    private func resolveRedirectedURL(url: URL, headers: [String: String]) async throws -> URL {
-        final class RedirectCatcher: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
-            private let lock = NSLock()
-            private var redirectedURLStorage: URL?
-
-            func urlSession(
-                _ session: URLSession,
-                task: URLSessionTask,
-                willPerformHTTPRedirection response: HTTPURLResponse,
-                newRequest request: URLRequest,
-                completionHandler: @escaping (URLRequest?) -> Void
-            ) {
-                setRedirectedURL(request.url)
-                completionHandler(nil)
-            }
-
-            func setRedirectedURL(_ url: URL?) {
-                lock.lock()
-                redirectedURLStorage = url
-                lock.unlock()
-            }
-
-            func redirectedURL() -> URL? {
-                lock.lock()
-                let url = redirectedURLStorage
-                lock.unlock()
-                return url
-            }
-        }
-
-        let delegate = RedirectCatcher()
-        let session = URLSession(configuration: .ephemeral, delegate: delegate, delegateQueue: nil)
-
-        var req = URLRequest(url: url)
-        req.httpMethod = "GET"
-        headers.forEach { req.setValue($0.value, forHTTPHeaderField: $0.key) }
-
-        _ = try await session.data(for: req)
-
-        if let redirected = delegate.redirectedURL() {
-            return redirected
-        }
-
-        return url
     }
 
     private func configureAudioSessionIfNeeded() {

@@ -3,6 +3,7 @@ import SoundCloud
 
 struct AuthGateView: View {
     let sc: SoundCloud
+    let streamCache: StreamDetailsCache
 
     enum AuthState {
         case checking
@@ -33,7 +34,7 @@ struct AuthGateView: View {
                 EmptyView()
             case .authenticated:
                 if let user {
-                    LoggedInPage(sc: sc, user: user, onLogOut: logOut)
+                    LoggedInPage(sc: sc, streamCache: streamCache, user: user, onLogOut: logOut)
                 } else {
                     Text("Missing user info")
                 }

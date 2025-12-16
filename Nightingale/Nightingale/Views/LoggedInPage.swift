@@ -8,12 +8,12 @@ struct LoggedInPage: View {
     }
     
     let sc: SoundCloud
+    let streamCache: StreamDetailsCache
     @EnvironmentObject var firebaseAPI: FirebaseAPI
     
     let user: User
     let onLogOut: () -> Void
     @State private var selectedTab: Tab = .home
-    @State private var hasPrefetchedURLs = false
     @State private var songs: [Song] = []
     
     var body: some View {
@@ -35,28 +35,23 @@ struct LoggedInPage: View {
             let users = try await firebaseAPI.fetchUsersAllowedFirebaseSongs()
             guard users.contains(extractSoundCloudUserId(userId: user.id)) else {
                 songs = soundcloudSongs
+                await streamCache.preload(songs: soundcloudSongs)
                 return
             }
             
             let firebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
             songs = soundcloudSongs + firebaseSongs
+            await streamCache.preload(songs: songs)
         } catch {
             print("Failed to fetch songs: \(error)")
         }
-            
-    }
-    
-    func fetchMp3() async throws {
-            let url = try await firebaseAPI.fetchStorageDownloadURL(path: "a_song.mp3")
-            print(url)
-        
     }
     
     var tabContent: some View {
         Group {
             switch selectedTab {
             case .home:
-                HomePage(sc: sc, firebaseAPI: firebaseAPI, songs: songs)
+                HomePage(streamCache: streamCache, songs: songs)
             case .settings:
                 SettingsPage(sc: sc, user: user, onLogOut: onLogOut)
             }

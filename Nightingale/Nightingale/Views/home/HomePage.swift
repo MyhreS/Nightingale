@@ -1,5 +1,4 @@
 import SwiftUI
-import SoundCloud
 
 struct HomePage: View {
     @StateObject private var player: MusicPlayer
@@ -18,8 +17,8 @@ struct HomePage: View {
         return min(max(player.progressSeconds / d, 0), 1)
     }
 
-    init(sc: SoundCloud, firebaseAPI: FirebaseAPI, songs: [Song]) {
-        _player = StateObject(wrappedValue: MusicPlayer(sc: sc, firebaseAPI: firebaseAPI))
+    init(streamCache: StreamDetailsCache, songs: [Song]) {
+        _player = StateObject(wrappedValue: MusicPlayer(streamCache: streamCache))
         self.songs = songs
     }
 
