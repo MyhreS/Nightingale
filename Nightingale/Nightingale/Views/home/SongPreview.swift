@@ -2,7 +2,7 @@ import SwiftUI
 
 
 struct SongPreview: View {
-    let song: PredefinedSong
+    let song: Song
     let onClose: () -> Void
     
     var body: some View {

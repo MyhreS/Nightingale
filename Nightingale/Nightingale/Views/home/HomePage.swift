@@ -2,14 +2,13 @@ import SwiftUI
 import SoundCloud
 
 struct HomePage: View {
-    @EnvironmentObject var firebaseAPI: FirebaseAPI
     @StateObject private var player: MusicPlayer
-    let songs: [PredefinedSong]
-    @State private var selectedPreviewSong: PredefinedSong?
+    @State private var selectedPreviewSong: Song?
     @State private var selectedGroup: SongGroup = .faceoff
     @State private var playedTimeStamps: [String: Date] = [:]
+    let songs: [Song]
     
-    var filteredSongs: [PredefinedSong] {
+    var filteredSongs: [Song] {
         songs.filter { $0.group == selectedGroup }
     }
     
@@ -19,9 +18,9 @@ struct HomePage: View {
         return min(max(player.progressSeconds / d, 0), 1)
     }
 
-    init(sc: SoundCloud) {
+    init(sc: SoundCloud, songs: [Song]) {
         _player = StateObject(wrappedValue: MusicPlayer(sc: sc))
-        songs = PredefinedSongStore.loadPredefinedSongs()
+        self.songs = songs
     }
 
     var body: some View {
@@ -107,12 +106,12 @@ struct HomePage: View {
         selectedGroup = .goal
     }
 
-    func handleSongTap(_ song: PredefinedSong) {
+    func handleSongTap(_ song: Song) {
         player.play(song: song)
         playedTimeStamps[song.id] = Date()
     }
     
-    func isSongSelected(_ song: PredefinedSong) -> Bool {
+    func isSongSelected(_ song: Song) -> Bool {
         if player.currentSong == song {
             return true
         }
@@ -122,13 +121,13 @@ struct HomePage: View {
         return interval < 1.0
     }
     
-    func isSongRecentlyPlayed(_ song: PredefinedSong) -> Bool {
+    func isSongRecentlyPlayed(_ song: Song) -> Bool {
         guard let lastPlayed = playedTimeStamps[song.id] else { return false }
         let interval = Date().timeIntervalSince(lastPlayed)
         return interval < 3 * 60 * 60
     }
 
-    func advanceToNextSong(after song: PredefinedSong) {
+    func advanceToNextSong(after song: Song) {
         let groupSongs = songs.filter { $0.group == song.group }
         guard !groupSongs.isEmpty else { return }
         guard let index = groupSongs.firstIndex(of: song) else { return }
@@ -140,4 +139,5 @@ struct HomePage: View {
         playedTimeStamps[nextSong.id] = Date()
         player.play(song: nextSong)
     }
+        
 }

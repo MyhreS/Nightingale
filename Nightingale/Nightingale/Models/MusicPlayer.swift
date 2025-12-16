@@ -14,9 +14,9 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     @Published var isPlaying = false
     @Published var progressSeconds: Double = 0
     @Published var durationSeconds: Double = 0
-    @Published var currentSong: PredefinedSong?
+    @Published var currentSong: Song?
     
-    var onSongFinished: ((PredefinedSong) -> Void)?
+    var onSongFinished: ((Song) -> Void)?
     private var progressCancellable: AnyCancellable?
     private var currentEntryId: String?
 
@@ -33,7 +33,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         player.delegate = self
     }
 
-    func play(song: PredefinedSong) {
+    func play(song: Song) {
         playTask?.cancel()
         currentSong = song
         pendingStartTime = max(0, Double(song.startSeconds))
@@ -87,7 +87,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         currentEntryId = nil
     }
 
-    private func getSongStreamDetails(song: PredefinedSong) async throws -> StreamDetails {
+    private func getSongStreamDetails(song: Song) async throws -> StreamDetails {
         if let cached = StreamURLCache.shared.getURL(for: song.id) {
             return StreamDetails(url: cached.url, headers: cached.headers)
         }

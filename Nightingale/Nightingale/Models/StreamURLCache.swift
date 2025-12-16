@@ -35,7 +35,7 @@ final class StreamURLCache: ObservableObject {
         cache[songId] = CachedStreamURL(url: url, headers: headers, expiresAt: expiresAt)
     }
     
-    func prefetchAll(songs: [PredefinedSong], using sc: SoundCloud) async {
+    func prefetchAll(songs: [Song], using sc: SoundCloud) async {
         await withTaskGroup(of: (String, URL?, [String: String]?).self) { group in
             for song in songs {
                 group.addTask {

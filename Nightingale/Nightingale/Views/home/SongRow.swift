@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SongRow: View {
-    let song: PredefinedSong
+    let song: Song
     let isSelected: Bool
     let isPlayed: Bool
     let onTap: () -> Void

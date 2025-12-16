@@ -20,7 +20,7 @@ enum SongGroup: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-struct PredefinedSong: Codable, Identifiable, Equatable {
+struct Song: Codable, Identifiable, Equatable {
     let id: String
     let name: String
     let artworkURL: String
@@ -33,19 +33,4 @@ struct PredefinedSong: Codable, Identifiable, Equatable {
     let startSeconds: Int
     let goPlussSong: Bool
     
-}
-
-enum PredefinedSongStore {
-    static func loadPredefinedSongs() -> [PredefinedSong] {
-        guard let url = Bundle.main.url(forResource: "predefined_songs", withExtension: "json") else {
-            return []
-        }
-        
-        guard let data = try? Data(contentsOf: url) else {
-            return []
-        }
-        
-        let decoder = JSONDecoder()
-        return (try? decoder.decode([PredefinedSong].self, from: data)) ?? []
-    }
 }

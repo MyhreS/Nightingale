@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>sm.nightingale</string>
+	<string>sm.Nightingale</string>
 	<key>PROJECT_ID</key>
 	<string>nightingale-ed86a</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:886865187698:ios:3e1e3ecda52eb8473903eb</string>
+	<string>1:886865187698:ios:8923f26d1c8a48023903eb</string>
+	<key>DATABASE_URL</key>
+	<string>https://nightingale-ed86a-default-rtdb.europe-west1.firebasedatabase.app</string>
 </dict>
 </plist>

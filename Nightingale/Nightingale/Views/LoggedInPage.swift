@@ -8,10 +8,13 @@ struct LoggedInPage: View {
     }
     
     let sc: SoundCloud
+    @EnvironmentObject var firebaseAPI: FirebaseAPI
+    
     let user: User
     let onLogOut: () -> Void
     @State private var selectedTab: Tab = .home
     @State private var hasPrefetchedURLs = false
+    @State private var songs: [Song] = []
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -20,18 +23,27 @@ struct LoggedInPage: View {
             
             footer
         }
-        .ignoresSafeArea(edges: .bottom)
-        .onAppear {
-            prefetchStreamURLs()
+        .task {
+            await getSongs()
         }
+        .ignoresSafeArea(edges: .bottom)
     }
     
-    func prefetchStreamURLs() {
+    func getSongs() async {
+        do {
+            songs = try await firebaseAPI.fetchPredefinedSongs()
+            prefetchStreamURLs(songs: songs)
+        } catch {
+            print("Failed to fetch songs: \(error)")
+        }
+            
+    }
+    
+    func prefetchStreamURLs(songs: [Song]) {
         guard !hasPrefetchedURLs else { return }
         hasPrefetchedURLs = true
         
         Task {
-            let songs = PredefinedSongStore.loadPredefinedSongs()
             await StreamURLCache.shared.prefetchAll(songs: songs, using: sc)
         }
     }
@@ -40,7 +52,7 @@ struct LoggedInPage: View {
         Group {
             switch selectedTab {
             case .home:
-                HomePage(sc: sc)
+                HomePage(sc: sc, songs: songs)
             case .settings:
                 SettingsPage(sc: sc, user: user, onLogOut: onLogOut)
             }
