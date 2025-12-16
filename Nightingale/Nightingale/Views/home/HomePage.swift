@@ -18,8 +18,8 @@ struct HomePage: View {
         return min(max(player.progressSeconds / d, 0), 1)
     }
 
-    init(sc: SoundCloud, songs: [Song]) {
-        _player = StateObject(wrappedValue: MusicPlayer(sc: sc))
+    init(sc: SoundCloud, firebaseAPI: FirebaseAPI, songs: [Song]) {
+        _player = StateObject(wrappedValue: MusicPlayer(sc: sc, firebaseAPI: firebaseAPI))
         self.songs = songs
     }
 

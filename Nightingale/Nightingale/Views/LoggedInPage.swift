@@ -56,7 +56,7 @@ struct LoggedInPage: View {
         Group {
             switch selectedTab {
             case .home:
-                HomePage(sc: sc, songs: songs)
+                HomePage(sc: sc, firebaseAPI: firebaseAPI, songs: songs)
             case .settings:
                 SettingsPage(sc: sc, user: user, onLogOut: onLogOut)
             }

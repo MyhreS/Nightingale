@@ -22,14 +22,16 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
 
     private let player = AudioPlayer()
     private let sc: SoundCloud
+    private let firebaseAPI: FirebaseAPI
 
     private var playTask: Task<Void, Never>?
     private var isAudioSessionConfigured = false
     
     private var pendingStartTime: Double?
 
-    init(sc: SoundCloud) {
+    init(sc: SoundCloud, firebaseAPI: FirebaseAPI) {
         self.sc = sc
+        self.firebaseAPI = firebaseAPI
         player.delegate = self
     }
 
@@ -88,16 +90,22 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
 
     private func getSongStreamDetails(song: Song) async throws -> StreamDetails {
-        let streamInfo = try await sc.streamInfo(for: song.id)
-        let headers = try await sc.authorizationHeader
-
-        guard let url = URL(string: streamInfo.httpMp3128URL) ?? URL(string: streamInfo.hlsMp3128URL) else {
-            throw URLError(.badURL)
+        switch song.streamingSource {
+        case .soundcloud:
+            let streamInfo = try await sc.streamInfo(for: song.id)
+            let headers = try await sc.authorizationHeader
+            
+            guard let url = URL(string: streamInfo.httpMp3128URL) ?? URL(string: streamInfo.hlsMp3128URL) else {
+                throw URLError(.badURL)
+            }
+            return StreamDetails(url: url, headers: headers)
+            
+        case .firebase:
+            let url = try await firebaseAPI.fetchStorageDownloadURL(path: song.id)
+            return StreamDetails(url: url, headers: [:])
         }
-
-        let details = StreamDetails(url: url, headers: headers)
-        return details
     }
+    
 
     private func resolveRedirectedURL(url: URL, headers: [String: String]) async throws -> URL {
         final class RedirectCatcher: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
