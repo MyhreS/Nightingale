@@ -1,11 +1,10 @@
 import SwiftUI
+import SoundCloud
 
 struct ContentView: View {
+    let sc: SoundCloud
+    
     var body: some View {
-        RootGateView()
+        RootGateView(sc: sc)
     }
-}
-
-#Preview {
-    ContentView()
 }

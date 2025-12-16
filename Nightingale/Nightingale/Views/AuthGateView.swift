@@ -2,7 +2,7 @@ import SwiftUI
 import SoundCloud
 
 struct AuthGateView: View {
-    private let sc: SoundCloud
+    let sc: SoundCloud
 
     enum AuthState {
         case checking
@@ -12,16 +12,6 @@ struct AuthGateView: View {
 
     @State private var authState: AuthState = .checking
     @State private var user: User?
-
-    init() {
-        let secrets = SecretsKeeper.shared
-        let config = SoundCloud.Config(
-            clientId: secrets.getClientId(),
-            clientSecret: secrets.getClientSecret(),
-            redirectURI: secrets.getRedirectUri()
-        )
-        self.sc = SoundCloud(config)
-    }
     
     var body: some View {
         NavigationStack {
