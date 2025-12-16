@@ -40,6 +40,9 @@ struct LoggedInPage: View {
             guard users.contains(extractSoundCloudUserId(userId: user.id)) else {
                 songs = deduplicateById(soundcloudSongs)
                 await streamCache.preload(songs: songs)
+                if songs.isEmpty {
+                    errorWhenLoadingSongs = true
+                }
                 return
             }
             
@@ -47,6 +50,9 @@ struct LoggedInPage: View {
             let filteredSoundcloudSongs = removeDuplicates(soundcloudSongs: soundcloudSongs, firebaseSongs: firebaseSongs)
             songs = deduplicateById(firebaseSongs + filteredSoundcloudSongs)
             await streamCache.preload(songs: songs)
+            if songs.isEmpty {
+                errorWhenLoadingSongs = true
+            }
         } catch {
             errorWhenLoadingSongs = true
             print("Failed to fetch songs: \(error)")
