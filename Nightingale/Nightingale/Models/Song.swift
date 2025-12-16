@@ -30,7 +30,7 @@ struct Song: Codable, Identifiable, Equatable {
     let name: String
     let artistName: String
     let originalSongName: String
-    let originalSonArtistName: String
+    let originalSongArtistName: String
     let originalArtWorkUrl: String
     let artworkURL: String
     let duration: Int
@@ -45,7 +45,7 @@ struct Song: Codable, Identifiable, Equatable {
     
     enum CodingKeys: String, CodingKey {
         case songId = "id"
-        case name, artistName, originalSongName, originalSonArtistName
+        case name, artistName, originalSongName, originalSongArtistName
         case originalArtWorkUrl, artworkURL, duration, playbackUrl
         case linkToSong, linkToArtist, group, startSeconds, streamingSource
     }

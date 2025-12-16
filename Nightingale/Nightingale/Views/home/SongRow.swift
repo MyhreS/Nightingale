@@ -9,19 +9,19 @@ struct SongRow: View {
     
     var body: some View {
         HStack(spacing: 14) {
-            CachedAsyncImage(url: URL(string: song.artworkURL)) { image in
+            CachedAsyncImage(url: URL(string: song.originalArtWorkUrl != "" ? song.originalArtWorkUrl : song.artworkURL)) { image in
                 artworkView(for: image)
             }
             .frame(width: 52, height: 52)
             .clipShape(RoundedRectangle(cornerRadius: 10))
             
             VStack(alignment: .leading, spacing: 5) {
-                Text(song.name)
+                Text(song.originalSongName != "" ? song.originalSongName : song.name)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                 
-                Text("by \(song.artistName)")
+                Text("by \(song.originalSongArtistName != "" ? song.originalSongArtistName : song.artistName)")
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)

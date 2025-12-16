@@ -13,39 +13,47 @@ struct SongPreview: View {
                     onClose()
                 }
             
-            VStack(spacing: 24) {
-                    AsyncImage(url: URL(string: song.artworkURL)) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                    } placeholder: {
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(Color(white: 0.15))
+            VStack(spacing: 16) {
+                    if let url = URL(string: song.artworkURL), !song.artworkURL.isEmpty {
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } placeholder: {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(white: 0.15))
+                        }
+                        .frame(width: 120, height: 120)
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
                     }
-                    .frame(width: 240, height: 240)
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                    .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 4)
                     
                     VStack(spacing: 8) {
-                        Text(song.name)
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.center)
-                            .lineSpacing(2)
+                        if !song.name.isEmpty {
+                            Text(song.name)
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .multilineTextAlignment(.center)
+                                .lineSpacing(2)
+                        }
                         
-                        Text("by \(song.artistName)")
-                            .font(.system(size: 15))
-                            .foregroundStyle(Color(white: 0.6))
+                        if !song.artistName.isEmpty {
+                            Text("by \(song.artistName)")
+                                .font(.system(size: 15))
+                                .foregroundStyle(Color(white: 0.6))
+                        }
                         
-                        Text(formattedDuration)
-                            .font(.system(size: 13))
-                            .foregroundStyle(Color(white: 0.5))
-                            .padding(.top, 2)
+                        if song.duration > 0 {
+                            Text(formattedDuration)
+                                .font(.system(size: 13))
+                                .foregroundStyle(Color(white: 0.5))
+                                .padding(.top, 2)
+                        }
                     }
                     .padding(.horizontal, 12)
                     
                     VStack(spacing: 12) {
-                        if let songUrl = URL(string: song.linkToSong) {
+                        if !song.linkToSong.isEmpty, let songUrl = URL(string: song.linkToSong) {
                             Link(destination: songUrl) {
                                 HStack {
                                     Label("Open song on SoundCloud", systemImage: "music.note")
@@ -67,7 +75,7 @@ struct SongPreview: View {
                             }
                         }
                         
-                        if let artistUrl = URL(string: song.linkToArtist) {
+                        if !song.linkToArtist.isEmpty, let artistUrl = URL(string: song.linkToArtist) {
                             Link(destination: artistUrl) {
                                 HStack {
                                     Label("Open artist on SoundCloud", systemImage: "person.fill")
@@ -91,8 +99,8 @@ struct SongPreview: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .padding(24)
-                .frame(maxWidth: 340)
+                .padding(20)
+                .frame(maxWidth: 300)
                 .background(Color(white: 0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                 .overlay(
