@@ -112,6 +112,6 @@ struct SongPreview: View {
     }
     
     func onPlay() {
-        print("Not implemented: \(song.name) (\(song.id))")
+        print("Not implemented: \(song.name) (\(song.songId))")
     }
 }

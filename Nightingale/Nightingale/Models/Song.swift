@@ -26,7 +26,7 @@ enum StreamingSource: String, Codable {
 }
 
 struct Song: Codable, Identifiable, Equatable {
-    let id: String
+    let songId: String
     let name: String
     let artistName: String
     let originalSongName: String
@@ -40,4 +40,13 @@ struct Song: Codable, Identifiable, Equatable {
     let group: SongGroup
     let startSeconds: Int
     let streamingSource: StreamingSource
+    
+    var id: String { "\(songId)-\(group.rawValue)" }
+    
+    enum CodingKeys: String, CodingKey {
+        case songId = "id"
+        case name, artistName, originalSongName, originalSonArtistName
+        case originalArtWorkUrl, artworkURL, duration, playbackUrl
+        case linkToSong, linkToArtist, group, startSeconds, streamingSource
+    }
 }

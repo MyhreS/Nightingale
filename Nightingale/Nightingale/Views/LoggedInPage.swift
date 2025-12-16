@@ -34,14 +34,14 @@ struct LoggedInPage: View {
             let soundcloudSongs = try await firebaseAPI.fetchSoundcloudSongs()
             let users = try await firebaseAPI.fetchUsersAllowedFirebaseSongs()
             guard users.contains(extractSoundCloudUserId(userId: user.id)) else {
-                songs = soundcloudSongs
-                await streamCache.preload(songs: soundcloudSongs)
+                songs = deduplicateById(soundcloudSongs)
+                await streamCache.preload(songs: songs)
                 return
             }
             
             let firebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
             let filteredSoundcloudSongs = removeDuplicates(soundcloudSongs: soundcloudSongs, firebaseSongs: firebaseSongs)
-            songs = soundcloudSongs + filteredSoundcloudSongs
+            songs = deduplicateById(firebaseSongs + filteredSoundcloudSongs)
             await streamCache.preload(songs: songs)
         } catch {
             print("Failed to fetch songs: \(error)")
@@ -91,6 +91,15 @@ struct LoggedInPage: View {
                 .foregroundStyle(Color(white: 0.2)),
             alignment: .top
         )
+    }
+}
+
+func deduplicateById(_ songs: [Song]) -> [Song] {
+    var seen = Set<String>()
+    return songs.filter { song in
+        guard !seen.contains(song.id) else { return false }
+        seen.insert(song.id)
+        return true
     }
 }
 

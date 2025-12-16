@@ -48,6 +48,10 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
 
     func play(song: Song) {
         playTask?.cancel()
+        player.stop()
+        
+        progressSeconds = 0
+        durationSeconds = 0
         currentSong = song
         effectiveStartTime = max(0, Double(song.startSeconds))
         pendingStartTime = effectiveStartTime

@@ -46,7 +46,7 @@ actor StreamDetailsCache {
     
     private func fetchAndCache(song: Song) async throws -> StreamDetails {
         let details = try await fetchStreamDetails(song: song)
-        let finalURL = try await resolveRedirectedURL(url: details.url, headers: details.headers)
+        let finalURL = await resolveRedirectedURL(url: details.url, headers: details.headers)
         
         let cached = CachedStreamDetails(
             url: finalURL,
@@ -61,7 +61,7 @@ actor StreamDetailsCache {
     private func fetchStreamDetails(song: Song) async throws -> StreamDetails {
         switch song.streamingSource {
         case .soundcloud:
-            let streamInfo = try await sc.streamInfo(for: song.id)
+            let streamInfo = try await sc.streamInfo(for: song.songId)
             let headers = try await sc.authorizationHeader
             
             guard let url = URL(string: streamInfo.httpMp3128URL) ?? URL(string: streamInfo.hlsMp3128URL) else {
@@ -70,12 +70,12 @@ actor StreamDetailsCache {
             return StreamDetails(url: url, headers: headers)
             
         case .firebase:
-            let url = try await firebaseAPI.fetchStorageDownloadURL(path: song.id)
+            let url = try await firebaseAPI.fetchStorageDownloadURL(path: song.songId)
             return StreamDetails(url: url, headers: [:])
         }
     }
     
-    private func resolveRedirectedURL(url: URL, headers: [String: String]) async throws -> URL {
+    private func resolveRedirectedURL(url: URL, headers: [String: String]) async -> URL {
         final class RedirectCatcher: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
             private let lock = NSLock()
             private var redirectedURLStorage: URL?
@@ -109,10 +109,14 @@ actor StreamDetailsCache {
         let session = URLSession(configuration: .ephemeral, delegate: delegate, delegateQueue: nil)
 
         var req = URLRequest(url: url)
-        req.httpMethod = "GET"
+        req.httpMethod = "HEAD"
         headers.forEach { req.setValue($0.value, forHTTPHeaderField: $0.key) }
 
-        _ = try await session.data(for: req)
+        do {
+            _ = try await session.data(for: req)
+        } catch {
+            // Redirect was caught and cancelled - this is expected
+        }
 
         if let redirected = delegate.redirectedURL() {
             return redirected
