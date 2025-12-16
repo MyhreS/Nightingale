@@ -3,16 +3,23 @@ import SwiftUI
 struct SongGroupSelector: View {
     let groups: [SongGroup]
     @Binding var selectedGroup: SongGroup
+    let isLoading: Bool
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                ForEach(groups) { group in
-                    GroupChip(
-                        title: group.displayName,
-                        isSelected: group == selectedGroup
-                    ) {
-                        selectedGroup = group
+                if isLoading {
+                    ForEach(0..<4, id: \.self) { _ in
+                        GroupChipSkeleton()
+                    }
+                } else {
+                    ForEach(groups, id: \.self) { group in
+                        GroupChip(
+                            title: group.displayName,
+                            isSelected: group == selectedGroup
+                        ) {
+                            selectedGroup = group
+                        }
                     }
                 }
             }
@@ -47,5 +54,18 @@ struct GroupChip: View {
                 .foregroundStyle(isSelected ? .black : Color(white: 0.7))
         }
         .buttonStyle(.plain)
+    }
+}
+
+struct GroupChipSkeleton: View {
+    var body: some View {
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+            .fill(Color(white: 0.12))
+            .frame(width: 80, height: 44)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .strokeBorder(Color(white: 0.2), lineWidth: 1)
+            )
+            .shimmer()
     }
 }

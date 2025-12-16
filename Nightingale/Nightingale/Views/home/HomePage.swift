@@ -3,10 +3,18 @@ import SwiftUI
 struct HomePage: View {
     @StateObject private var player: MusicPlayer
     @State private var selectedPreviewSong: Song?
-    @State private var selectedGroup: SongGroup = .faceoff
+    @State private var selectedGroup: SongGroup = ""
     @State private var playedTimeStamps: [String: Date] = [:]
     let songs: [Song]
     let isLoadingSongs: Bool
+    
+    var availableGroups: [SongGroup] {
+        songs.uniqueGroups
+    }
+    
+    var hasGoalGroup: Bool {
+        availableGroups.contains { $0.lowercased() == "goal" }
+    }
     
     var filteredSongs: [Song] {
         songs.filter { $0.group == selectedGroup }
@@ -21,8 +29,19 @@ struct HomePage: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             PageLayout(title: "Music") {
+                HStack(spacing: 4) {
+                    Text("powered by")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Text("SoundCloud")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color(red: 1.0, green: 0.33, blue: 0.0))
+                }
+                .opacity(0.8)
+            } content: {
                 VStack(spacing: 16) {
-                    SongGroupSelector(groups: SongGroup.allCases, selectedGroup: $selectedGroup)
+                    SongGroupSelector(groups: availableGroups, selectedGroup: $selectedGroup, isLoading: isLoadingSongs)
                     
                     ScrollView {
                         LazyVStack(spacing: 10) {
@@ -72,10 +91,12 @@ struct HomePage: View {
             
         }
         .overlay(alignment: .bottomLeading) {
-            GoalButton(action: { playGoalSong() })
-                .padding(.leading, 20)
-                .padding(.bottom, 100)
-                .zIndex(900)
+            if hasGoalGroup {
+                GoalButton(action: { playGoalSong() })
+                    .padding(.leading, 20)
+                    .padding(.bottom, 100)
+                    .zIndex(900)
+            }
         }
         .overlay(alignment: .bottomTrailing) {
             if player.currentSong != nil {
@@ -90,8 +111,16 @@ struct HomePage: View {
             }
         }
         .onAppear {
+            if selectedGroup.isEmpty, let firstGroup = availableGroups.first {
+                selectedGroup = firstGroup
+            }
             player.onSongFinished = { finished in
                 advanceToNextSong(after: finished)
+            }
+        }
+        .onChange(of: songs) { _, newSongs in
+            if selectedGroup.isEmpty || !newSongs.contains(where: { $0.group == selectedGroup }) {
+                selectedGroup = newSongs.uniqueGroups.first ?? ""
             }
         }
         .onDisappear {
@@ -100,13 +129,15 @@ struct HomePage: View {
     }
     
     func playGoalSong() {
-        let goalSongs = songs.filter({ $0.group == .goal })
+        let goalSongs = songs.filter({ $0.group.lowercased() == "goal" })
         guard !goalSongs.isEmpty else { return }
         
         guard let song = goalSongs.randomElement() else {return}
         player.play(song: song)
         playedTimeStamps[song.id] = Date()
-        selectedGroup = .goal
+        if let goalGroup = availableGroups.first(where: { $0.lowercased() == "goal" }) {
+            selectedGroup = goalGroup
+        }
     }
 
     func handleSongTap(_ song: Song) {

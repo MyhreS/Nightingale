@@ -1,22 +1,11 @@
 import Foundation
 
-enum SongGroup: String, Codable, CaseIterable, Identifiable {
-    case faceoff
-    case penalty
-    case goal
-    case crowd
-    case intro
-    
-    var id: String { rawValue }
-    
+typealias SongGroup = String
+
+extension SongGroup {
     var displayName: String {
-        switch self {
-        case .faceoff: return "Face-off"
-        case .penalty: return "Penalty"
-        case .goal: return "Goal"
-        case .crowd: return "Crowd"
-        case .intro: return "Intro"
-        }
+        guard !self.isEmpty else { return "" }
+        return self.prefix(1).uppercased() + self.dropFirst()
     }
 }
 
@@ -41,12 +30,26 @@ struct Song: Codable, Identifiable, Equatable {
     let startSeconds: Int
     let streamingSource: StreamingSource
     
-    var id: String { "\(songId)-\(group.rawValue)" }
+    var id: String { "\(songId)-\(group)" }
     
     enum CodingKeys: String, CodingKey {
         case songId = "id"
         case name, artistName, originalSongName, originalSongArtistName
         case originalArtWorkUrl, artworkURL, duration, playbackUrl
         case linkToSong, linkToArtist, group, startSeconds, streamingSource
+    }
+}
+
+extension Array where Element == Song {
+    var uniqueGroups: [SongGroup] {
+        var seen = Set<SongGroup>()
+        var result = [SongGroup]()
+        for song in self {
+            if !seen.contains(song.group) {
+                seen.insert(song.group)
+                result.append(song.group)
+            }
+        }
+        return result
     }
 }
