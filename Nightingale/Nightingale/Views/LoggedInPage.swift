@@ -31,22 +31,19 @@ struct LoggedInPage: View {
     
     func getSongs() async {
         do {
-            songs = try await firebaseAPI.fetchPredefinedSongs()
-            prefetchStreamURLs(songs: songs)
-            try await fetchMp3()
+            let soundcloudSongs = try await firebaseAPI.fetchSoundcloudSongs()
+            let users = try await firebaseAPI.fetchUsersAllowedFirebaseSongs()
+            guard users.contains(extractSoundCloudUserId(userId: user.id)) else {
+                songs = soundcloudSongs
+                return
+            }
+            
+            let firebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
+            songs = soundcloudSongs + firebaseSongs
         } catch {
             print("Failed to fetch songs: \(error)")
         }
             
-    }
-    
-    func prefetchStreamURLs(songs: [Song]) {
-        guard !hasPrefetchedURLs else { return }
-        hasPrefetchedURLs = true
-        
-        Task {
-            await StreamURLCache.shared.prefetchAll(songs: songs, using: sc)
-        }
     }
     
     func fetchMp3() async throws {

@@ -88,10 +88,6 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
 
     private func getSongStreamDetails(song: Song) async throws -> StreamDetails {
-        if let cached = StreamURLCache.shared.getURL(for: song.id) {
-            return StreamDetails(url: cached.url, headers: cached.headers)
-        }
-
         let streamInfo = try await sc.streamInfo(for: song.id)
         let headers = try await sc.authorizationHeader
 
@@ -100,7 +96,6 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         }
 
         let details = StreamDetails(url: url, headers: headers)
-        StreamURLCache.shared.setURL(for: song.id, url: url, headers: headers)
         return details
     }
 

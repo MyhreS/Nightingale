@@ -14,8 +14,16 @@ final class FirebaseAPI: ObservableObject {
         FirebaseApp.configure()
     }
     
-    func fetchPredefinedSongs() async throws -> [Song] {
-        let snapshot = try await read(path: "predefined_songs")
+    func fetchSoundcloudSongs() async throws -> [Song] {
+        return try await fetchSongs(name: "soundcloudSongs")
+    }
+    
+    func fetchFirebaseSongs() async throws -> [Song] {
+        return try await fetchSongs(name: "firebaseSongs")
+    }
+    
+    private func fetchSongs(name: String) async throws -> [Song] {
+        let snapshot = try await read(path: name)
 
         guard let value = snapshot.value else {
             return []
@@ -56,6 +64,15 @@ final class FirebaseAPI: ObservableObject {
             }
         }
     }
+    
+    func fetchUsersAllowedFirebaseSongs() async throws -> [String] {
+        let snapshot = try await read(path: "usersAllowedFirebaseSongs")
+        guard let array = snapshot.value as? [[String: Any]] else {
+            return []
+        }
+        return array.compactMap { $0["id"] as? String }
+    }
+    
     
     func fetchStorageDownloadURL(path: String) async throws -> URL {
         try await storage.reference(withPath: path).downloadURL()

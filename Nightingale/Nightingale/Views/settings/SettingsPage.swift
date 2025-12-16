@@ -5,6 +5,8 @@ struct SettingsPage: View {
     let sc: SoundCloud
     let user: User
     let onLogOut: () -> Void
+    
+    @State private var didCopy = false
 
     var isAdmin: Bool {
         user.id == "soundcloud:users:1531282276"
@@ -70,6 +72,14 @@ struct SettingsPage: View {
                 Text("@\(user.username)")
                     .font(.system(size: 14))
                     .foregroundStyle(Color(white: 0.6))
+                Text(didCopy ? "Copied ✓" : "ID: \(userId)")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color(white: 0.6))
+                    .onTapGesture {
+                        UIPasteboard.general.string = userId
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        showCopiedFeedback()
+                    }
             }
             
             Spacer()
@@ -93,6 +103,10 @@ struct SettingsPage: View {
         return first
     }
     
+    var userId: String {
+        return extractSoundCloudUserId(userId: user.id)
+    }
+    
     func printUserLikedTracksIds() {
         Task {
             do {
@@ -114,6 +128,13 @@ struct SettingsPage: View {
             }
         }
         
+    }
+    
+    private func showCopiedFeedback() {
+        didCopy = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            didCopy = false
+        }
     }
 
     struct AdminSettings: View {

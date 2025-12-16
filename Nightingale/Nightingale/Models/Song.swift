@@ -7,7 +7,7 @@ enum SongGroup: String, Codable, CaseIterable, Identifiable {
     case crowd
     case intro
     
-    var id: String { rawValue}
+    var id: String { rawValue }
     
     var displayName: String {
         switch self {
@@ -20,17 +20,24 @@ enum SongGroup: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+enum StreamingSource: String, Codable {
+    case soundcloud
+    case firebase
+}
+
 struct Song: Codable, Identifiable, Equatable {
     let id: String
     let name: String
+    let artistName: String
+    let originalSongName: String
+    let originalSonArtistName: String
+    let originalArtWorkUrl: String
     let artworkURL: String
     let duration: Int
     let playbackUrl: String
     let linkToSong: String
     let linkToArtist: String
-    let artistName: String
     let group: SongGroup
     let startSeconds: Int
-    let goPlussSong: Bool
-    
+    let streamingSource: StreamingSource
 }
