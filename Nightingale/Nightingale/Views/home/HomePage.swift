@@ -91,7 +91,7 @@ struct HomePage: View {
             
         }
         .overlay(alignment: .bottomLeading) {
-            if hasGoalGroup {
+            if hasGoalGroup && !isLoadingSongs {
                 GoalButton(action: { playGoalSong() })
                     .padding(.leading, 20)
                     .padding(.bottom, 100)
