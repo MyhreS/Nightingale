@@ -15,6 +15,8 @@ struct LoggedInPage: View {
     let onLogOut: () -> Void
     @State private var selectedTab: Tab = .home
     @State private var songs: [Song] = []
+    @State private var isLoadingSongs = false
+    @State private var errorWhenLoadingSongs = false
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -30,6 +32,8 @@ struct LoggedInPage: View {
     }
     
     func getSongs() async {
+        isLoadingSongs = true
+        defer { isLoadingSongs = false }
         do {
             let soundcloudSongs = try await firebaseAPI.fetchSoundcloudSongs()
             let users = try await firebaseAPI.fetchUsersAllowedFirebaseSongs()
@@ -44,6 +48,7 @@ struct LoggedInPage: View {
             songs = deduplicateById(firebaseSongs + filteredSoundcloudSongs)
             await streamCache.preload(songs: songs)
         } catch {
+            errorWhenLoadingSongs = true
             print("Failed to fetch songs: \(error)")
         }
     }
@@ -54,7 +59,11 @@ struct LoggedInPage: View {
         Group {
             switch selectedTab {
             case .home:
-                HomePage(streamCache: streamCache, songs: songs)
+                if !errorWhenLoadingSongs {
+                    HomePage(streamCache: streamCache, songs: songs, isLoadingSongs: isLoadingSongs)
+                } else {
+                    ErrorLoadingSongsView()
+                }
             case .settings:
                 SettingsPage(sc: sc, user: user, onLogOut: onLogOut)
             }
