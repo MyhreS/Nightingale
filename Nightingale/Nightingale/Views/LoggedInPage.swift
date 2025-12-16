@@ -33,6 +33,7 @@ struct LoggedInPage: View {
         do {
             songs = try await firebaseAPI.fetchPredefinedSongs()
             prefetchStreamURLs(songs: songs)
+            try await fetchMp3()
         } catch {
             print("Failed to fetch songs: \(error)")
         }
@@ -46,6 +47,12 @@ struct LoggedInPage: View {
         Task {
             await StreamURLCache.shared.prefetchAll(songs: songs, using: sc)
         }
+    }
+    
+    func fetchMp3() async throws {
+            let url = try await firebaseAPI.fetchStorageDownloadURL(path: "a_song.mp3")
+            print(url)
+        
     }
     
     var tabContent: some View {

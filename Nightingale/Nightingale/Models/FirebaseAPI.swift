@@ -1,12 +1,14 @@
 import Foundation
 import FirebaseCore
 import FirebaseDatabase
+import FirebaseStorage
 
 @MainActor
 final class FirebaseAPI: ObservableObject {
     static let shared = FirebaseAPI()
     
     private lazy var db = Database.database().reference()
+    private lazy var storage = Storage.storage()
     
     private init() {
         FirebaseApp.configure()
@@ -53,5 +55,9 @@ final class FirebaseAPI: ObservableObject {
                 cont.resume(returning: snapshot)
             }
         }
+    }
+    
+    func fetchStorageDownloadURL(path: String) async throws -> URL {
+        try await storage.reference(withPath: path).downloadURL()
     }
 }

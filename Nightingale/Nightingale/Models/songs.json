@@ -10,7 +10,7 @@
     "artistName": "Peaches",
     "group": "faceoff",
     "startSeconds": 3,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:35273963",
@@ -23,7 +23,7 @@
     "artistName": "Baauer",
     "group": "faceoff",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:196274034",
@@ -36,7 +36,7 @@
     "artistName": "AronChupa",
     "group": "faceoff",
     "startSeconds": 14,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:52908657",
@@ -49,7 +49,7 @@
     "artistName": "Reel 2 Real",
     "group": "faceoff",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:93144788",
@@ -62,7 +62,7 @@
     "artistName": "AC/DC",
     "group": "faceoff",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:360184787",
@@ -75,7 +75,7 @@
     "artistName": "Fall Out Boy",
     "group": "faceoff",
     "startSeconds": 2,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:1266029521",
@@ -88,7 +88,7 @@
     "artistName": "Linkin Park",
     "group": "faceoff",
     "startSeconds": 3,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:1077453214",
@@ -101,7 +101,7 @@
     "artistName": "The Black Eyed Peas",
     "group": "faceoff",
     "startSeconds": 65,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:1736316732",
@@ -114,7 +114,7 @@
     "artistName": "Motörhead",
     "group": "faceoff",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:861811447",
@@ -127,7 +127,7 @@
     "artistName": "Survivor",
     "group": "faceoff",
     "startSeconds": 5,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:173610720",
@@ -140,7 +140,7 @@
     "artistName": "Tungevaag & Raaban",
     "group": "faceoff",
     "startSeconds": 66,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:297006692",
@@ -153,7 +153,7 @@
     "artistName": "Guns N' Roses",
     "group": "faceoff",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:1803524331",
@@ -166,7 +166,7 @@
     "artistName": "Led Zeppelin",
     "group": "faceoff",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:165193475",
@@ -179,7 +179,7 @@
     "artistName": "Kenny Loggins",
     "group": "faceoff",
     "startSeconds": 154,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:256240486",
@@ -192,7 +192,7 @@
     "artistName": "Green Day",
     "group": "faceoff",
     "startSeconds": 12,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:50707218",
@@ -205,7 +205,7 @@
     "artistName": "Zombie Nation",
     "group": "faceoff",
     "startSeconds": 74,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:2605805",
@@ -218,7 +218,7 @@
     "artistName": "Darude",
     "group": "faceoff",
     "startSeconds": 30,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:68687106",
@@ -231,7 +231,7 @@
     "artistName": "Alexandra Stan",
     "group": "faceoff",
     "startSeconds": 25,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "64568888",
@@ -244,7 +244,7 @@
     "artistName": "Duck Sauce",
     "group": "faceoff",
     "startSeconds": 13,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "1423752895",
@@ -257,7 +257,7 @@
     "artistName": "Britney Spears",
     "group": "penalty",
     "startSeconds": 50,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "46113551",
@@ -270,7 +270,7 @@
     "artistName": "Boots Randolph",
     "group": "penalty",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "133782248",
@@ -283,7 +283,7 @@
     "artistName": "Trang Fødsel",
     "group": "penalty",
     "startSeconds": 25,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "200158104",
@@ -296,7 +296,7 @@
     "artistName": "John Williams",
     "group": "penalty",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "1125800749",
@@ -309,7 +309,7 @@
     "artistName": "War",
     "group": "penalty",
     "startSeconds": 28,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "23355646",
@@ -322,7 +322,7 @@
     "artistName": "Pat Benatar",
     "group": "penalty",
     "startSeconds": 31,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "73102445",
@@ -335,7 +335,7 @@
     "artistName": "War",
     "group": "penalty",
     "startSeconds": 34,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "830594362",
@@ -348,7 +348,7 @@
     "artistName": "Inner Circle",
     "group": "penalty",
     "startSeconds": 5,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "12651743",
@@ -361,7 +361,7 @@
     "artistName": "Baha Men",
     "group": "goal",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "289214028",
@@ -374,7 +374,7 @@
     "artistName": "DJ Khaled",
     "group": "goal",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "153854257",
@@ -387,7 +387,7 @@
     "artistName": "Icona Pop",
     "group": "goal",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "3447175",
@@ -400,7 +400,7 @@
     "artistName": "The Fratellis",
     "group": "goal",
     "startSeconds": 25,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "80812754",
@@ -413,7 +413,7 @@
     "artistName": "Kool & The Gang",
     "group": "goal",
     "startSeconds": 180,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "1571417620",
@@ -426,7 +426,7 @@
     "artistName": "House of Pain",
     "group": "goal",
     "startSeconds": 5,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "755107204",
@@ -439,7 +439,7 @@
     "artistName": "D.D.E.",
     "group": "goal",
     "startSeconds": 51,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "29315099",
@@ -452,7 +452,7 @@
     "artistName": "Neil Diamond",
     "group": "crowd",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "253799714",
@@ -465,7 +465,7 @@
     "artistName": "Whitney Houston",
     "group": "crowd",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "343315354",
@@ -478,7 +478,7 @@
     "artistName": "Pinkfong",
     "group": "crowd",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "991329592",
@@ -491,7 +491,7 @@
     "artistName": "Pitbull",
     "group": "crowd",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "2525977",
@@ -504,7 +504,7 @@
     "artistName": "Los del Río",
     "group": "crowd",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "14756314",
@@ -517,7 +517,7 @@
     "artistName": "DJ Casper",
     "group": "crowd",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "45253025",
@@ -530,7 +530,7 @@
     "artistName": "Village People",
     "group": "crowd",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "116078035",
@@ -543,7 +543,7 @@
     "artistName": "AC/DC",
     "group": "intro",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "360173948",
@@ -556,7 +556,7 @@
     "artistName": "Fall Out Boy",
     "group": "intro",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:489999696",
@@ -569,7 +569,7 @@
     "artistName": "Tiësto",
     "group": "faceoff",
     "startSeconds": 85,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:1412558908",
@@ -582,7 +582,7 @@
     "artistName": "MC Hammer",
     "group": "faceoff",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:336151527",
@@ -595,7 +595,7 @@
     "artistName": "Steve Aoki & Laidback Luke",
     "group": "faceoff",
     "startSeconds": 20,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:35760932",
@@ -608,7 +608,7 @@
     "artistName": "Avicii",
     "group": "faceoff",
     "startSeconds": 93,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:176873805",
@@ -621,7 +621,7 @@
     "artistName": "Timmy Trumpet & Savage",
     "group": "faceoff",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:1162359292",
@@ -634,7 +634,7 @@
     "artistName": "Yeah Yeah Yeahs",
     "group": "faceoff",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:166943191",
@@ -647,7 +647,7 @@
     "artistName": "Armin van Buuren",
     "group": "faceoff",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:12417512",
@@ -660,7 +660,7 @@
     "artistName": "Jorge Quintero",
     "group": "intro",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:203874018",
@@ -673,7 +673,7 @@
     "artistName": "Twisted Sister",
     "group": "faceoff",
     "startSeconds": 0,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:256079842",
@@ -686,7 +686,7 @@
     "artistName": "Nickelback",
     "group": "faceoff",
     "startSeconds": 1,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:1091068756",
@@ -699,7 +699,7 @@
     "artistName": "Lil Nas X",
     "group": "faceoff",
     "startSeconds": 29,
-    "goPlussSong": false
+    "special": false
   },
   {
     "id": "soundcloud:tracks:361665965",
@@ -712,6 +712,19 @@
     "artistName": "SNAP!",
     "group": "faceoff",
     "startSeconds": 12,
-    "goPlussSong": false
+    "special": false
+  }
+  {
+    "id": "a_song.mp3",
+    "name": "a_song",
+    "artworkURL": "",
+    "duration": 222222,
+    "playbackUrl": "",
+    "linkToSong": "",
+    "linkToArtist": "",
+    "artistName": "Some artist",
+    "group": "goal",
+    "startSeconds": 0,
+    "special": true,
   }
 ]
