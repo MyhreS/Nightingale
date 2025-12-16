@@ -64,7 +64,7 @@ struct HomePage: View {
                             
                         }
                         .padding(.vertical, 6)
-                        .padding(.bottom, 70)
+                        .padding(.bottom, 160)
                     }
                 }
             }
