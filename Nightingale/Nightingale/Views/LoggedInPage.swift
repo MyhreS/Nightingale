@@ -40,12 +40,15 @@ struct LoggedInPage: View {
             }
             
             let firebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
-            songs = soundcloudSongs + firebaseSongs
+            let filteredSoundcloudSongs = removeDuplicates(soundcloudSongs: soundcloudSongs, firebaseSongs: firebaseSongs)
+            songs = soundcloudSongs + filteredSoundcloudSongs
             await streamCache.preload(songs: songs)
         } catch {
             print("Failed to fetch songs: \(error)")
         }
     }
+    
+     
     
     var tabContent: some View {
         Group {
@@ -89,6 +92,18 @@ struct LoggedInPage: View {
             alignment: .top
         )
     }
+}
+
+func removeDuplicates(
+    soundcloudSongs: [Song],
+    firebaseSongs: [Song]
+) -> [Song] {
+    let firebaseKeySet = Set(firebaseSongs.map(makeSongKey))
+    return soundcloudSongs.filter { !firebaseKeySet.contains(makeSongKey($0)) }
+}
+
+func makeSongKey(_ song: Song) -> String {
+    "\(song.name.lowercased())|\(song.artistName.lowercased())"
 }
 
 struct FooterButton: View {

@@ -26,6 +26,20 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     private var isAudioSessionConfigured = false
     
     private var pendingStartTime: Double?
+    private var effectiveStartTime: Double = 0
+    
+    var adjustedProgressSeconds: Double {
+        max(0, progressSeconds - effectiveStartTime)
+    }
+    
+    var adjustedDurationSeconds: Double {
+        max(0, durationSeconds - effectiveStartTime)
+    }
+    
+    var progressFraction: Double {
+        guard adjustedDurationSeconds > 0 else { return 0 }
+        return min(max(adjustedProgressSeconds / adjustedDurationSeconds, 0), 1)
+    }
 
     init(streamCache: StreamDetailsCache) {
         self.streamCache = streamCache
@@ -35,7 +49,8 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     func play(song: Song) {
         playTask?.cancel()
         currentSong = song
-        pendingStartTime = max(0, Double(song.startSeconds))
+        effectiveStartTime = max(0, Double(song.startSeconds))
+        pendingStartTime = effectiveStartTime
 
         playTask = Task { [weak self] in
             guard let self else { return }
@@ -81,6 +96,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         stopProgressUpdates()
         progressSeconds = 0
         durationSeconds = 0
+        effectiveStartTime = 0
         currentSong = nil
         currentEntryId = nil
     }

@@ -10,12 +10,6 @@ struct HomePage: View {
     var filteredSongs: [Song] {
         songs.filter { $0.group == selectedGroup }
     }
-    
-    var progressFraction: Double {
-        let d = player.durationSeconds
-        guard d > 0 else {return 0}
-        return min(max(player.progressSeconds / d, 0), 1)
-    }
 
     init(streamCache: StreamDetailsCache, songs: [Song]) {
         _player = StateObject(wrappedValue: MusicPlayer(streamCache: streamCache))
@@ -58,7 +52,7 @@ struct HomePage: View {
             if player.currentSong != nil {
                 MiniPlayerButton(
                     isPlaying: player.isPlaying,
-                    progress: progressFraction,
+                    progress: player.progressFraction,
                     action: { player.togglePlayPause() }
                 )
                 .padding(.trailing, 20)
@@ -77,7 +71,7 @@ struct HomePage: View {
             if player.currentSong != nil {
                 MiniPlayerButton(
                     isPlaying: player.isPlaying,
-                    progress: progressFraction,
+                    progress: player.progressFraction,
                     action: { player.togglePlayPause() }
                 )
                 .padding(.trailing, 20)
