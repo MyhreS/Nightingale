@@ -17,6 +17,10 @@ struct LoggedInPage: View {
     @State private var songs: [Song] = []
     @State private var isLoadingSongs = false
     @State private var errorWhenLoadingSongs = false
+    @State private var playerIsPlaying = false
+    @State private var playerProgress: Double = 0
+    @State private var playerHasSong = false
+    @State private var togglePlayPauseTrigger = false
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -66,7 +70,15 @@ struct LoggedInPage: View {
             switch selectedTab {
             case .home:
                 if !errorWhenLoadingSongs {
-                    HomePage(streamCache: streamCache, songs: songs, isLoadingSongs: isLoadingSongs)
+                    HomePage(
+                        streamCache: streamCache,
+                        songs: songs,
+                        isLoadingSongs: isLoadingSongs,
+                        playerIsPlaying: $playerIsPlaying,
+                        playerProgress: $playerProgress,
+                        playerHasSong: $playerHasSong,
+                        togglePlayPauseTrigger: $togglePlayPauseTrigger
+                    )
                 } else {
                     ErrorLoadingSongsView()
                 }
@@ -85,6 +97,15 @@ struct LoggedInPage: View {
                 isSelected: selectedTab == .home
             ) {
                 selectedTab = .home
+            }
+
+            if selectedTab == .home {
+                MiniPlayerButton(
+                    isPlaying: playerIsPlaying,
+                    progress: playerProgress,
+                    isEnabled: playerHasSong,
+                    action: { togglePlayPauseTrigger = true }
+                )
             }
 
             FooterButton(

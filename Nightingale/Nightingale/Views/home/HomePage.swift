@@ -5,6 +5,10 @@ struct HomePage: View {
     @State private var selectedPreviewSong: Song?
     @State private var selectedGroup: SongGroup = ""
     @State private var playedTimeStamps: [String: Date] = [:]
+    @Binding var playerIsPlaying: Bool
+    @Binding var playerProgress: Double
+    @Binding var playerHasSong: Bool
+    @Binding var togglePlayPauseTrigger: Bool
     let songs: [Song]
     let isLoadingSongs: Bool
     
@@ -20,10 +24,22 @@ struct HomePage: View {
         songs.filter { $0.group == selectedGroup }
     }
 
-    init(streamCache: StreamDetailsCache, songs: [Song], isLoadingSongs: Bool) {
+    init(
+        streamCache: StreamDetailsCache,
+        songs: [Song],
+        isLoadingSongs: Bool,
+        playerIsPlaying: Binding<Bool>,
+        playerProgress: Binding<Double>,
+        playerHasSong: Binding<Bool>,
+        togglePlayPauseTrigger: Binding<Bool>
+    ) {
         _player = StateObject(wrappedValue: MusicPlayer(streamCache: streamCache))
         self.songs = songs
         self.isLoadingSongs = isLoadingSongs
+        _playerIsPlaying = playerIsPlaying
+        _playerProgress = playerProgress
+        _playerHasSong = playerHasSong
+        _togglePlayPauseTrigger = togglePlayPauseTrigger
     }
 
     var body: some View {
@@ -78,36 +94,13 @@ struct HomePage: View {
                 .zIndex(1000)
             }
 
-            if player.currentSong != nil {
-                MiniPlayerButton(
-                    isPlaying: player.isPlaying,
-                    progress: player.progressFraction,
-                    action: { player.togglePlayPause() }
-                )
-                .padding(.trailing, 20)
-                .padding(.bottom, 100)
-                .zIndex(900)
-            }
-            
-        }
-        .overlay(alignment: .bottomLeading) {
-            if hasGoalGroup && !isLoadingSongs {
-                GoalButton(action: { playGoalSong() })
-                    .padding(.leading, 20)
-                    .padding(.bottom, 100)
-                    .zIndex(900)
-            }
         }
         .overlay(alignment: .bottomTrailing) {
-            if player.currentSong != nil {
-                MiniPlayerButton(
-                    isPlaying: player.isPlaying,
-                    progress: player.progressFraction,
-                    action: { player.togglePlayPause() }
-                )
-                .padding(.trailing, 20)
-                .padding(.bottom, 100)
-                .zIndex(900)
+            if hasGoalGroup && !isLoadingSongs {
+                GoalButton(action: { playGoalSong() })
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 100)
+                    .zIndex(900)
             }
         }
         .onAppear {
@@ -117,10 +110,20 @@ struct HomePage: View {
             player.onSongFinished = { finished in
                 advanceToNextSong(after: finished)
             }
+            syncPlayerState()
         }
         .onChange(of: songs) { _, newSongs in
             if selectedGroup.isEmpty || !newSongs.contains(where: { $0.group == selectedGroup }) {
                 selectedGroup = newSongs.uniqueGroups.first ?? ""
+            }
+        }
+        .onChange(of: player.isPlaying) { _, _ in syncPlayerState() }
+        .onChange(of: player.progressFraction) { _, _ in syncPlayerState() }
+        .onChange(of: player.currentSong) { _, _ in syncPlayerState() }
+        .onChange(of: togglePlayPauseTrigger) { _, triggered in
+            if triggered {
+                player.togglePlayPause()
+                togglePlayPauseTrigger = false
             }
         }
         .onDisappear {
@@ -172,6 +175,12 @@ struct HomePage: View {
         selectedGroup = song.group
         playedTimeStamps[nextSong.id] = Date()
         player.play(song: nextSong)
+    }
+    
+    func syncPlayerState() {
+        playerIsPlaying = player.isPlaying
+        playerProgress = player.progressFraction
+        playerHasSong = player.currentSong != nil
     }
         
 }
