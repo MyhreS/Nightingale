@@ -8,7 +8,6 @@ struct LoggedInPage: View {
     }
     
     let sc: SoundCloud
-    let streamCache: StreamDetailsCache
     @EnvironmentObject var firebaseAPI: FirebaseAPI
     
     let user: User
@@ -43,7 +42,6 @@ struct LoggedInPage: View {
             let users = try await firebaseAPI.fetchUsersAllowedFirebaseSongs()
             guard users.contains(extractSoundCloudUserId(userId: user.id)) else {
                 songs = deduplicateById(soundcloudSongs)
-                await streamCache.preload(songs: songs)
                 if songs.isEmpty {
                     errorWhenLoadingSongs = true
                 }
@@ -53,7 +51,6 @@ struct LoggedInPage: View {
             let firebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
             let filteredSoundcloudSongs = removeDuplicates(soundcloudSongs: soundcloudSongs, firebaseSongs: firebaseSongs)
             songs = deduplicateById(firebaseSongs + filteredSoundcloudSongs)
-            await streamCache.preload(songs: songs)
             if songs.isEmpty {
                 errorWhenLoadingSongs = true
             }
@@ -71,7 +68,8 @@ struct LoggedInPage: View {
             case .home:
                 if !errorWhenLoadingSongs {
                     HomePage(
-                        streamCache: streamCache,
+                        firebaseAPI: firebaseAPI,
+                        sc: sc,
                         songs: songs,
                         isLoadingSongs: isLoadingSongs,
                         playerIsPlaying: $playerIsPlaying,

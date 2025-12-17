@@ -2,6 +2,7 @@ import Foundation
 import Combine
 import AVFoundation
 import AudioStreaming
+import SoundCloud
 
 struct StreamDetails {
     let url: URL
@@ -20,13 +21,15 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     private var currentEntryId: String?
 
     private let player = AudioPlayer()
-    private let streamCache: StreamDetailsCache
 
     private var playTask: Task<Void, Never>?
     private var isAudioSessionConfigured = false
     
     private var pendingStartTime: Double?
     private var effectiveStartTime: Double = 0
+    
+    private var sc: SoundCloud
+    private var firebaseAPI: FirebaseAPI
     
     var adjustedProgressSeconds: Double {
         max(0, progressSeconds - effectiveStartTime)
@@ -41,8 +44,9 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         return min(max(adjustedProgressSeconds / adjustedDurationSeconds, 0), 1)
     }
 
-    init(streamCache: StreamDetailsCache) {
-        self.streamCache = streamCache
+    init(sc: SoundCloud, firebaseAPI: FirebaseAPI) {
+        self.sc = sc
+        self.firebaseAPI = firebaseAPI
         player.delegate = self
     }
 
@@ -60,7 +64,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
             guard let self else { return }
 
             do {
-                let details = try await streamCache.getStreamDetails(for: song)
+                let details = try await fetchStreamDetails(song: song)
 
                 if Task.isCancelled { return }
 
@@ -78,6 +82,23 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
                 if Task.isCancelled { return }
                 print("Failed to play:", error)
             }
+        }
+    }
+    
+    private func fetchStreamDetails(song: Song) async throws -> StreamDetails {
+        switch song.streamingSource {
+        case .soundcloud:
+            let streamInfo = try await sc.streamInfo(for: song.songId)
+            let headers = try await sc.authorizationHeader
+            
+            guard let url = URL(string: streamInfo.httpMp3128URL) ?? URL(string: streamInfo.hlsMp3128URL) else {
+                throw URLError(.badURL)
+            }
+            return StreamDetails(url: url, headers: headers)
+            
+        case .firebase:
+            let url = try await firebaseAPI.fetchStorageDownloadURL(path: song.songId)
+            return StreamDetails(url: url, headers: [:])
         }
     }
 
