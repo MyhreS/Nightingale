@@ -74,7 +74,6 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
                 }
 
                 configureAudioSessionIfNeeded()
-                currentEntryId = details.url.absoluteString
                 player.play(url: details.url, headers: details.headers)
                 isPlaying = true
                 startProgressUpdates()
@@ -172,6 +171,7 @@ extension MusicPlayer: AudioPlayerDelegate {
     nonisolated func audioPlayerDidStartPlaying(player: AudioPlayer, with entryId: AudioEntryId) {
         Task { @MainActor [weak self] in
             guard let self else { return }
+            currentEntryId = entryId.id
             guard let t = pendingStartTime else { return }
             pendingStartTime = nil
             player.seek(to: t)
