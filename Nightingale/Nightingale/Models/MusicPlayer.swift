@@ -97,6 +97,13 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
             return StreamDetails(url: url, headers: headers)
             
         case .firebase:
+            let cache = MP3Cache.shared
+            let localURL = cache.cachedURL(for: song)
+            
+            if cache.hasCachedSong(song) {
+                return StreamDetails(url: localURL, headers: [:])
+            }
+            
             let url = try await firebaseAPI.fetchStorageDownloadURL(path: song.songId)
             return StreamDetails(url: url, headers: [:])
         }

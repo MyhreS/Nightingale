@@ -6,7 +6,6 @@ import SoundCloud
 struct NightingaleApp: App {
     @StateObject private var firebaseAPI = FirebaseAPI.shared
     private let sc: SoundCloud
-    private let streamCache: StreamDetailsCache
     
     init() {
         UIApplication.shared.isIdleTimerDisabled = true
@@ -19,12 +18,11 @@ struct NightingaleApp: App {
         )
         let soundcloud = SoundCloud(config)
         self.sc = soundcloud
-        self.streamCache = StreamDetailsCache(sc: soundcloud, firebaseAPI: FirebaseAPI.shared)
     }
 
     var body: some Scene {
         WindowGroup {
-            ContentView(sc: sc, streamCache: streamCache)
+            ContentView(sc: sc)
                 .preferredColorScheme(.dark)
                 .environmentObject(firebaseAPI)
         }

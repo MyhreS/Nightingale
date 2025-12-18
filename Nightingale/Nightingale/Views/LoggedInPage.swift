@@ -49,6 +49,18 @@ struct LoggedInPage: View {
             }
             
             let firebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
+            if firebaseSongs.isEmpty {
+                Task {
+                    await MP3Cache.shared.removeAllSongs()
+                }
+                
+            } else{
+                Task {
+                    await MP3Cache.shared.removeSongsNotInList(songs: firebaseSongs)
+                    await MP3Cache.shared.preloadSongs(songs: firebaseSongs)
+                }
+            }
+            
             let filteredSoundcloudSongs = removeDuplicates(soundcloudSongs: soundcloudSongs, firebaseSongs: firebaseSongs)
             songs = deduplicateById(firebaseSongs + filteredSoundcloudSongs)
             if songs.isEmpty {
