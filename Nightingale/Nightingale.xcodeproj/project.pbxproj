@@ -11,6 +11,7 @@
 		436C9AE62EF16B3800F8F366 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 436C9AE52EF16B3800F8F366 /* FirebaseCore */; };
 		436C9AE82EF16B3800F8F366 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 436C9AE72EF16B3800F8F366 /* FirebaseDatabase */; };
 		436C9AEA2EF16B3800F8F366 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 436C9AE92EF16B3800F8F366 /* FirebaseStorage */; };
+		43A803702EF429BC0052958B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 43A8036F2EF429BC0052958B /* FirebaseAuth */; };
 		43B13ECB2EBDEC4F00949F4A /* SoundCloud in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13ECA2EBDEC4F00949F4A /* SoundCloud */; };
 		43B13EFD2EC3798700949F4A /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13EFC2EC3798700949F4A /* FirebaseAI */; };
 		43B13EFF2EC3798700949F4A /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = 43B13EFE2EC3798700949F4A /* FirebaseAILogic */; };
@@ -88,6 +89,7 @@
 				43B13F032EC3798700949F4A /* FirebaseAnalyticsCore in Frameworks */,
 				43E489E22EF0035E003EECEB /* AudioStreaming in Frameworks */,
 				43B13F012EC3798700949F4A /* FirebaseAnalytics in Frameworks */,
+				43A803702EF429BC0052958B /* FirebaseAuth in Frameworks */,
 				436C9AE82EF16B3800F8F366 /* FirebaseDatabase in Frameworks */,
 				436C9AE62EF16B3800F8F366 /* FirebaseCore in Frameworks */,
 				43B13EFD2EC3798700949F4A /* FirebaseAI in Frameworks */,
@@ -163,6 +165,7 @@
 				436C9AE52EF16B3800F8F366 /* FirebaseCore */,
 				436C9AE72EF16B3800F8F366 /* FirebaseDatabase */,
 				436C9AE92EF16B3800F8F366 /* FirebaseStorage */,
+				43A8036F2EF429BC0052958B /* FirebaseAuth */,
 			);
 			productName = Nightingale;
 			productReference = 434A85962D535F27000C4AB5 /* Nightingale.app */;
@@ -672,6 +675,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 43B13EFB2EC3798700949F4A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		43A8036F2EF429BC0052958B /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 43B13EFB2EC3798700949F4A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
 		};
 		43B13ECA2EBDEC4F00949F4A /* SoundCloud */ = {
 			isa = XCSwiftPackageProductDependency;

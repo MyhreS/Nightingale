@@ -13,6 +13,7 @@ final class LoggedInViewModel: ObservableObject {
         defer { isLoadingSongs = false }
 
         do {
+            try await FirebaseAuthGate.shared.ensureSignedIn()
             let soundcloudSongs = try await firebaseAPI.fetchSoundcloudSongs()
             let users = try await firebaseAPI.fetchUsersAllowedFirebaseSongs()
 
@@ -21,7 +22,7 @@ final class LoggedInViewModel: ObservableObject {
                 errorWhenLoadingSongs = songs.isEmpty
                 return
             }
-
+            
             let firebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
             startCacheWork(firebaseSongs: firebaseSongs)
 

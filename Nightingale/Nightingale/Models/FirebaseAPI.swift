@@ -10,6 +10,7 @@ final class FirebaseAPI: ObservableObject {
     private lazy var db = Database.database().reference()
     private lazy var storage = Storage.storage()
     
+    
     private init() {
         FirebaseApp.configure()
     }
