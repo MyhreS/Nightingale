@@ -5,6 +5,8 @@ struct SettingsPage: View {
     let sc: SoundCloud
     let user: User
     let onLogOut: () -> Void
+    @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
+    
     
     @State private var didCopy = false
 
@@ -16,6 +18,8 @@ struct SettingsPage: View {
         PageLayout(title: "Settings") {
             VStack(alignment: .leading, spacing: 20) {
                 userHeader
+                
+                autoPlayToggle
                 
                 logOutButton
 
@@ -91,6 +95,39 @@ struct SettingsPage: View {
                 .strokeBorder(Color(white: 0.2), lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+    }
+    
+    var autoPlayToggle: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Auto play next song")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                Text("When a song finishes, automatically play the next song in the same group")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color(white: 0.6))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            
+            Spacer()
+            
+            Toggle("", isOn: $isAutoPlayEnabled)
+                .labelsHidden()
+                .tint(Color(red: 0.3, green: 0.7, blue: 0.4))
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, minHeight: 56)
+        .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(Color(white: 0.2), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            isAutoPlayEnabled.toggle()
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        }
     }
 
     var displayName: String {

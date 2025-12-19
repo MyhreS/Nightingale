@@ -6,12 +6,12 @@ struct HomePage: View {
     @State private var selectedPreviewSong: Song?
     @State private var selectedGroup: SongGroup = ""
     @State private var playedTimeStamps: [String: Date] = [:]
-    @State private var isBreakAutoPlayEnabled = false
     @State private var finishedSong: Song?
     @Binding var playerIsPlaying: Bool
     @Binding var playerProgress: Double
     @Binding var playerHasSong: Bool
     @Binding var togglePlayPauseTrigger: Bool
+    @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
     let songs: [Song]
     let isLoadingSongs: Bool
     
@@ -70,9 +70,6 @@ struct HomePage: View {
                                     SongRowSkeleton()
                                 }
                             } else {
-                                if selectedGroup.lowercased() == "break" {
-                                    AutoPlayToggle(isEnabled: $isBreakAutoPlayEnabled)
-                                }
                                 ForEach(filteredSongs) { song in
                                     SongRow(
                                         song: song,
@@ -196,7 +193,7 @@ struct HomePage: View {
     }
     
     func handleSongFinished(_ song: Song) {
-        if isBreakAutoPlayEnabled, song.group.lowercased() == "break" {
+        if isAutoPlayEnabled {
             advanceToNextSong(after: song)
         }
     }
