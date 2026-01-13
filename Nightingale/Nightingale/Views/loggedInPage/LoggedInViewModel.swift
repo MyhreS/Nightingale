@@ -61,10 +61,14 @@ func deduplicateById(_ songs: [Song]) -> [Song] {
 }
 
 func removeDuplicates(soundcloudSongs: [Song], firebaseSongs: [Song]) -> [Song] {
-    let firebaseKeySet = Set(firebaseSongs.map(makeSongKey))
-    return soundcloudSongs.filter { !firebaseKeySet.contains(makeSongKey($0)) }
+    let firebaseKeySet = Set(firebaseSongs.map(makeFirebaseSongKey))
+    return soundcloudSongs.filter { !firebaseKeySet.contains(makeSoundcloudSongKey($0)) }
 }
 
-func makeSongKey(_ song: Song) -> String {
+func makeSoundcloudSongKey(_ song: Song) -> String {
+    "\(song.originalSongName.lowercased())|\(song.originalSongArtistName.lowercased())"
+}
+
+func makeFirebaseSongKey(_ song: Song) -> String {
     "\(song.name.lowercased())|\(song.artistName.lowercased())"
 }
