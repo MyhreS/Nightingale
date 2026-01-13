@@ -200,6 +200,8 @@ struct HomePage: View {
     }
 
     func advanceToNextSong(after song: Song) {
+        tapDebounceTask?.cancel()
+        
         let groupSongs = songs.filter { $0.group == song.group }
         guard !groupSongs.isEmpty else { return }
         guard let index = groupSongs.firstIndex(of: song) else { return }
@@ -209,7 +211,12 @@ struct HomePage: View {
 
         selectedGroup = song.group
         playedTimeStamps[nextSong.id] = Date()
-        player.play(song: nextSong)
+        
+        tapDebounceTask = Task {
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            guard !Task.isCancelled else { return }
+            player.play(song: nextSong)
+        }
     }
     
     func syncPlayerState() {
