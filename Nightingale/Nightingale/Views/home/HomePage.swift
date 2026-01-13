@@ -158,13 +158,11 @@ struct HomePage: View {
     }
     
     func isSongSelected(_ song: Song) -> Bool {
-        if player.currentSong == song {
-            return true
-        }
-        
-        guard let lastPlayed = playedTimeStamps[song.id] else { return false }
-        let interval = Date().timeIntervalSince(lastPlayed)
-        return interval < 1.0
+        let playerMatch = player.currentSong == song
+        let lastPlayed = playedTimeStamps[song.id]
+        let interval = lastPlayed.map { Date().timeIntervalSince($0) }
+        let timestampMatch = interval.map { $0 < 1.0 } ?? false
+        return playerMatch || timestampMatch
     }
     
     func isSongRecentlyPlayed(_ song: Song) -> Bool {

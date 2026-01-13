@@ -76,6 +76,7 @@ final class FirebaseAPI: ObservableObject {
     
     
     func fetchStorageDownloadURL(path: String) async throws -> URL {
-        try await storage.reference(withPath: path).downloadURL()
+        let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? path
+        return try await storage.reference(withPath: encodedPath).downloadURL()
     }
 }

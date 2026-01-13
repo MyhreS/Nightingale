@@ -52,7 +52,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
 
     func play(song: Song) {
         playTask?.cancel()
-        player.stop()
+        currentEntryId = nil
         
         progressSeconds = 0
         durationSeconds = 0
@@ -191,6 +191,13 @@ extension MusicPlayer: AudioPlayerDelegate {
             guard let self else { return }
             guard stopReason == .eof else { return }
             guard entryId.id == currentEntryId else { return }
+            
+            let minPlaybackDuration: Double = 10.0
+            guard progress >= minPlaybackDuration else {
+                isPlaying = false
+                stopProgressUpdates()
+                return
+            }
 
             refreshProgress()
             isPlaying = false
