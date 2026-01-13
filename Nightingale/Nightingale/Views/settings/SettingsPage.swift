@@ -182,28 +182,28 @@ struct SettingsPage: View {
                 Text("Admin")
                     .font(.system(size: 17, weight: .semibold))
 
-                HapticButton(action: onPrintLikedTracks) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "list.bullet.rectangle")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(.white)
-                        Text("Print most liked tracks IDs")
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(.white)
+                // HapticButton(action: onPrintLikedTracks) {
+                //     HStack(spacing: 12) {
+                //         Image(systemName: "list.bullet.rectangle")
+                //             .font(.system(size: 20, weight: .semibold))
+                //             .foregroundStyle(.white)
+                //         Text("Print most liked tracks IDs")
+                //             .font(.system(size: 15, weight: .medium))
+                //             .foregroundStyle(.white)
                         
-                        Spacer()
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 14)
-                    .frame(maxWidth: .infinity, minHeight: 56)
-                    .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .strokeBorder(Color(white: 0.2), lineWidth: 1)
-                    )
-                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                }
-                .buttonStyle(.plain)
+                //         Spacer()
+                //     }
+                //     .padding(.horizontal, 16)
+                //     .padding(.vertical, 14)
+                //     .frame(maxWidth: .infinity, minHeight: 56)
+                //     .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                //     .overlay(
+                //         RoundedRectangle(cornerRadius: 14, style: .continuous)
+                //             .strokeBorder(Color(white: 0.2), lineWidth: 1)
+                //     )
+                //     .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                // }
+                // .buttonStyle(.plain)
             }
         }
     }
