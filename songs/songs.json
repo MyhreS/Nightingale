@@ -1007,7 +1007,7 @@
       "linkToSong": "",
       "linkToArtist": "",
       "group": "break",
-      "startSeconds": 0,
+      "startSeconds": 2,
       "streamingSource": "firebase"
     },
     {
@@ -1054,7 +1054,7 @@
       "playbackUrl": "",
       "linkToSong": "",
       "linkToArtist": "",
-      "group": "break",
+      "group": "faceoff",
       "startSeconds": 0,
       "streamingSource": "firebase"
     },

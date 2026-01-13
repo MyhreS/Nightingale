@@ -7,6 +7,7 @@ struct HomePage: View {
     @State private var selectedGroup: SongGroup = ""
     @State private var playedTimeStamps: [String: Date] = [:]
     @State private var finishedSong: Song?
+    @State private var tapDebounceTask: Task<Void, Never>?
     @Binding var playerIsPlaying: Bool
     @Binding var playerProgress: Double
     @Binding var playerHasSong: Bool
@@ -141,20 +142,47 @@ struct HomePage: View {
     }
     
     func playGoalSong() {
+        tapDebounceTask?.cancel()
+        
         let goalSongs = songs.filter({ $0.group.lowercased() == "goal" })
         guard !goalSongs.isEmpty else { return }
+        guard let song = goalSongs.randomElement() else { return }
         
-        guard let song = goalSongs.randomElement() else {return}
-        player.play(song: song)
         playedTimeStamps[song.id] = Date()
         if let goalGroup = availableGroups.first(where: { $0.lowercased() == "goal" }) {
             selectedGroup = goalGroup
         }
+        
+        let wasPlaying = player.isPlaying
+        if wasPlaying {
+            player.stop()
+        }
+        
+        tapDebounceTask = Task {
+            if wasPlaying {
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+            }
+            guard !Task.isCancelled else { return }
+            player.play(song: song)
+        }
     }
 
     func handleSongTap(_ song: Song) {
-        player.play(song: song)
+        tapDebounceTask?.cancel()
         playedTimeStamps[song.id] = Date()
+        
+        let wasPlaying = player.isPlaying
+        if wasPlaying {
+            player.stop()
+        }
+        
+        tapDebounceTask = Task {
+            if wasPlaying {
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+            }
+            guard !Task.isCancelled else { return }
+            player.play(song: song)
+        }
     }
     
     func isSongSelected(_ song: Song) -> Bool {
