@@ -3,6 +3,7 @@ import Combine
 import AVFoundation
 import AudioStreaming
 import SoundCloud
+import MediaPlayer
 
 struct StreamDetails {
     let url: URL
@@ -48,6 +49,57 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         self.sc = sc
         self.firebaseAPI = firebaseAPI
         player.delegate = self
+        setupRemoteCommands()
+    }
+    
+    private func setupRemoteCommands() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+        
+        commandCenter.playCommand.addTarget { [weak self] _ in
+            guard let self else { return .commandFailed }
+            if !self.isPlaying {
+                self.togglePlayPause()
+            }
+            return .success
+        }
+        
+        commandCenter.pauseCommand.addTarget { [weak self] _ in
+            guard let self else { return .commandFailed }
+            if self.isPlaying {
+                self.togglePlayPause()
+            }
+            return .success
+        }
+        
+        commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
+            guard let self else { return .commandFailed }
+            self.togglePlayPause()
+            return .success
+        }
+    }
+    
+    private func updateNowPlayingInfo() {
+        guard let song = currentSong else {
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+            return
+        }
+        
+        var info: [String: Any] = [
+            MPMediaItemPropertyTitle: song.originalSongName.isEmpty ? song.name : song.originalSongName,
+            MPMediaItemPropertyArtist: song.originalSongArtistName.isEmpty ? song.artistName : song.originalSongArtistName,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: adjustedProgressSeconds,
+            MPMediaItemPropertyPlaybackDuration: adjustedDurationSeconds,
+            MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0
+        ]
+        
+        let artworkURLString = song.originalArtWorkUrl.isEmpty ? song.artworkURL : song.originalArtWorkUrl
+        if let artworkURL = URL(string: artworkURLString),
+           let cachedImage = ImageCache.shared[artworkURL] {
+            let artwork = MPMediaItemArtwork(boundsSize: cachedImage.size) { _ in cachedImage }
+            info[MPMediaItemPropertyArtwork] = artwork
+        }
+        
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
 
     func play(song: Song) {
@@ -77,6 +129,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
                 player.play(url: details.url, headers: details.headers)
                 isPlaying = true
                 startProgressUpdates()
+                updateNowPlayingInfo()
             } catch {
                 if Task.isCancelled { return }
                 print("Failed to play:", error)
@@ -118,6 +171,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
             isPlaying = true
             startProgressUpdates()
         }
+        updateNowPlayingInfo()
     }
 
     func stop() {
@@ -130,6 +184,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         effectiveStartTime = 0
         currentSong = nil
         currentEntryId = nil
+        updateNowPlayingInfo()
     }
 
     private func configureAudioSessionIfNeeded() {
@@ -163,6 +218,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     private func refreshProgress() {
         progressSeconds = player.progress
         durationSeconds = player.duration
+        updateNowPlayingInfo()
     }
 
 }
