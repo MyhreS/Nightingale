@@ -1,2 +1,16 @@
-# Nightingale
-A swift app to play hockey music. The user should be able to add songs. Idealy with spotify but in the short term through mp3 files. Furthermore, the user should be able to group them/ tag them. The user should also be able to go through the groups/tags/playlists and select which to play. The user should  also be able to predifine start time of the songs. When a user has selected a song, it should be added to the next song, so he can click play and its played. 
+Nightingale
+
+Nightingale is a Swift app designed to play music during ice hockey matches to enhance the game atmosphere.
+
+The app fetches songs from SoundCloud and presents them to the user in a familiar, streaming-style interface similar to Spotify. Instead of traditional playlists, songs are grouped into game-specific playlists such as:
+	•	Goal
+	•	Faceoff
+
+Each song starts playing from a predefined timestamp, skipping directly to the most energetic or recognizable part of the track. This allows instant, high-impact playback that fits the fast pace of a hockey match.
+
+Features
+	•	Built in Swift
+	•	Uses Firebase for data storage and configuration
+	•	Fetches music from SoundCloud
+	•	Game-event–based playlists
+	•	Precise playback starting points per song
