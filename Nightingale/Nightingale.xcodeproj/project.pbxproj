@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		436B8ACB2EA0E259007E6706 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 436B8ACA2EA0E259007E6706 /* Secrets.xcconfig */; };
 		436C9AE62EF16B3800F8F366 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 436C9AE52EF16B3800F8F366 /* FirebaseCore */; };
 		436C9AE82EF16B3800F8F366 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 436C9AE72EF16B3800F8F366 /* FirebaseDatabase */; };
 		436C9AEA2EF16B3800F8F366 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 436C9AE92EF16B3800F8F366 /* FirebaseStorage */; };
@@ -225,7 +224,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					434A85952D535F27000C4AB5 = {
 						CreatedOnToolsVersion = 16.2;
@@ -271,7 +270,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				436B8ACB2EA0E259007E6706 /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -389,6 +387,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -447,6 +446,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
