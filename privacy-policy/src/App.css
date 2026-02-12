@@ -1,0 +1,146 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 24px 96px;
+}
+
+.header {
+  margin-bottom: 48px;
+}
+
+.app-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.effective-date {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.section {
+  margin-bottom: 36px;
+}
+
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section p,
+.section li {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.section li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 6px;
+}
+
+.section li::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  color: var(--accent);
+}
+
+.data-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.data-card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.data-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-item:last-child {
+  border-bottom: none;
+}
+
+.data-label {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.data-purpose {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: var(--accent-dim);
+  padding: 2px 10px;
+  border-radius: 100px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 48px 0;
+}
+
+.footer {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  padding-top: 32px;
+}
+
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 40px 18px 72px;
+  }
+
+  .title {
+    font-size: 1.7rem;
+  }
+
+  .data-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
