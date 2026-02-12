@@ -13,5 +13,4 @@ Features
 - Built in Swift
 - Uses Firebase for data storage and configuration
 - Fetches music from SoundCloud
-- Game-event–based playlists
 - Precise playback starting points per song
