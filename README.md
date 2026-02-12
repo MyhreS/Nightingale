@@ -1,6 +1,6 @@
 # Nightingale
 
-Nightingale is a Swift app designed to play music during ice hockey matches to enhance the game atmosphere.
+Nightingale is a Swift app designed to play music at its peak!
 
 
 The app fetches songs from SoundCloud and presents them to the user in a familiar, streaming-style interface similar to Spotify. Instead of traditional playlists, songs are grouped into game-specific playlists such as: Goal and Faceoff
