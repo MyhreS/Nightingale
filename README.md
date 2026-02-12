@@ -1,5 +1,8 @@
 # Nightingale
 
+The app can be found in the App Store with the name: PuckBeats
+
+
 Nightingale is a Swift app designed to play music at its peak!
 
 
