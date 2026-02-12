@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "434A85952D535F27000C4AB5"
-               BuildableName = "Nightingale.app"
+               BuildableName = "PuckBeats.app"
                BlueprintName = "Nightingale"
                ReferencedContainer = "container:Nightingale.xcodeproj">
             </BuildableReference>
@@ -69,7 +69,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "434A85952D535F27000C4AB5"
-            BuildableName = "Nightingale.app"
+            BuildableName = "PuckBeats.app"
             BlueprintName = "Nightingale"
             ReferencedContainer = "container:Nightingale.xcodeproj">
          </BuildableReference>
@@ -86,7 +86,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "434A85952D535F27000C4AB5"
-            BuildableName = "Nightingale.app"
+            BuildableName = "PuckBeats.app"
             BlueprintName = "Nightingale"
             ReferencedContainer = "container:Nightingale.xcodeproj">
          </BuildableReference>

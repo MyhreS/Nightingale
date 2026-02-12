@@ -68,10 +68,29 @@ final class FirebaseAPI: ObservableObject {
     
     func fetchUsersAllowedFirebaseSongs() async throws -> [String] {
         let snapshot = try await read(path: "usersAllowedFirebaseSongs")
-        guard let array = snapshot.value as? [[String: Any]] else {
+
+        guard let value = snapshot.value else {
             return []
         }
-        return array.compactMap { $0["id"] as? String }
+
+        if let array = value as? [[String: Any]] {
+            return array.compactMap(extractAllowedUserId)
+        }
+
+        if let dict = value as? [String: Any] {
+            return dict.values.compactMap { item in
+                guard let itemDict = item as? [String: Any] else { return nil }
+                return extractAllowedUserId(itemDict)
+            }
+        }
+
+        return []
+    }
+
+    private func extractAllowedUserId(_ dict: [String: Any]) -> String? {
+        if let id = dict["id"] as? String { return id }
+        if let id = dict["id"] as? Int { return String(id) }
+        return nil
     }
     
     

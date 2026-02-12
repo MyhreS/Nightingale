@@ -8,6 +8,7 @@ final class LoggedInViewModel: ObservableObject {
     @Published var errorWhenLoadingSongs = false
 
     func loadSongs(firebaseAPI: FirebaseAPI, user: User) async {
+        print("Load songs")
         isLoadingSongs = true
         errorWhenLoadingSongs = false
         defer { isLoadingSongs = false }

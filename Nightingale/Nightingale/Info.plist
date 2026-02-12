@@ -10,10 +10,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>nightingale</string>
+			<string>puckbeats</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>nightingale</string>
+				<string>puckbeats</string>
 			</array>
 		</dict>
 	</array>
