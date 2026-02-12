@@ -6,7 +6,7 @@ import os
 import subprocess
 
 FILE_PATH = os.path.expanduser(
-    "~/Library/Mobile Documents/com~apple~CloudDocs/Hockey music/Intro/my_songs_know_what_you_did_in_the_dark_by_fall_out_boy.mp3"
+    "~/Library/Mobile Documents/com~apple~CloudDocs/Hockey music/Face-Offs/danger_zone_by_kenny_loggins.mp3"
 )
 
 def check_file_exists():
