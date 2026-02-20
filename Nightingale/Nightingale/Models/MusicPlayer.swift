@@ -11,7 +11,7 @@ struct StreamDetails {
 }
 
 @MainActor
-final class MusicPlayer: ObservableObject, @unchecked Sendable {
+final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
     @Published var isPlaying = false
     @Published var progressSeconds: Double = 0
     @Published var durationSeconds: Double = 0
@@ -49,6 +49,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     init(sc: SoundCloud, firebaseAPI: FirebaseAPI) {
         self.sc = sc
         self.firebaseAPI = firebaseAPI
+        super.init()
         player.delegate = self
         setupRemoteCommands()
     }
@@ -151,6 +152,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         do {
             configureAudioSessionIfNeeded()
             localPlayer = try AVAudioPlayer(contentsOf: fileURL)
+            localPlayer?.delegate = self
             localPlayer?.prepareToPlay()
 
             if effectiveStartTime > 0 {
@@ -267,15 +269,6 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         if let lp = localPlayer {
             progressSeconds = lp.currentTime
             durationSeconds = lp.duration
-
-            if !lp.isPlaying && isPlaying && lp.currentTime >= lp.duration - 0.5 {
-                isPlaying = false
-                stopProgressUpdates()
-                if let finishedSong = currentSong {
-                    onSongFinished?(finishedSong)
-                }
-                return
-            }
         } else {
             progressSeconds = player.progress
             durationSeconds = player.duration
@@ -333,4 +326,17 @@ extension MusicPlayer: AudioPlayerDelegate {
     nonisolated func audioPlayerDidCancel(player: AudioPlayer, queuedItems: [AudioEntryId]) {}
 
     nonisolated func audioPlayerUnexpectedError(player: AudioPlayer, error: AudioPlayerError) {}
+}
+
+extension MusicPlayer: AVAudioPlayerDelegate {
+    nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            guard flag else { return }
+            isPlaying = false
+            stopProgressUpdates()
+            guard let finishedSong = currentSong else { return }
+            onSongFinished?(finishedSong)
+        }
+    }
 }

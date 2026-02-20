@@ -32,6 +32,15 @@ struct MainPage: View {
                 scAuthenticated: scUser != nil && firebaseAPI.soundcloudSongsEnabled
             )
         }
+        .onChange(of: email) { _, newEmail in
+            Task {
+                await vm.loadSongs(
+                    firebaseAPI: firebaseAPI,
+                    email: newEmail,
+                    scAuthenticated: scUser != nil && firebaseAPI.soundcloudSongsEnabled
+                )
+            }
+        }
         .ignoresSafeArea(edges: .bottom)
     }
 
