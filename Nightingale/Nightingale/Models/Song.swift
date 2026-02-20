@@ -17,8 +17,8 @@ enum StreamingSource: String, Codable {
 
 struct Song: Codable, Identifiable, Equatable {
     let songId: String
-    let name: String
-    let artistName: String
+    var name: String
+    var artistName: String
     let originalSongName: String
     let originalSongArtistName: String
     let originalArtWorkUrl: String

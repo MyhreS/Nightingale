@@ -22,6 +22,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     private var currentEntryId: String?
 
     private let player = AudioPlayer()
+    private var localPlayer: AVAudioPlayer?
 
     private var playTask: Task<Void, Never>?
     private var isAudioSessionConfigured = false
@@ -104,6 +105,8 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
 
     func play(song: Song) {
         playTask?.cancel()
+        stopLocalPlayer()
+        player.stop()
         currentEntryId = nil
         
         progressSeconds = 0
@@ -111,6 +114,11 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
         currentSong = song
         effectiveStartTime = max(0, Double(song.startSeconds))
         pendingStartTime = effectiveStartTime
+
+        if song.streamingSource == .local {
+            playLocalFile(song)
+            return
+        }
 
         playTask = Task { [weak self] in
             guard let self else { return }
@@ -136,6 +144,34 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
             }
         }
     }
+
+    private func playLocalFile(_ song: Song) {
+        let fileURL = LocalSongStore.shared.fileURL(for: song)
+
+        do {
+            configureAudioSessionIfNeeded()
+            localPlayer = try AVAudioPlayer(contentsOf: fileURL)
+            localPlayer?.prepareToPlay()
+
+            if effectiveStartTime > 0 {
+                localPlayer?.currentTime = effectiveStartTime
+            }
+
+            localPlayer?.play()
+            durationSeconds = localPlayer?.duration ?? 0
+            pendingStartTime = nil
+            isPlaying = true
+            startProgressUpdates()
+            updateNowPlayingInfo()
+        } catch {
+            print("Failed to play local file:", error)
+        }
+    }
+
+    private func stopLocalPlayer() {
+        localPlayer?.stop()
+        localPlayer = nil
+    }
     
     private func fetchStreamDetails(song: Song) async throws -> StreamDetails {
         switch song.streamingSource {
@@ -160,18 +196,25 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
             return StreamDetails(url: url, headers: [:])
 
         case .local:
-            let fileURL = LocalSongStore.shared.fileURL(for: song)
-            return StreamDetails(url: fileURL, headers: [:])
+            fatalError("Local songs use AVAudioPlayer, not the streaming path")
         }
     }
 
     func togglePlayPause() {
         if isPlaying {
-            player.pause()
+            if localPlayer != nil {
+                localPlayer?.pause()
+            } else {
+                player.pause()
+            }
             isPlaying = false
             stopProgressUpdates()
         } else {
-            player.resume()
+            if localPlayer != nil {
+                localPlayer?.play()
+            } else {
+                player.resume()
+            }
             isPlaying = true
             startProgressUpdates()
         }
@@ -180,6 +223,7 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
 
     func stop() {
         playTask?.cancel()
+        stopLocalPlayer()
         player.stop()
         isPlaying = false
         stopProgressUpdates()
@@ -220,8 +264,22 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
     }
     
     private func refreshProgress() {
-        progressSeconds = player.progress
-        durationSeconds = player.duration
+        if let lp = localPlayer {
+            progressSeconds = lp.currentTime
+            durationSeconds = lp.duration
+
+            if !lp.isPlaying && isPlaying && lp.currentTime >= lp.duration - 0.5 {
+                isPlaying = false
+                stopProgressUpdates()
+                if let finishedSong = currentSong {
+                    onSongFinished?(finishedSong)
+                }
+                return
+            }
+        } else {
+            progressSeconds = player.progress
+            durationSeconds = player.duration
+        }
         updateNowPlayingInfo()
     }
 

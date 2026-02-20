@@ -5,14 +5,22 @@ struct SongOptionsPopup: View {
     let onClose: () -> Void
     let onDelete: (Song) -> Void
     let onUpdateStartTime: (Song, Int) -> Void
+    let onEdit: (Song, String, String) -> Void
 
-    enum Page { case menu, details, startTime }
+    enum Page { case menu, details, startTime, edit }
 
     @State private var currentPage: Page = .menu
     @State private var editedStartSeconds: Int = 0
+    @State private var editedName: String = ""
+    @State private var editedArtist: String = ""
     @State private var showDeleteConfirmation = false
 
     private var isLocal: Bool { song.streamingSource == .local }
+
+    private var headerArtist: String {
+        let artist = song.originalSongArtistName.isEmpty ? song.artistName : song.originalSongArtistName
+        return artist.trimmingCharacters(in: .whitespaces)
+    }
 
     var body: some View {
         ZStack {
@@ -32,7 +40,11 @@ struct SongOptionsPopup: View {
                 .shadow(color: .black.opacity(0.5), radius: 24, x: 0, y: 12)
                 .padding(.horizontal, 20)
         }
-        .onAppear { editedStartSeconds = song.startSeconds }
+        .onAppear {
+        editedStartSeconds = song.startSeconds
+        editedName = song.name
+        editedArtist = song.artistName
+    }
     }
 
     @ViewBuilder
@@ -44,6 +56,8 @@ struct SongOptionsPopup: View {
             detailsPage
         case .startTime:
             startTimePage
+        case .edit:
+            editPage
         }
     }
 
@@ -58,6 +72,10 @@ struct SongOptionsPopup: View {
 
                 Divider().background(Color(white: 0.2))
 
+                editMenuRow
+
+                Divider().background(Color(white: 0.2))
+
                 startTimeMenuRow
 
                 Divider().background(Color(white: 0.2))
@@ -65,6 +83,17 @@ struct SongOptionsPopup: View {
                 deleteMenuRow
             }
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+    }
+
+    @ViewBuilder
+    private var editMenuRow: some View {
+        if isLocal {
+            menuRow(icon: "pencil", title: "Edit Song", enabled: true) {
+                withAnimation(.easeInOut(duration: 0.2)) { currentPage = .edit }
+            }
+        } else {
+            lockedRow(icon: "pencil", title: "Edit Song", reason: "Server songs can't be edited")
         }
     }
 
@@ -128,8 +157,8 @@ struct SongOptionsPopup: View {
                         .lineSpacing(2)
                 }
 
-                if !song.artistName.isEmpty {
-                    Text("by \(song.artistName)")
+                if !headerArtist.isEmpty {
+                    Text("by \(headerArtist)")
                         .font(.system(size: 15))
                         .foregroundStyle(Color(white: 0.6))
                 }
@@ -218,6 +247,73 @@ struct SongOptionsPopup: View {
         }
     }
 
+    private var editPage: some View {
+        VStack(spacing: 20) {
+            backButton
+
+            Text("Edit Song")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(.white)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Name")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Color(white: 0.5))
+
+                TextField("Song name", text: $editedName)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(14)
+                    .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .strokeBorder(Color(white: 0.2), lineWidth: 1)
+                    )
+                    .autocorrectionDisabled()
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Artist")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Color(white: 0.5))
+
+                TextField("Artist name", text: $editedArtist)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(14)
+                    .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .strokeBorder(Color(white: 0.2), lineWidth: 1)
+                    )
+                    .autocorrectionDisabled()
+            }
+
+            HapticButton(action: saveEdit) {
+                Text("Save")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.black)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .background(
+                        editedName.trimmingCharacters(in: .whitespaces).isEmpty
+                            ? Color(white: 0.3)
+                            : Color.white,
+                        in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    )
+            }
+            .buttonStyle(.plain)
+            .disabled(editedName.trimmingCharacters(in: .whitespaces).isEmpty)
+        }
+    }
+
+    private func saveEdit() {
+        let trimmedName = editedName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return }
+        let trimmedArtist = editedArtist.trimmingCharacters(in: .whitespacesAndNewlines)
+        onEdit(song, trimmedName, trimmedArtist)
+        onClose()
+    }
+
     private var songHeader: some View {
         HStack(spacing: 10) {
             if let url = URL(string: song.originalArtWorkUrl.isEmpty ? song.artworkURL : song.originalArtWorkUrl),
@@ -245,10 +341,13 @@ struct SongOptionsPopup: View {
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.white)
                     .lineLimit(1)
-                Text(song.originalSongArtistName.isEmpty ? song.artistName : song.originalSongArtistName)
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color(white: 0.6))
-                    .lineLimit(1)
+
+                if !headerArtist.isEmpty {
+                    Text(headerArtist)
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color(white: 0.6))
+                        .lineLimit(1)
+                }
             }
 
             Spacer()

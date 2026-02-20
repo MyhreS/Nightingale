@@ -6,11 +6,16 @@ struct SongRow: View {
     let isPlayed: Bool
     let onTap: () -> Void
     let onLongPress: () -> Void
-    
+
+    private var resolvedArtist: String {
+        let artist = song.originalSongArtistName.isEmpty ? song.artistName : song.originalSongArtistName
+        return artist.trimmingCharacters(in: .whitespaces)
+    }
+
     var body: some View {
         HStack(spacing: 14) {
             CachedAsyncImage(url: URL(string: song.originalArtWorkUrl != "" ? song.originalArtWorkUrl : song.artworkURL)) { image in
-                artworkView(for: image)
+                artworkView(for: image, songId: song.songId)
             }
             .frame(width: 52, height: 52)
             .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -20,12 +25,14 @@ struct SongRow: View {
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                
-                Text("by \(song.originalSongArtistName != "" ? song.originalSongArtistName : song.artistName)")
-                    .font(.system(size: 13))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+
+                if !resolvedArtist.isEmpty {
+                    Text("by \(resolvedArtist)")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
             }
             
             Spacer(minLength: 12)
@@ -62,21 +69,32 @@ struct SongRow: View {
         }
     }
 
-    private func artworkView(for image: Image?) -> some View {
+    private static let iconPalette: [Color] = [
+        Color(red: 0.35, green: 0.60, blue: 0.95),
+        Color(red: 0.90, green: 0.45, blue: 0.50),
+        Color(red: 0.40, green: 0.78, blue: 0.55),
+        Color(red: 0.95, green: 0.70, blue: 0.30),
+        Color(red: 0.65, green: 0.50, blue: 0.90),
+        Color(red: 0.85, green: 0.55, blue: 0.80),
+        Color(red: 0.45, green: 0.75, blue: 0.80),
+        Color(red: 0.90, green: 0.60, blue: 0.40),
+    ]
+
+    private func artworkView(for image: Image?, songId: String) -> some View {
         Group {
             if let image {
                 image
                     .resizable()
                     .scaledToFill()
             } else {
+                let color = Self.iconPalette[abs(songId.hashValue) % Self.iconPalette.count]
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(white: 0.15))
+                    .fill(color.opacity(0.2))
                     .overlay(
                         Image(systemName: "music.note")
                             .font(.system(size: 18))
-                            .foregroundStyle(Color(white: 0.4))
+                            .foregroundStyle(color)
                     )
-                    .redacted(reason: .placeholder)
             }
         }
     }

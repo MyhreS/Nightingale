@@ -67,6 +67,20 @@ final class MainViewModel: ObservableObject {
         }
     }
 
+    func updateLocalSongName(song: Song, name: String) {
+        LocalSongStore.shared.updateName(songId: song.songId, name: name)
+        if let index = songs.firstIndex(where: { $0.songId == song.songId && $0.group == song.group }) {
+            songs[index].name = name
+        }
+    }
+
+    func updateLocalSongArtist(song: Song, artist: String) {
+        LocalSongStore.shared.updateArtist(songId: song.songId, artist: artist)
+        if let index = songs.firstIndex(where: { $0.songId == song.songId && $0.group == song.group }) {
+            songs[index].artistName = artist
+        }
+    }
+
     private func startCacheWork(firebaseSongs: [Song]) {
         Task {
             if firebaseSongs.isEmpty {

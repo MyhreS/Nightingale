@@ -58,6 +58,10 @@ struct MainPage: View {
                         },
                         onUpdateStartTime: { song, seconds in
                             vm.updateLocalSongStartTime(song: song, startSeconds: seconds)
+                        },
+                        onEditSong: { song, name, artist in
+                            vm.updateLocalSongName(song: song, name: name)
+                            vm.updateLocalSongArtist(song: song, artist: artist)
                         }
                     )
                 } else {

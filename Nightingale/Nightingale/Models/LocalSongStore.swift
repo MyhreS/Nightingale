@@ -50,9 +50,9 @@ final class LocalSongStore {
         let song = Song(
             songId: songId,
             name: metadata.title ?? fallbackName,
-            artistName: metadata.artist ?? "Unknown Artist",
+            artistName: metadata.artist ?? "",
             originalSongName: metadata.title ?? fallbackName,
-            originalSongArtistName: metadata.artist ?? "Unknown Artist",
+            originalSongArtistName: metadata.artist ?? "",
             originalArtWorkUrl: "",
             artworkURL: "",
             duration: metadata.durationMs,
@@ -86,6 +86,22 @@ final class LocalSongStore {
         var songs = allSongs()
         if let index = songs.firstIndex(where: { $0.songId == songId }) {
             songs[index].startSeconds = startSeconds
+            saveSongs(songs)
+        }
+    }
+
+    func updateName(songId: String, name: String) {
+        var songs = allSongs()
+        if let index = songs.firstIndex(where: { $0.songId == songId }) {
+            songs[index].name = name
+            saveSongs(songs)
+        }
+    }
+
+    func updateArtist(songId: String, artist: String) {
+        var songs = allSongs()
+        if let index = songs.firstIndex(where: { $0.songId == songId }) {
+            songs[index].artistName = artist
             saveSongs(songs)
         }
     }

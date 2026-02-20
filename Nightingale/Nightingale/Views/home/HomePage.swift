@@ -20,6 +20,7 @@ struct HomePage: View {
     let onAddLocalSong: (URL, SongGroup) -> Void
     let onDeleteSong: (Song) -> Void
     let onUpdateStartTime: (Song, Int) -> Void
+    let onEditSong: (Song, String, String) -> Void
 
     var availableGroups: [SongGroup] {
         songs.uniqueGroups
@@ -47,7 +48,8 @@ struct HomePage: View {
         togglePlayPauseTrigger: Binding<Bool>,
         onAddLocalSong: @escaping (URL, SongGroup) -> Void,
         onDeleteSong: @escaping (Song) -> Void,
-        onUpdateStartTime: @escaping (Song, Int) -> Void
+        onUpdateStartTime: @escaping (Song, Int) -> Void,
+        onEditSong: @escaping (Song, String, String) -> Void
     ) {
         _player = StateObject(wrappedValue: MusicPlayer(sc: sc, firebaseAPI: firebaseAPI))
         self.songs = songs
@@ -60,6 +62,7 @@ struct HomePage: View {
         self.onAddLocalSong = onAddLocalSong
         self.onDeleteSong = onDeleteSong
         self.onUpdateStartTime = onUpdateStartTime
+        self.onEditSong = onEditSong
     }
 
     var body: some View {
@@ -106,7 +109,8 @@ struct HomePage: View {
                         }
                         onDeleteSong(deletedSong)
                     },
-                    onUpdateStartTime: onUpdateStartTime
+                    onUpdateStartTime: onUpdateStartTime,
+                    onEdit: onEditSong
                 )
                 .transition(.scale.combined(with: .opacity))
                 .zIndex(1000)
