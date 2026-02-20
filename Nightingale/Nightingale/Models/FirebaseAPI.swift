@@ -9,10 +9,24 @@ final class FirebaseAPI: ObservableObject {
     
     private lazy var db = Database.database().reference()
     private lazy var storage = Storage.storage()
-    
-    
+
+    @Published var addLocalMusicEnabled = false
+    @Published var soundcloudSongsEnabled = false
+
     private init() {
         FirebaseApp.configure()
+    }
+
+    func fetchFeatureFlags() async {
+        do {
+            try await FirebaseAuthGate.shared.ensureSignedIn()
+            let snapshot = try await read(path: "featureFlags")
+            guard let dict = snapshot.value as? [String: Any] else { return }
+            addLocalMusicEnabled = dict["addLocalMusicButton"] as? Bool ?? false
+            soundcloudSongsEnabled = dict["soundcloudSongs"] as? Bool ?? false
+        } catch {
+            print("Failed to fetch feature flags: \(error)")
+        }
     }
     
     func fetchSoundcloudSongs() async throws -> [Song] {
@@ -46,27 +60,15 @@ final class FirebaseAPI: ObservableObject {
     
     private func read(path: String) async throws -> DataSnapshot {
         try await withCheckedThrowingContinuation { cont in
-            db.child(path).getData { error, snapshot in
-                if let error {
-                    cont.resume(throwing: error)
-                    return
-                }
-
-                guard let snapshot else {
-                    cont.resume(throwing: NSError(
-                        domain: "FirebaseAPI",
-                        code: -1,
-                        userInfo: [NSLocalizedDescriptionKey: "Snapshot was nil"]
-                    ))
-                    return
-                }
-
+            db.child(path).observeSingleEvent(of: .value) { snapshot in
                 cont.resume(returning: snapshot)
+            } withCancel: { error in
+                cont.resume(throwing: error)
             }
         }
     }
     
-    func fetchUsersAllowedFirebaseSongs() async throws -> [String] {
+    func fetchAllowedFirebaseSongsEmails() async throws -> [String] {
         let snapshot = try await read(path: "usersAllowedFirebaseSongs")
 
         guard let value = snapshot.value else {
@@ -74,22 +76,22 @@ final class FirebaseAPI: ObservableObject {
         }
 
         if let array = value as? [[String: Any]] {
-            return array.compactMap(extractAllowedUserId)
+            return array.compactMap(extractAllowedEmail)
         }
 
         if let dict = value as? [String: Any] {
             return dict.values.compactMap { item in
                 guard let itemDict = item as? [String: Any] else { return nil }
-                return extractAllowedUserId(itemDict)
+                return extractAllowedEmail(itemDict)
             }
         }
 
         return []
     }
 
-    private func extractAllowedUserId(_ dict: [String: Any]) -> String? {
+    private func extractAllowedEmail(_ dict: [String: Any]) -> String? {
+        if let email = dict["email"] as? String { return email }
         if let id = dict["id"] as? String { return id }
-        if let id = dict["id"] as? Int { return String(id) }
         return nil
     }
     

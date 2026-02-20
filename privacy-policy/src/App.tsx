@@ -49,7 +49,7 @@ const App = () => {
       <section className="section">
         <h2 className="section-title">Overview</h2>
         <p>
-          PuckBeats is a music app that streams curated hockey-themed playlists powered by SoundCloud. We respect your privacy and are committed to
+          PuckBeats is a music app. We respect your privacy and are committed to
           being transparent about the data we collect and how it is used.
         </p>
       </section>

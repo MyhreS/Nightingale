@@ -1,16 +1,15 @@
 import SwiftUI
 import SoundCloud
 
-struct LoggedInPage: View {
+struct MainPage: View {
     enum Tab { case home, settings }
 
     let sc: SoundCloud
     @EnvironmentObject var firebaseAPI: FirebaseAPI
+    @AppStorage("userEmail") private var email = ""
 
-    let user: User
-    let onLogOut: () -> Void
-
-    @StateObject private var vm = LoggedInViewModel()
+    @StateObject private var vm = MainViewModel()
+    @State private var scUser: User?
     @State private var selectedTab: Tab = .home
     @State private var playerIsPlaying = false
     @State private var playerProgress: Double = 0
@@ -25,7 +24,13 @@ struct LoggedInPage: View {
             footer
         }
         .task {
-            await vm.loadSongs(firebaseAPI: firebaseAPI, user: user)
+            await firebaseAPI.fetchFeatureFlags()
+            await tryRefreshSCAuth()
+            await vm.loadSongs(
+                firebaseAPI: firebaseAPI,
+                email: email,
+                scAuthenticated: scUser != nil && firebaseAPI.soundcloudSongsEnabled
+            )
         }
         .ignoresSafeArea(edges: .bottom)
     }
@@ -40,16 +45,31 @@ struct LoggedInPage: View {
                         sc: sc,
                         songs: vm.songs,
                         isLoadingSongs: vm.isLoadingSongs,
+                        addLocalMusicEnabled: firebaseAPI.addLocalMusicEnabled,
                         playerIsPlaying: $playerIsPlaying,
                         playerProgress: $playerProgress,
                         playerHasSong: $playerHasSong,
-                        togglePlayPauseTrigger: $togglePlayPauseTrigger
+                        togglePlayPauseTrigger: $togglePlayPauseTrigger,
+                        onAddLocalSong: { url, group in
+                            Task { await vm.addLocalSong(from: url, group: group) }
+                        },
+                        onDeleteSong: { song in
+                            vm.deleteLocalSong(song)
+                        },
+                        onUpdateStartTime: { song, seconds in
+                            vm.updateLocalSongStartTime(song: song, startSeconds: seconds)
+                        }
                     )
                 } else {
                     ErrorLoadingSongsView()
                 }
             case .settings:
-                SettingsPage(sc: sc, user: user, onLogOut: onLogOut)
+                SettingsPage(
+                    sc: sc,
+                    scUser: scUser,
+                    onConnectSoundCloud: connectSoundCloud,
+                    onDisconnectSoundCloud: disconnectSoundCloud
+                )
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -90,5 +110,40 @@ struct LoggedInPage: View {
             alignment: .top
         )
     }
-}
 
+    private func tryRefreshSCAuth() async {
+        do {
+            scUser = try await sc.currentUser()
+        } catch {
+            scUser = nil
+        }
+    }
+
+    private func connectSoundCloud() {
+        Task {
+            do {
+                try await sc.authenticate()
+                scUser = try await sc.currentUser()
+                await vm.loadSongs(
+                    firebaseAPI: firebaseAPI,
+                    email: email,
+                    scAuthenticated: true
+                )
+            } catch {
+                print("SoundCloud auth failed: \(error)")
+            }
+        }
+    }
+
+    private func disconnectSoundCloud() {
+        sc.signOut()
+        scUser = nil
+        Task {
+            await vm.loadSongs(
+                firebaseAPI: firebaseAPI,
+                email: email,
+                scAuthenticated: false
+            )
+        }
+    }
+}

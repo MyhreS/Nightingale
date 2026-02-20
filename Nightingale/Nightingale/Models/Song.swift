@@ -12,6 +12,7 @@ extension SongGroup {
 enum StreamingSource: String, Codable {
     case soundcloud
     case firebase
+    case local
 }
 
 struct Song: Codable, Identifiable, Equatable {
@@ -27,7 +28,7 @@ struct Song: Codable, Identifiable, Equatable {
     let linkToSong: String
     let linkToArtist: String
     let group: SongGroup
-    let startSeconds: Int
+    var startSeconds: Int
     let streamingSource: StreamingSource
     
     var id: String { "\(songId)-\(group)" }

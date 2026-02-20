@@ -158,6 +158,10 @@ final class MusicPlayer: ObservableObject, @unchecked Sendable {
             
             let url = try await firebaseAPI.fetchStorageDownloadURL(path: song.songId)
             return StreamDetails(url: url, headers: [:])
+
+        case .local:
+            let fileURL = LocalSongStore.shared.fileURL(for: song)
+            return StreamDetails(url: fileURL, headers: [:])
         }
     }
 

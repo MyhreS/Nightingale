@@ -3,101 +3,144 @@ import SoundCloud
 
 struct SettingsPage: View {
     let sc: SoundCloud
-    let user: User
-    let onLogOut: () -> Void
-    @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
-    
-    
-    @State private var didCopy = false
+    let scUser: User?
+    let onConnectSoundCloud: () -> Void
+    let onDisconnectSoundCloud: () -> Void
 
-    var isAdmin: Bool {
-        user.id == "soundcloud:users:1531282276"
-    }
-    
+    @EnvironmentObject var firebaseAPI: FirebaseAPI
+    @AppStorage("userEmail") private var email = ""
+    @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
+    @State private var isEditingEmail = false
+    @State private var emailDraft = ""
+
     var body: some View {
         PageLayout(title: "Settings") {
             VStack(alignment: .leading, spacing: 20) {
-                userHeader
+                emailCard
+
+
+                if firebaseAPI.soundcloudSongsEnabled {
+                    soundCloudCard
+                }
                 
                 autoPlayToggle
-                
-                logOutButton
-
-                if isAdmin {
-                    AdminSettings(onPrintLikedTracks: printUserLikedTracksIds)
-                }
 
                 Spacer()
             }
         }
     }
-    
-    var logOutButton: some View {
-        HapticButton(action: onLogOut) {
+
+    @ViewBuilder
+    private var emailCard: some View {
+        if isEditingEmail {
             HStack(spacing: 12) {
-                Image(systemName: "rectangle.portrait.and.arrow.right")
-                    .font(.system(size: 20, weight: .semibold))
+                TextField("your@email.com", text: $emailDraft)
+                    .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(.white)
-                Text("Log Out")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(.white)
-                
-                Spacer()
+                    .textContentType(.emailAddress)
+                    .keyboardType(.emailAddress)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                    .submitLabel(.done)
+                    .onSubmit { saveEmail() }
+
+                HapticButton(action: saveEmail) {
+                    Text("Save")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.black)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 7)
+                        .background(Color.white, in: Capsule())
+                }
+                .buttonStyle(.plain)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(16)
             .frame(maxWidth: .infinity, minHeight: 56)
-            .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .strokeBorder(Color(white: 0.2), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+        } else if email.isEmpty {
+            HapticButton(action: beginEditingEmail) {
+                HStack {
+                    Text("Email")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    Text("Add")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 7)
+                        .background(Color(white: 0.2), in: Capsule())
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, minHeight: 56)
+                .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .strokeBorder(Color(white: 0.2), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+            }
+            .buttonStyle(.plain)
+        } else {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 14) {
+                    ZStack {
+                        Circle()
+                            .fill(Color(white: 0.15))
+                            .frame(width: 48, height: 48)
+
+                        Image(systemName: "envelope.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(.white)
+                    }
+
+                    Text(email)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    HapticButton(action: beginEditingEmail) {
+                        Text("Change")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 7)
+                            .background(Color(white: 0.2), in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                HapticButton(action: clearEmail) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "xmark.circle")
+                            .font(.system(size: 14))
+                        Text("Clear email")
+                            .font(.system(size: 13, weight: .medium))
+                    }
+                    .foregroundStyle(Color(white: 0.5))
+                }
+                .buttonStyle(.plain)
+                .padding(.leading, 62)
+            }
+            .padding(16)
+            .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .strokeBorder(Color(white: 0.2), lineWidth: 1)
             )
             .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
         }
-        .buttonStyle(.plain)
     }
 
-    var userHeader: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(Color(white: 0.15))
-                    .frame(width: 56, height: 56)
-
-                Text(initials)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
-
-            VStack(alignment: .leading, spacing: 5) {
-                Text(displayName)
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
-                Text("@\(user.username)")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color(white: 0.6))
-                Text(didCopy ? "Copied ✓" : "ID: \(userId)")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color(white: 0.6))
-                    .onTapGesture {
-                        UIPasteboard.general.string = userId
-                        UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        showCopiedFeedback()
-                    }
-            }
-            
-            Spacer()
-        }
-        .padding(16)
-        .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(Color(white: 0.2), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-    }
-    
-    var autoPlayToggle: some View {
+    private var autoPlayToggle: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Auto play next song")
@@ -108,9 +151,9 @@ struct SettingsPage: View {
                     .foregroundStyle(Color(white: 0.6))
                     .fixedSize(horizontal: false, vertical: true)
             }
-            
+
             Spacer()
-            
+
             Toggle("", isOn: $isAutoPlayEnabled)
                 .labelsHidden()
                 .tint(Color(red: 0.3, green: 0.7, blue: 0.4))
@@ -130,81 +173,97 @@ struct SettingsPage: View {
         }
     }
 
-    var displayName: String {
-        user.firstName ?? user.username
-    }
+    @ViewBuilder
+    private var soundCloudCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: "cloud.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(Color(red: 1.0, green: 0.33, blue: 0.0))
 
-    var initials: String {
-        let base = user.firstName ?? user.username
-        let first = base.first.map { String($0).uppercased() } ?? ""
-        return first
-    }
-    
-    var userId: String {
-        return extractSoundCloudUserId(userId: user.id)
-    }
-    
-    func printUserLikedTracksIds() {
-        Task {
-            do {
-                let res = try await sc.likedTracks()
-                print("Liked tracks")
-                for track in res.items {
-                    print("Track name: \(track.title)")
-                    print("Track ID: \(track.id)")
-                    print("Track artwork URL: \(track.artworkUrl ?? "")")
-                    print("Track duration: \(track.duration)")
-                    print("Track playback URL: \(track.playbackUrl ?? "")")
-                    print("Track permalink: \(track.permalinkUrl)")
-                    print("Track user permalinkURL: \(track.user.permalinkUrl)")
-                    print("Tracks user name: \(track.user.username)")
-                    print("-")
+                Text("SoundCloud")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+
+                Spacer()
+            }
+
+            if let scUser {
+                HStack(spacing: 10) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color(red: 0.3, green: 0.7, blue: 0.4))
+                    Text("@\(scUser.username)")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.white)
                 }
-            } catch {
-                print("❌ \(error)")
+
+                HapticButton(action: onDisconnectSoundCloud) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "xmark.circle")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text("Log out of Soundcloud")
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                    .foregroundStyle(Color(red: 0.9, green: 0.3, blue: 0.3))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 9)
+                    .frame(maxWidth: .infinity)
+                    .background(Color(red: 0.9, green: 0.3, blue: 0.3).opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .strokeBorder(Color(red: 0.9, green: 0.3, blue: 0.3).opacity(0.3), lineWidth: 1)
+                    )
+                }
+                .buttonStyle(.plain)
+            } else {
+                Text("Link your account to access SoundCloud songs")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color(white: 0.5))
+
+                HapticButton(action: onConnectSoundCloud) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "link.badge.plus")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text("Connect")
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 9)
+                    .frame(maxWidth: .infinity)
+                    .background(Color(red: 1.0, green: 0.33, blue: 0.0).opacity(0.15), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .strokeBorder(Color(red: 1.0, green: 0.33, blue: 0.0).opacity(0.3), lineWidth: 1)
+                    )
+                }
+                .buttonStyle(.plain)
             }
         }
-        
+        .padding(16)
+        .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(Color(white: 0.2), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
     }
-    
-    private func showCopiedFeedback() {
-        didCopy = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            didCopy = false
-        }
+
+    private func beginEditingEmail() {
+        emailDraft = email
+        isEditingEmail = true
     }
 
-    struct AdminSettings: View {
-        let onPrintLikedTracks: () -> Void
+    private func saveEmail() {
+        let trimmed = emailDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        email = trimmed
+        isEditingEmail = false
+    }
 
-        var body: some View {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Admin")
-                    .font(.system(size: 17, weight: .semibold))
-
-                // HapticButton(action: onPrintLikedTracks) {
-                //     HStack(spacing: 12) {
-                //         Image(systemName: "list.bullet.rectangle")
-                //             .font(.system(size: 20, weight: .semibold))
-                //             .foregroundStyle(.white)
-                //         Text("Print most liked tracks IDs")
-                //             .font(.system(size: 15, weight: .medium))
-                //             .foregroundStyle(.white)
-                        
-                //         Spacer()
-                //     }
-                //     .padding(.horizontal, 16)
-                //     .padding(.vertical, 14)
-                //     .frame(maxWidth: .infinity, minHeight: 56)
-                //     .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                //     .overlay(
-                //         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                //             .strokeBorder(Color(white: 0.2), lineWidth: 1)
-                //     )
-                //     .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                // }
-                // .buttonStyle(.plain)
-            }
-        }
+    private func clearEmail() {
+        email = ""
+        emailDraft = ""
+        isEditingEmail = false
     }
 }

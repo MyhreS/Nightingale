@@ -11,6 +11,7 @@ struct NightingaleApp: App {
         UIApplication.shared.isIdleTimerDisabled = true
         
         let secrets = SecretsKeeper.shared
+        
         let config = SoundCloud.Config(
             clientId: secrets.getClientId(),
             clientSecret: secrets.getClientSecret(),
