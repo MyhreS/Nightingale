@@ -16,15 +16,12 @@ struct HomePage: View {
     @Binding var togglePlayPauseTrigger: Bool
     @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
     let songs: [Song]
+    let availableGroups: [SongGroup]
     let isLoadingSongs: Bool
     let onAddLocalSong: (URL, SongGroup) -> Void
     let onDeleteSong: (Song) -> Void
     let onUpdateStartTime: (Song, Int) -> Void
     let onEditSong: (Song, String, String) -> Void
-
-    var availableGroups: [SongGroup] {
-        songs.uniqueGroups
-    }
 
     var hasGoalGroup: Bool {
         availableGroups.contains { $0.lowercased() == "goal" }
@@ -40,6 +37,7 @@ struct HomePage: View {
         firebaseAPI: FirebaseAPI,
         sc: SoundCloud,
         songs: [Song],
+        availableGroups: [SongGroup],
         isLoadingSongs: Bool,
         addLocalMusicEnabled: Bool,
         playerIsPlaying: Binding<Bool>,
@@ -53,6 +51,7 @@ struct HomePage: View {
     ) {
         _player = StateObject(wrappedValue: MusicPlayer(sc: sc, firebaseAPI: firebaseAPI))
         self.songs = songs
+        self.availableGroups = availableGroups
         self.isLoadingSongs = isLoadingSongs
         self.addLocalMusicEnabled = addLocalMusicEnabled
         _playerIsPlaying = playerIsPlaying
@@ -153,9 +152,9 @@ struct HomePage: View {
             handleSongFinished(song)
             finishedSong = nil
         }
-        .onChange(of: songs) { _, newSongs in
-            if selectedGroup.isEmpty || !newSongs.contains(where: { $0.group == selectedGroup }) {
-                selectedGroup = newSongs.uniqueGroups.first ?? ""
+        .onChange(of: availableGroups) { _, newGroups in
+            if selectedGroup.isEmpty || !newGroups.contains(selectedGroup) {
+                selectedGroup = newGroups.first ?? ""
             }
         }
         .onChange(of: player.isPlaying) { _, _ in syncPlayerState() }

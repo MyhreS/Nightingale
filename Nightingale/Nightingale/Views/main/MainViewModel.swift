@@ -3,6 +3,7 @@ import Foundation
 @MainActor
 final class MainViewModel: ObservableObject {
     @Published var songs: [Song] = []
+    @Published var availableGroups: [SongGroup] = []
     @Published var isLoadingSongs = false
     @Published var errorWhenLoadingSongs = false
 
@@ -14,34 +15,38 @@ final class MainViewModel: ObservableObject {
         do {
             try await FirebaseAuthGate.shared.ensureSignedIn()
 
+            let allFirebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
+            let allSoundcloudSongs = try await firebaseAPI.fetchSoundcloudSongs()
+            let localSongs = LocalSongStore.shared.allSongs()
+
+            availableGroups = (allFirebaseSongs + allSoundcloudSongs + localSongs).uniqueGroups
+
             var serverSongs: [Song] = []
 
             if scAuthenticated {
-                let soundcloudSongs = try await firebaseAPI.fetchSoundcloudSongs()
-                serverSongs.append(contentsOf: soundcloudSongs)
+                serverSongs.append(contentsOf: allSoundcloudSongs)
             }
 
             let emailLower = email.lowercased()
             let allowedEmails = emailLower.isEmpty ? [] : try await firebaseAPI.fetchAllowedFirebaseSongsEmails()
 
             if !emailLower.isEmpty && allowedEmails.contains(where: { $0.lowercased() == emailLower }) {
-                let firebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
-                startCacheWork(firebaseSongs: firebaseSongs)
+                startCacheWork(firebaseSongs: allFirebaseSongs)
 
                 let filtered = removeDuplicates(
                     soundcloudSongs: serverSongs,
-                    firebaseSongs: firebaseSongs
+                    firebaseSongs: allFirebaseSongs
                 )
-                serverSongs = firebaseSongs + filtered
+                serverSongs = allFirebaseSongs + filtered
             }
 
-            let localSongs = LocalSongStore.shared.allSongs()
             songs = deduplicateById(serverSongs + localSongs)
-            errorWhenLoadingSongs = songs.isEmpty
+            errorWhenLoadingSongs = songs.isEmpty && availableGroups.isEmpty
         } catch {
             let localSongs = LocalSongStore.shared.allSongs()
             if !localSongs.isEmpty {
                 songs = localSongs
+                availableGroups = localSongs.uniqueGroups
                 errorWhenLoadingSongs = false
             } else {
                 errorWhenLoadingSongs = true
@@ -53,6 +58,9 @@ final class MainViewModel: ObservableObject {
     func addLocalSong(from url: URL, group: SongGroup) async {
         guard let song = await LocalSongStore.shared.addSong(from: url, group: group) else { return }
         songs.append(song)
+        if !availableGroups.contains(group) {
+            availableGroups.append(group)
+        }
     }
 
     func deleteLocalSong(_ song: Song) {

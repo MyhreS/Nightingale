@@ -217,7 +217,7 @@ struct SettingsPage: View {
                 }
                 .buttonStyle(.plain)
             } else {
-                Text("Link your account to access SoundCloud songs")
+                Text("Link your account to access predefined SoundCloud songs")
                     .font(.system(size: 13))
                     .foregroundStyle(Color(white: 0.5))
 

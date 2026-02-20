@@ -44,6 +44,7 @@ struct MainPage: View {
                         firebaseAPI: firebaseAPI,
                         sc: sc,
                         songs: vm.songs,
+                        availableGroups: vm.availableGroups,
                         isLoadingSongs: vm.isLoadingSongs,
                         addLocalMusicEnabled: firebaseAPI.addLocalMusicEnabled,
                         playerIsPlaying: $playerIsPlaying,
