@@ -51,8 +51,8 @@ final class LocalSongStore {
             songId: songId,
             name: metadata.title ?? fallbackName,
             artistName: metadata.artist ?? "",
-            originalSongName: metadata.title ?? fallbackName,
-            originalSongArtistName: metadata.artist ?? "",
+            originalSongName: "",
+            originalSongArtistName: "",
             originalArtWorkUrl: "",
             artworkURL: "",
             duration: metadata.durationMs,
@@ -94,6 +94,7 @@ final class LocalSongStore {
         var songs = allSongs()
         if let index = songs.firstIndex(where: { $0.songId == songId }) {
             songs[index].name = name
+            songs[index].originalSongName = ""
             saveSongs(songs)
         }
     }
@@ -102,6 +103,7 @@ final class LocalSongStore {
         var songs = allSongs()
         if let index = songs.firstIndex(where: { $0.songId == songId }) {
             songs[index].artistName = artist
+            songs[index].originalSongArtistName = ""
             saveSongs(songs)
         }
     }

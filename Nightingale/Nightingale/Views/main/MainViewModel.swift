@@ -71,6 +71,7 @@ final class MainViewModel: ObservableObject {
         LocalSongStore.shared.updateName(songId: song.songId, name: name)
         if let index = songs.firstIndex(where: { $0.songId == song.songId && $0.group == song.group }) {
             songs[index].name = name
+            songs[index].originalSongName = ""
         }
     }
 
@@ -78,6 +79,7 @@ final class MainViewModel: ObservableObject {
         LocalSongStore.shared.updateArtist(songId: song.songId, artist: artist)
         if let index = songs.firstIndex(where: { $0.songId == song.songId && $0.group == song.group }) {
             songs[index].artistName = artist
+            songs[index].originalSongArtistName = ""
         }
     }
 

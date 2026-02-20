@@ -208,21 +208,21 @@ struct SongOptionsPopup: View {
                     .font(.system(size: 36, weight: .bold, design: .monospaced))
                     .foregroundStyle(.white)
 
-                HStack(spacing: 20) {
-                    stepButton(systemName: "minus.circle.fill") {
+                HStack(spacing: 12) {
+                    labeledStepButton(label: "-10") {
+                        editedStartSeconds = max(0, editedStartSeconds - 10)
+                    }
+
+                    labeledStepButton(label: "-1") {
                         editedStartSeconds = max(0, editedStartSeconds - 1)
                     }
 
-                    stepButton(systemName: "minus.circle") {
-                        editedStartSeconds = max(0, editedStartSeconds - 5)
-                    }
-
-                    stepButton(systemName: "plus.circle") {
-                        editedStartSeconds += 5
-                    }
-
-                    stepButton(systemName: "plus.circle.fill") {
+                    labeledStepButton(label: "+1") {
                         editedStartSeconds += 1
+                    }
+
+                    labeledStepButton(label: "+10") {
+                        editedStartSeconds += 10
                     }
                 }
             }
@@ -454,11 +454,17 @@ struct SongOptionsPopup: View {
         }
     }
 
-    private func stepButton(systemName: String, action: @escaping () -> Void) -> some View {
+    private func labeledStepButton(label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Image(systemName: systemName)
-                .font(.system(size: 28))
+            Text(label)
+                .font(.system(size: 16, weight: .bold, design: .monospaced))
                 .foregroundStyle(.white)
+                .frame(width: 52, height: 40)
+                .background(Color(white: 0.18), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .strokeBorder(Color(white: 0.28), lineWidth: 1)
+                )
         }
     }
 

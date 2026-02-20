@@ -19,8 +19,8 @@ struct Song: Codable, Identifiable, Equatable {
     let songId: String
     var name: String
     var artistName: String
-    let originalSongName: String
-    let originalSongArtistName: String
+    var originalSongName: String
+    var originalSongArtistName: String
     let originalArtWorkUrl: String
     let artworkURL: String
     let duration: Int
