@@ -61,7 +61,8 @@ final class LocalSongStore {
             linkToArtist: "",
             group: group,
             startSeconds: 0,
-            streamingSource: .local
+            streamingSource: .local,
+            updatedAt: 0
         )
 
         var songs = allSongs()

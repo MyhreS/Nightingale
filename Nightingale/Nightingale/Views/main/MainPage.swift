@@ -28,17 +28,22 @@ struct MainPage: View {
             await tryRefreshSCAuth()
             await vm.loadSongs(
                 firebaseAPI: firebaseAPI,
-                email: email,
-                scAuthenticated: scUser != nil && firebaseAPI.soundcloudSongsEnabled
+                email: firebaseAPI.emailLoginEnabled ? email : "",
+                scAuthenticated: scUser != nil && firebaseAPI.soundcloudLoginEnabled
             )
         }
         .onChange(of: email) { _, newEmail in
             Task {
                 await vm.loadSongs(
                     firebaseAPI: firebaseAPI,
-                    email: newEmail,
-                    scAuthenticated: scUser != nil && firebaseAPI.soundcloudSongsEnabled
+                    email: firebaseAPI.emailLoginEnabled ? newEmail : "",
+                    scAuthenticated: scUser != nil && firebaseAPI.soundcloudLoginEnabled
                 )
+            }
+        }
+        .onChange(of: vm.hasFirebaseAccess) { _, hasAccess in
+            if hasAccess && scUser != nil {
+                disconnectSoundCloud()
             }
         }
         .ignoresSafeArea(edges: .bottom)
@@ -81,6 +86,7 @@ struct MainPage: View {
                 SettingsPage(
                     sc: sc,
                     scUser: scUser,
+                    hasFirebaseAccess: vm.hasFirebaseAccess,
                     onConnectSoundCloud: connectSoundCloud,
                     onDisconnectSoundCloud: disconnectSoundCloud
                 )

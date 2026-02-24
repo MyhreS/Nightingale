@@ -3,9 +3,12 @@ import Foundation
 @MainActor
 final class MainViewModel: ObservableObject {
     @Published var songs: [Song] = []
-    @Published var availableGroups: [SongGroup] = []
+    @Published var availableGroups: [SongGroup] = [
+        "warmup", "faceoff", "break", "goal", "penalty", "crowd", "intro", "victory"
+    ]
     @Published var isLoadingSongs = false
     @Published var errorWhenLoadingSongs = false
+    @Published var hasFirebaseAccess = false
 
     func loadSongs(firebaseAPI: FirebaseAPI, email: String, scAuthenticated: Bool) async {
         isLoadingSongs = true
@@ -15,39 +18,30 @@ final class MainViewModel: ObservableObject {
         do {
             try await FirebaseAuthGate.shared.ensureSignedIn()
 
-            let allFirebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
-            let allSoundcloudSongs = try await firebaseAPI.fetchSoundcloudSongs()
             let localSongs = LocalSongStore.shared.allSongs()
-
-            availableGroups = (allFirebaseSongs + allSoundcloudSongs + localSongs).uniqueGroups
-
             var serverSongs: [Song] = []
-
-            if scAuthenticated {
-                serverSongs.append(contentsOf: allSoundcloudSongs)
-            }
 
             let emailLower = email.lowercased()
             let allowedEmails = emailLower.isEmpty ? [] : try await firebaseAPI.fetchAllowedFirebaseSongsEmails()
+            let emailIsAllowed = !emailLower.isEmpty && allowedEmails.contains(where: { $0.lowercased() == emailLower })
 
-            if !emailLower.isEmpty && allowedEmails.contains(where: { $0.lowercased() == emailLower }) {
-                startCacheWork(firebaseSongs: allFirebaseSongs)
-
-                let filtered = removeDuplicates(
-                    soundcloudSongs: serverSongs,
-                    firebaseSongs: allFirebaseSongs
-                )
-                serverSongs = allFirebaseSongs + filtered
+            if emailIsAllowed {
+                let firebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
+                serverSongs = firebaseSongs
+                hasFirebaseAccess = true
+                startCacheWork(firebaseSongs: firebaseSongs)
+            } else {
+                hasFirebaseAccess = false
+                if scAuthenticated {
+                    serverSongs = try await firebaseAPI.fetchSoundcloudSongs()
+                }
             }
 
             songs = deduplicateById(serverSongs + localSongs)
-            errorWhenLoadingSongs = songs.isEmpty && availableGroups.isEmpty
         } catch {
             let localSongs = LocalSongStore.shared.allSongs()
             if !localSongs.isEmpty {
                 songs = localSongs
-                availableGroups = localSongs.uniqueGroups
-                errorWhenLoadingSongs = false
             } else {
                 errorWhenLoadingSongs = true
             }
@@ -103,24 +97,11 @@ final class MainViewModel: ObservableObject {
     }
 }
 
-func deduplicateById(_ songs: [Song]) -> [Song] {
+private func deduplicateById(_ songs: [Song]) -> [Song] {
     var seen = Set<String>()
     return songs.filter { song in
         guard !seen.contains(song.id) else { return false }
         seen.insert(song.id)
         return true
     }
-}
-
-func removeDuplicates(soundcloudSongs: [Song], firebaseSongs: [Song]) -> [Song] {
-    let firebaseKeySet = Set(firebaseSongs.map(makeFirebaseSongKey))
-    return soundcloudSongs.filter { !firebaseKeySet.contains(makeSoundcloudSongKey($0)) }
-}
-
-func makeSoundcloudSongKey(_ song: Song) -> String {
-    "\(song.originalSongName.lowercased())|\(song.originalSongArtistName.lowercased())"
-}
-
-func makeFirebaseSongKey(_ song: Song) -> String {
-    "\(song.name.lowercased())|\(song.artistName.lowercased())"
 }

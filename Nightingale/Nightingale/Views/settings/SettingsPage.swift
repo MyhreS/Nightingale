@@ -4,6 +4,7 @@ import SoundCloud
 struct SettingsPage: View {
     let sc: SoundCloud
     let scUser: User?
+    let hasFirebaseAccess: Bool
     let onConnectSoundCloud: () -> Void
     let onDisconnectSoundCloud: () -> Void
 
@@ -13,16 +14,27 @@ struct SettingsPage: View {
     @State private var isEditingEmail = false
     @State private var emailDraft = ""
 
+    private var scIsConnected: Bool { scUser != nil }
+
     var body: some View {
         PageLayout(title: "Settings") {
             VStack(alignment: .leading, spacing: 20) {
-                emailCard
-
-
-                if firebaseAPI.soundcloudSongsEnabled {
-                    soundCloudCard
+                if firebaseAPI.soundcloudLoginEnabled {
+                    if hasFirebaseAccess {
+                        soundCloudDisabledCard
+                    } else {
+                        soundCloudCard
+                    }
                 }
-                
+
+                if firebaseAPI.emailLoginEnabled {
+                    if scIsConnected && !hasFirebaseAccess {
+                        emailDisabledCard
+                    } else {
+                        emailCard
+                    }
+                }
+
                 autoPlayToggle
 
                 Spacer()
@@ -30,12 +42,60 @@ struct SettingsPage: View {
         }
     }
 
+    private var emailDisabledCard: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "envelope.fill")
+                .font(.system(size: 14))
+                .foregroundStyle(Color(white: 0.3))
+
+            Text("Disconnect SoundCloud to use email-based access")
+                .font(.system(size: 12))
+                .foregroundStyle(Color(white: 0.3))
+
+            Spacer()
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity)
+        .background(Color(white: 0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(Color(white: 0.12), lineWidth: 1)
+        )
+    }
+
+    private var soundCloudDisabledCard: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "cloud.fill")
+                .font(.system(size: 20))
+                .foregroundStyle(Color(white: 0.4))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("SoundCloud")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Color(white: 0.4))
+                Text("You're using email-based access. SoundCloud is disabled.")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color(white: 0.35))
+            }
+
+            Spacer()
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, minHeight: 56)
+        .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(Color(white: 0.15), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+    }
+
     @ViewBuilder
     private var emailCard: some View {
         if isEditingEmail {
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 TextField("your@email.com", text: $emailDraft)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.white)
                     .textContentType(.emailAddress)
                     .keyboardType(.emailAddress)
@@ -46,97 +106,87 @@ struct SettingsPage: View {
 
                 HapticButton(action: saveEmail) {
                     Text("Save")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.black)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 7)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
                         .background(Color.white, in: Capsule())
                 }
                 .buttonStyle(.plain)
             }
-            .padding(16)
-            .frame(maxWidth: .infinity, minHeight: 56)
-            .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .padding(12)
+            .frame(maxWidth: .infinity)
+            .background(Color(white: 0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .strokeBorder(Color(white: 0.2), lineWidth: 1)
             )
-            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
         } else if email.isEmpty {
             HapticButton(action: beginEditingEmail) {
                 HStack {
+                    Image(systemName: "envelope.fill")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color(white: 0.4))
                     Text("Email")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Color(white: 0.4))
 
                     Spacer()
 
                     Text("Add")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 7)
-                        .background(Color(white: 0.2), in: Capsule())
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(Color(white: 0.5))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 5)
+                        .background(Color(white: 0.15), in: Capsule())
                 }
-                .padding(16)
-                .frame(maxWidth: .infinity, minHeight: 56)
-                .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .padding(12)
+                .frame(maxWidth: .infinity)
+                .background(Color(white: 0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .strokeBorder(Color(white: 0.2), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(Color(white: 0.15), lineWidth: 1)
                 )
-                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
             }
             .buttonStyle(.plain)
         } else {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 14) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(white: 0.15))
-                            .frame(width: 48, height: 48)
-
-                        Image(systemName: "envelope.fill")
-                            .font(.system(size: 18))
-                            .foregroundStyle(.white)
-                    }
-
-                    Text(email)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-
-                    Spacer()
-
-                    HapticButton(action: beginEditingEmail) {
-                        Text("Change")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 7)
-                            .background(Color(white: 0.2), in: Capsule())
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                HapticButton(action: clearEmail) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "xmark.circle")
-                            .font(.system(size: 14))
-                        Text("Clear email")
-                            .font(.system(size: 13, weight: .medium))
-                    }
+            HStack(spacing: 10) {
+                Image(systemName: "envelope.fill")
+                    .font(.system(size: 13))
                     .foregroundStyle(Color(white: 0.5))
+
+                Text(email)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Color(white: 0.7))
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+
+                Spacer()
+
+                HapticButton(action: beginEditingEmail) {
+                    Text("Change")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(Color(white: 0.5))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 5)
+                        .background(Color(white: 0.15), in: Capsule())
                 }
                 .buttonStyle(.plain)
-                .padding(.leading, 62)
+
+                HapticButton(action: clearEmail) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color(white: 0.3))
+                }
+                .buttonStyle(.plain)
             }
-            .padding(16)
-            .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .padding(12)
+            .frame(maxWidth: .infinity)
+            .background(Color(white: 0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(Color(white: 0.2), lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(Color(white: 0.15), lineWidth: 1)
+                )
         }
     }
 
@@ -217,7 +267,7 @@ struct SettingsPage: View {
                 }
                 .buttonStyle(.plain)
             } else {
-                Text("Link your account to access predefined SoundCloud songs")
+                Text("Connect to access pre-configured songs from SoundCloud")
                     .font(.system(size: 13))
                     .foregroundStyle(Color(white: 0.5))
 

@@ -3,6 +3,7 @@ import Foundation
 final class MP3Cache {
     private let firebaseAPI: FirebaseAPI
     let baseURL: URL
+    private let metaURL: URL
     
     @MainActor
     static let shared = MP3Cache(firebaseAPI: .shared)
@@ -10,7 +11,26 @@ final class MP3Cache {
     init(firebaseAPI: FirebaseAPI) {
         self.firebaseAPI = firebaseAPI
         self.baseURL = MP3Cache.makeBaseURL()
+        self.metaURL = baseURL.appendingPathComponent("cache-meta.json", isDirectory: false)
     }
+
+    // MARK: - Sidecar metadata (songId -> updatedAt)
+
+    private func loadMeta() -> [String: Int] {
+        guard let data = try? Data(contentsOf: metaURL),
+              let dict = try? JSONDecoder().decode([String: Int].self, from: data) else {
+            return [:]
+        }
+        return dict
+    }
+
+    private func saveMeta(_ meta: [String: Int]) {
+        guard let data = try? JSONEncoder().encode(meta) else { return }
+        try? createDirectoryIfNeeded(for: metaURL)
+        try? data.write(to: metaURL, options: .atomic)
+    }
+
+    // MARK: - Public API
     
     func removeAllSongs() async {
         do {
@@ -27,12 +47,14 @@ final class MP3Cache {
         } catch {
             return
         }
+        saveMeta([:])
     }
     
     func removeSongsNotInList(songs: [Song]) async {
         let allowedFileNames = Set(
             songs.map { safeFileName(from: $0.songId) }
         )
+        let allowedIds = Set(songs.map(\.songId))
 
         do {
             let fileURLs = try FileManager.default.contentsOfDirectory(
@@ -52,28 +74,46 @@ final class MP3Cache {
         } catch {
             return
         }
+
+        var meta = loadMeta()
+        meta = meta.filter { allowedIds.contains($0.key) }
+        saveMeta(meta)
     }
     
     func preloadSongs(songs: [Song]) async {
-        let uncachedSongs = songs.filter{ song in
+        let meta = loadMeta()
+
+        let songsToDownload = songs.filter { song in
+            guard song.streamingSource == .firebase else { return false }
             let localURL = getPreloadedSongPath(song: song)
-            return !isCached(at: localURL)
+            if !isCached(at: localURL) { return true }
+            return meta[song.songId] != song.updatedAt
         }
         
-        await withTaskGroup(of: Void.self) { group in
-            for song in uncachedSongs {
+        guard !songsToDownload.isEmpty else { return }
+
+        await withTaskGroup(of: (String, Int)?.self) { group in
+            for song in songsToDownload {
                 group.addTask {
                     do {
                         let localURL = self.getPreloadedSongPath(song: song)
+                        if self.isCached(at: localURL) {
+                            try FileManager.default.removeItem(at: localURL)
+                        }
                         _ = try await self.downloadMP3(from: song.songId, to: localURL)
-                    }
-                    catch {
-                        return
+                        return (song.songId, song.updatedAt)
+                    } catch {
+                        return nil
                     }
                 }
             }
-            await group.waitForAll()
-            
+
+            var updatedMeta = loadMeta()
+            for await result in group {
+                guard let (songId, updatedAt) = result else { continue }
+                updatedMeta[songId] = updatedAt
+            }
+            saveMeta(updatedMeta)
         }
     }
     
@@ -82,7 +122,10 @@ final class MP3Cache {
     }
     
     func hasCachedSong(_ song: Song) -> Bool {
-        isCached(at: cachedURL(for: song))
+        let localURL = cachedURL(for: song)
+        guard isCached(at: localURL) else { return false }
+        let meta = loadMeta()
+        return meta[song.songId] == song.updatedAt
     }
     
     private func getPreloadedSongPath(song: Song) -> URL {
@@ -94,10 +137,8 @@ final class MP3Cache {
         return sanitized.hasSuffix(".mp3") ? sanitized : "\(sanitized).mp3"
     }
     
-    
     private static func makeBaseURL() -> URL {
         let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)
-        
         return (caches.first ?? FileManager.default.temporaryDirectory).appendingPathComponent("mp3-cache", isDirectory: true)
     }
     
@@ -109,20 +150,10 @@ final class MP3Cache {
         try createDirectoryIfNeeded(for: destinationURL)
 
         if FileManager.default.fileExists(atPath: destinationURL.path) {
-            try FileManager.default.removeItem(at: tempURL)
-            return
-        }
-        
-        do {
-            try FileManager.default.moveItem(at: tempURL, to: destinationURL)
-        } catch {
-            if FileManager.default.fileExists(atPath: destinationURL.path) {
-                try FileManager.default.removeItem(at: tempURL)
-                return
-            }
-            throw error
+            try FileManager.default.removeItem(at: destinationURL)
         }
 
+        try FileManager.default.moveItem(at: tempURL, to: destinationURL)
     }
 
     private func createDirectoryIfNeeded(for fileURL: URL) throws {

@@ -11,7 +11,8 @@ final class FirebaseAPI: ObservableObject {
     private lazy var storage = Storage.storage()
 
     @Published var addLocalMusicEnabled = false
-    @Published var soundcloudSongsEnabled = false
+    @Published var emailLoginEnabled = true
+    @Published var soundcloudLoginEnabled = false
 
     private init() {
         FirebaseApp.configure()
@@ -23,7 +24,10 @@ final class FirebaseAPI: ObservableObject {
             let snapshot = try await read(path: "featureFlags")
             guard let dict = snapshot.value as? [String: Any] else { return }
             addLocalMusicEnabled = dict["addLocalMusicButton"] as? Bool ?? false
-            soundcloudSongsEnabled = dict["soundcloudSongs"] as? Bool ?? false
+            emailLoginEnabled = dict["emailLogin"] as? Bool ?? true
+            soundcloudLoginEnabled = dict["soundcloudLogin"] as? Bool
+                ?? dict["soundcloudSongs"] as? Bool
+                ?? false
         } catch {
             print("Failed to fetch feature flags: \(error)")
         }

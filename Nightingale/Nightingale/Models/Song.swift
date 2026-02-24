@@ -30,6 +30,7 @@ struct Song: Codable, Identifiable, Equatable {
     let group: SongGroup
     var startSeconds: Int
     let streamingSource: StreamingSource
+    let updatedAt: Int
     
     var id: String { "\(songId)-\(group)" }
     
@@ -38,6 +39,7 @@ struct Song: Codable, Identifiable, Equatable {
         case name, artistName, originalSongName, originalSongArtistName
         case originalArtWorkUrl, artworkURL, duration, playbackUrl
         case linkToSong, linkToArtist, group, startSeconds, streamingSource
+        case updatedAt
     }
 }
 
