@@ -22,6 +22,8 @@ struct HomePage: View {
     let onDeleteSong: (Song) -> Void
     let onUpdateStartTime: (Song, Int) -> Void
     let onEditSong: (Song, String, String) -> Void
+    let soundcloudLoginEnabled: Bool
+    let onConnectSoundCloud: () -> Void
 
     var hasGoalGroup: Bool {
         availableGroups.contains { $0.lowercased() == "goal" }
@@ -40,6 +42,7 @@ struct HomePage: View {
         availableGroups: [SongGroup],
         isLoadingSongs: Bool,
         addLocalMusicEnabled: Bool,
+        soundcloudLoginEnabled: Bool,
         playerIsPlaying: Binding<Bool>,
         playerProgress: Binding<Double>,
         playerHasSong: Binding<Bool>,
@@ -47,13 +50,15 @@ struct HomePage: View {
         onAddLocalSong: @escaping (URL, SongGroup) -> Void,
         onDeleteSong: @escaping (Song) -> Void,
         onUpdateStartTime: @escaping (Song, Int) -> Void,
-        onEditSong: @escaping (Song, String, String) -> Void
+        onEditSong: @escaping (Song, String, String) -> Void,
+        onConnectSoundCloud: @escaping () -> Void
     ) {
         _player = StateObject(wrappedValue: MusicPlayer(sc: sc, firebaseAPI: firebaseAPI))
         self.songs = songs
         self.availableGroups = availableGroups
         self.isLoadingSongs = isLoadingSongs
         self.addLocalMusicEnabled = addLocalMusicEnabled
+        self.soundcloudLoginEnabled = soundcloudLoginEnabled
         _playerIsPlaying = playerIsPlaying
         _playerProgress = playerProgress
         _playerHasSong = playerHasSong
@@ -62,11 +67,24 @@ struct HomePage: View {
         self.onDeleteSong = onDeleteSong
         self.onUpdateStartTime = onUpdateStartTime
         self.onEditSong = onEditSong
+        self.onConnectSoundCloud = onConnectSoundCloud
     }
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            PageLayout(title: "Music") {
+            PageLayout(title: "Music", trailing: {
+                if songs.contains(where: { $0.streamingSource == .soundcloud }) {
+                    HStack(spacing: 4) {
+                        Text("powered by ")
+                            .foregroundStyle(Color(white: 0.4))
+                        + Text("SoundCloud")
+                            .foregroundStyle(Color(red: 1.0, green: 0.33, blue: 0.0))
+                        Image(systemName: "cloud.fill")
+                            .foregroundStyle(Color(red: 1.0, green: 0.33, blue: 0.0))
+                    }
+                    .font(.system(size: 11, weight: .medium))
+                }
+            }) {
                 VStack(spacing: 16) {
                     SongGroupSelector(groups: availableGroups, selectedGroup: $selectedGroup, isLoading: isLoadingSongs)
 
@@ -85,6 +103,10 @@ struct HomePage: View {
                                         onTap: { handleSongTap(song) },
                                         onLongPress: { selectedPreviewSong = song }
                                     )
+                                }
+
+                                if soundcloudLoginEnabled && !songs.contains(where: { $0.streamingSource == .soundcloud }) && songs.allSatisfy({ $0.streamingSource != .local }) {
+                                    ConnectSoundCloudRow(onTap: onConnectSoundCloud)
                                 }
 
                                 if addLocalMusicEnabled {

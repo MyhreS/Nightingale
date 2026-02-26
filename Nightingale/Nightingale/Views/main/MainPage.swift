@@ -26,6 +26,16 @@ struct MainPage: View {
         .task {
             await firebaseAPI.fetchFeatureFlags()
             await tryRefreshSCAuth()
+
+            if !firebaseAPI.soundcloudLoginEnabled && scUser != nil {
+                sc.signOut()
+                scUser = nil
+            }
+
+            if !firebaseAPI.emailLoginEnabled && !email.isEmpty {
+                email = ""
+            }
+
             await vm.loadSongs(
                 firebaseAPI: firebaseAPI,
                 email: firebaseAPI.emailLoginEnabled ? email : "",
@@ -61,6 +71,7 @@ struct MainPage: View {
                         availableGroups: vm.availableGroups,
                         isLoadingSongs: vm.isLoadingSongs,
                         addLocalMusicEnabled: firebaseAPI.addLocalMusicEnabled,
+                        soundcloudLoginEnabled: firebaseAPI.soundcloudLoginEnabled,
                         playerIsPlaying: $playerIsPlaying,
                         playerProgress: $playerProgress,
                         playerHasSong: $playerHasSong,
@@ -77,7 +88,8 @@ struct MainPage: View {
                         onEditSong: { song, name, artist in
                             vm.updateLocalSongName(song: song, name: name)
                             vm.updateLocalSongArtist(song: song, artist: artist)
-                        }
+                        },
+                        onConnectSoundCloud: connectSoundCloud
                     )
                 } else {
                     ErrorLoadingSongsView()

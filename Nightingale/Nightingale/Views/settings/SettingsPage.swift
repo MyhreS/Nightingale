@@ -27,12 +27,8 @@ struct SettingsPage: View {
                     }
                 }
 
-                if firebaseAPI.emailLoginEnabled {
-                    if scIsConnected && !hasFirebaseAccess {
-                        emailDisabledCard
-                    } else {
-                        emailCard
-                    }
+                if firebaseAPI.emailLoginEnabled && !scIsConnected {
+                    emailCard
                 }
 
                 autoPlayToggle
@@ -267,9 +263,11 @@ struct SettingsPage: View {
                 }
                 .buttonStyle(.plain)
             } else {
-                Text("Connect to access pre-configured songs from SoundCloud")
+                Text("Get ready-to-play songs for your games")
                     .font(.system(size: 13))
                     .foregroundStyle(Color(white: 0.5))
+
+                SoundCloudInfoDropdown()
 
                 HapticButton(action: onConnectSoundCloud) {
                     HStack(spacing: 8) {
