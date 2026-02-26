@@ -66,6 +66,7 @@ struct SongRow: View {
             onTap()
         }
         .onLongPressGesture {
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             onLongPress()
         }
     }

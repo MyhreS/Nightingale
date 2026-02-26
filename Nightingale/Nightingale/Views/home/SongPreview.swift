@@ -359,6 +359,7 @@ struct SongOptionsPopup: View {
     private var backButton: some View {
         HStack {
             Button {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 withAnimation(.easeInOut(duration: 0.2)) { currentPage = .menu }
             } label: {
                 HStack(spacing: 4) {
@@ -388,7 +389,10 @@ struct SongOptionsPopup: View {
         destructive: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
-        Button(action: action) {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            action()
+        } label: {
             HStack(spacing: 12) {
                 Image(systemName: icon)
                     .font(.system(size: 16))
@@ -456,7 +460,10 @@ struct SongOptionsPopup: View {
     }
 
     private func labeledStepButton(label: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            action()
+        } label: {
             Text(label)
                 .font(.system(size: 16, weight: .bold, design: .monospaced))
                 .foregroundStyle(.white)
