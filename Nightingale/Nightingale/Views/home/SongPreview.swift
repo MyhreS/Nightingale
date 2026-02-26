@@ -18,8 +18,9 @@ struct SongOptionsPopup: View {
     private var isLocal: Bool { song.streamingSource == .local }
 
     private var headerArtist: String {
-        let artist = song.originalSongArtistName.isEmpty ? song.artistName : song.originalSongArtistName
-        return artist.trimmingCharacters(in: .whitespaces)
+        let base = song.artistName.trimmingCharacters(in: .whitespaces)
+        guard !base.isEmpty else { return "" }
+        return base.hasPrefix("Remixed by:") ? base : "by \(base)"
     }
 
     var body: some View {
@@ -158,7 +159,7 @@ struct SongOptionsPopup: View {
                 }
 
                 if !headerArtist.isEmpty {
-                    Text("by \(headerArtist)")
+                    Text(headerArtist)
                         .font(.system(size: 15))
                         .foregroundStyle(Color(white: 0.6))
                 }
@@ -316,8 +317,8 @@ struct SongOptionsPopup: View {
 
     private var songHeader: some View {
         HStack(spacing: 10) {
-            if let url = URL(string: song.originalArtWorkUrl.isEmpty ? song.artworkURL : song.originalArtWorkUrl),
-               !song.artworkURL.isEmpty || !song.originalArtWorkUrl.isEmpty {
+            if let url = URL(string: song.artworkURL),
+               !song.artworkURL.isEmpty {
                 AsyncImage(url: url) { image in
                     image.resizable().scaledToFill()
                 } placeholder: {
@@ -337,7 +338,7 @@ struct SongOptionsPopup: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(song.originalSongName.isEmpty ? song.name : song.originalSongName)
+                Text(song.name)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.white)
                     .lineLimit(1)

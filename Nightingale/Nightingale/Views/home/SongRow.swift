@@ -8,26 +8,27 @@ struct SongRow: View {
     let onLongPress: () -> Void
 
     private var resolvedArtist: String {
-        let artist = song.originalSongArtistName.isEmpty ? song.artistName : song.originalSongArtistName
-        return artist.trimmingCharacters(in: .whitespaces)
+        let base = song.artistName.trimmingCharacters(in: .whitespaces)
+        guard !base.isEmpty else { return "" }
+        return base.hasPrefix("Remixed by:") ? base : "by \(base)"
     }
 
     var body: some View {
         HStack(spacing: 14) {
-            CachedAsyncImage(url: URL(string: song.originalArtWorkUrl != "" ? song.originalArtWorkUrl : song.artworkURL)) { image in
+            CachedAsyncImage(url: URL(string: song.artworkURL)) { image in
                 artworkView(for: image, songId: song.songId)
             }
             .frame(width: 52, height: 52)
             .clipShape(RoundedRectangle(cornerRadius: 10))
             
             VStack(alignment: .leading, spacing: 5) {
-                Text(song.originalSongName != "" ? song.originalSongName : song.name)
+                Text(song.name)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
                 if !resolvedArtist.isEmpty {
-                    Text("by \(resolvedArtist)")
+                    Text(resolvedArtist)
                         .font(.system(size: 13))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)

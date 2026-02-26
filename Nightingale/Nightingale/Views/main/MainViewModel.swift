@@ -1,12 +1,18 @@
 import Foundation
 
+private let defaultGroups: [SongGroup] = [
+    "faceoff", "penalty", "goal", "crowd", "intro"
+]
+
+private let firebaseGroups: [SongGroup] = [
+    "warmup", "faceoff", "break", "goal", "penalty", "crowd", "intro", "victory"
+]
+
 @MainActor
 final class MainViewModel: ObservableObject {
     @Published var songs: [Song] = []
-    @Published var availableGroups: [SongGroup] = [
-        "warmup", "faceoff", "break", "goal", "penalty", "crowd", "intro", "victory"
-    ]
-    @Published var isLoadingSongs = false
+    @Published var availableGroups: [SongGroup] = defaultGroups
+    @Published var isLoadingSongs = true
     @Published var errorWhenLoadingSongs = false
     @Published var hasFirebaseAccess = false
 
@@ -37,7 +43,9 @@ final class MainViewModel: ObservableObject {
                 }
             }
 
+            invalidateStaleArtwork(songs: serverSongs)
             songs = deduplicateById(serverSongs + localSongs)
+            availableGroups = emailIsAllowed ? firebaseGroups : defaultGroups
         } catch {
             let localSongs = LocalSongStore.shared.allSongs()
             if !localSongs.isEmpty {
@@ -73,7 +81,6 @@ final class MainViewModel: ObservableObject {
         LocalSongStore.shared.updateName(songId: song.songId, name: name)
         if let index = songs.firstIndex(where: { $0.songId == song.songId && $0.group == song.group }) {
             songs[index].name = name
-            songs[index].originalSongName = ""
         }
     }
 
@@ -81,8 +88,23 @@ final class MainViewModel: ObservableObject {
         LocalSongStore.shared.updateArtist(songId: song.songId, artist: artist)
         if let index = songs.firstIndex(where: { $0.songId == song.songId && $0.group == song.group }) {
             songs[index].artistName = artist
-            songs[index].originalSongArtistName = ""
         }
+    }
+
+    private func invalidateStaleArtwork(songs: [Song]) {
+        let key = "lastSeenUpdatedAt"
+        let stored = UserDefaults.standard.dictionary(forKey: key) as? [String: Int] ?? [:]
+        var updated = stored
+
+        for song in songs {
+            guard !song.artworkURL.isEmpty, let url = URL(string: song.artworkURL) else { continue }
+            if let lastSeen = stored[song.songId], song.updatedAt > lastSeen {
+                ImageCache.shared[url] = nil
+            }
+            updated[song.songId] = song.updatedAt
+        }
+
+        UserDefaults.standard.set(updated, forKey: key)
     }
 
     private func startCacheWork(firebaseSongs: [Song]) {

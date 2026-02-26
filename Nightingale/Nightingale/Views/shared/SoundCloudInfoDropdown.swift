@@ -23,7 +23,7 @@ struct SoundCloudInfoDropdown: View {
                 VStack(alignment: .leading, spacing: 8) {
                     infoBullet(icon: "music.note.list", text: "We've hand-picked songs and found the perfect starting point for each one")
                     infoBullet(icon: "dollarsign.circle", text: "All songs are free — no paid SoundCloud account needed")
-                    infoBullet(icon: "waveform", text: "Songs are remixes that sound very close to the originals")
+                    infoBullet(icon: "waveform", text: "Includes originals and remixes when no free original is available")
                 }
                 .padding(.top, 10)
                 .transition(.opacity.combined(with: .move(edge: .top)))

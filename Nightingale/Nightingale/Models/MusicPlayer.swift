@@ -86,16 +86,19 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             return
         }
         
+        let displayArtist = song.streamingSource == .soundcloud
+            ? "Remixed by: \(song.artistName)"
+            : song.artistName
+
         var info: [String: Any] = [
-            MPMediaItemPropertyTitle: song.originalSongName.isEmpty ? song.name : song.originalSongName,
-            MPMediaItemPropertyArtist: song.originalSongArtistName.isEmpty ? song.artistName : song.originalSongArtistName,
+            MPMediaItemPropertyTitle: song.name,
+            MPMediaItemPropertyArtist: displayArtist,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: adjustedProgressSeconds,
             MPMediaItemPropertyPlaybackDuration: adjustedDurationSeconds,
             MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0
         ]
         
-        let artworkURLString = song.originalArtWorkUrl.isEmpty ? song.artworkURL : song.originalArtWorkUrl
-        if let artworkURL = URL(string: artworkURLString),
+        if let artworkURL = URL(string: song.artworkURL),
            let cachedImage = ImageCache.shared[artworkURL] {
             let artwork = MPMediaItemArtwork(boundsSize: cachedImage.size) { _ in cachedImage }
             info[MPMediaItemPropertyArtwork] = artwork

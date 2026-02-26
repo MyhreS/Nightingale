@@ -13,6 +13,7 @@ struct SettingsPage: View {
     @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
     @State private var isEditingEmail = false
     @State private var emailDraft = ""
+    @FocusState private var emailFieldFocused: Bool
 
     private var scIsConnected: Bool { scUser != nil }
 
@@ -90,7 +91,7 @@ struct SettingsPage: View {
     private var emailCard: some View {
         if isEditingEmail {
             HStack(spacing: 10) {
-                TextField("your@email.com", text: $emailDraft)
+                TextField("", text: $emailDraft)
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.white)
                     .textContentType(.emailAddress)
@@ -98,6 +99,7 @@ struct SettingsPage: View {
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
                     .submitLabel(.done)
+                    .focused($emailFieldFocused)
                     .onSubmit { saveEmail() }
 
                 HapticButton(action: saveEmail) {
@@ -117,6 +119,7 @@ struct SettingsPage: View {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .strokeBorder(Color(white: 0.2), lineWidth: 1)
             )
+            .onAppear { emailFieldFocused = true }
         } else if email.isEmpty {
             HapticButton(action: beginEditingEmail) {
                 HStack {
@@ -146,43 +149,52 @@ struct SettingsPage: View {
             }
             .buttonStyle(.plain)
         } else {
-            HStack(spacing: 10) {
-                Image(systemName: "envelope.fill")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color(white: 0.5))
+            let verified = hasFirebaseAccess
+            let accentColor = verified ? Color(red: 0.3, green: 0.7, blue: 0.4) : Color(white: 0.5)
 
-                Text(email)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(Color(white: 0.7))
-                    .lineLimit(1)
-                    .truncationMode(.middle)
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 10) {
+                    Image(systemName: verified ? "checkmark.seal.fill" : "envelope.fill")
+                        .font(.system(size: 13))
+                        .foregroundStyle(accentColor)
 
-                Spacer()
+                    Text(email)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(verified ? .white : Color(white: 0.7))
+                        .lineLimit(1)
+                        .truncationMode(.middle)
 
-                HapticButton(action: beginEditingEmail) {
-                    Text("Change")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(Color(white: 0.5))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 5)
-                        .background(Color(white: 0.15), in: Capsule())
+                    Spacer()
+
+                    HapticButton(action: beginEditingEmail) {
+                        Text("Change")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(Color(white: 0.5))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 5)
+                            .background(Color(white: 0.15), in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+
+                    HapticButton(action: clearEmail) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 16))
+                            .foregroundStyle(Color(white: 0.3))
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
 
-                HapticButton(action: clearEmail) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 16))
-                        .foregroundStyle(Color(white: 0.3))
-                }
-                .buttonStyle(.plain)
             }
             .padding(12)
             .frame(maxWidth: .infinity)
-            .background(Color(white: 0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(
+                (verified ? accentColor.opacity(0.06) : Color(white: 0.06)),
+                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+            )
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(Color(white: 0.15), lineWidth: 1)
-                )
+                    .strokeBorder(verified ? accentColor.opacity(0.4) : Color(white: 0.15), lineWidth: 1)
+            )
         }
     }
 
@@ -232,6 +244,12 @@ struct SettingsPage: View {
                     .foregroundStyle(.white)
 
                 Spacer()
+
+                if scUser == nil {
+                    Text("Get ready-to-play songs")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color(white: 0.5))
+                }
             }
 
             if let scUser {
@@ -263,10 +281,6 @@ struct SettingsPage: View {
                 }
                 .buttonStyle(.plain)
             } else {
-                Text("Get ready-to-play songs for your games")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color(white: 0.5))
-
                 SoundCloudInfoDropdown()
 
                 HapticButton(action: onConnectSoundCloud) {
@@ -293,7 +307,7 @@ struct SettingsPage: View {
         .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(Color(white: 0.2), lineWidth: 1)
+                .strokeBorder(Color(red: 1.0, green: 0.33, blue: 0.0).opacity(0.5), lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
     }
