@@ -171,10 +171,12 @@ struct SongOptionsPopup: View {
                         .padding(.top, 2)
                 }
 
-                Text(sourceLabel)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color(white: 0.4))
-                    .padding(.top, 4)
+                if let sourceLabel {
+                    Text(sourceLabel)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color(white: 0.4))
+                        .padding(.top, 4)
+                }
             }
             .padding(.horizontal, 12)
 
@@ -374,10 +376,10 @@ struct SongOptionsPopup: View {
         }
     }
 
-    private var sourceLabel: String {
+    private var sourceLabel: String? {
         switch song.streamingSource {
         case .soundcloud: return "Source: SoundCloud"
-        case .firebase: return "Source: Server"
+        case .firebase: return nil
         case .local: return "Source: Local file"
         }
     }

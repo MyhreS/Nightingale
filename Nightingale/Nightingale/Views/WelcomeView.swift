@@ -6,9 +6,8 @@ struct EmailEntryView: View {
     @State private var email = ""
     @FocusState private var isFocused: Bool
 
-    private var isValidEmail: Bool {
-        let trimmed = email.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.contains("@") && trimmed.contains(".")
+    private var isValidInput: Bool {
+        !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     var body: some View {
@@ -47,15 +46,15 @@ struct EmailEntryView: View {
                     FeatureCard(
                         icon: "envelope.fill",
                         title: "Quick Setup",
-                        description: "Just enter your email to get started—no password needed"
+                        description: "Just enter your email or username to get started—no password needed"
                     )
                 }
                 .padding(.horizontal, 24)
 
                 VStack(spacing: 16) {
-                    TextField("Email address", text: $email)
-                        .keyboardType(.emailAddress)
-                        .textContentType(.emailAddress)
+                    TextField("Email or username", text: $email)
+                        .keyboardType(.default)
+                        .textContentType(.username)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
                         .focused($isFocused)
@@ -78,20 +77,15 @@ struct EmailEntryView: View {
                             .padding(.vertical, 16)
                             .padding(.horizontal, 32)
                             .frame(maxWidth: .infinity, minHeight: 52)
-                            .background(isValidEmail ? Color.white : Color(white: 0.3))
-                            .foregroundColor(isValidEmail ? .black : Color(white: 0.6))
+                            .background(isValidInput ? Color.white : Color(white: 0.3))
+                            .foregroundColor(isValidInput ? .black : Color(white: 0.6))
                             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                             .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
                     }
                     .buttonStyle(.plain)
-                    .disabled(!isValidEmail)
+                    .disabled(!isValidInput)
                     .padding(.horizontal, 24)
 
-                    Text("We just need your email to identify you—no password required")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color(white: 0.5))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
                 }
 
                 Spacer()

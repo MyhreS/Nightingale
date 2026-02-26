@@ -45,7 +45,7 @@ struct SettingsPage: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Color(white: 0.3))
 
-            Text("Disconnect SoundCloud to use email-based access")
+            Text("Disconnect SoundCloud to use email or username access")
                 .font(.system(size: 12))
                 .foregroundStyle(Color(white: 0.3))
 
@@ -70,7 +70,7 @@ struct SettingsPage: View {
                 Text("SoundCloud")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(Color(white: 0.4))
-                Text("You're using email-based access. SoundCloud is disabled.")
+                Text("You're using email or username access. SoundCloud is disabled.")
                     .font(.system(size: 13))
                     .foregroundStyle(Color(white: 0.35))
             }
@@ -126,7 +126,7 @@ struct SettingsPage: View {
                     Image(systemName: "envelope.fill")
                         .font(.system(size: 13))
                         .foregroundStyle(Color(white: 0.4))
-                    Text("Email")
+                    Text("Email / Username")
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(Color(white: 0.4))
 
