@@ -22,6 +22,7 @@ struct HomePage: View {
     let onDeleteSong: (Song) -> Void
     let onUpdateStartTime: (Song, Int) -> Void
     let onEditSong: (Song, String, String) -> Void
+    let hasFirebaseAccess: Bool
     let soundcloudLoginEnabled: Bool
     let onConnectSoundCloud: () -> Void
 
@@ -46,6 +47,7 @@ struct HomePage: View {
         availableGroups: [SongGroup],
         isLoadingSongs: Bool,
         addLocalMusicEnabled: Bool,
+        hasFirebaseAccess: Bool,
         soundcloudLoginEnabled: Bool,
         playerIsPlaying: Binding<Bool>,
         playerProgress: Binding<Double>,
@@ -62,6 +64,7 @@ struct HomePage: View {
         self.availableGroups = availableGroups
         self.isLoadingSongs = isLoadingSongs
         self.addLocalMusicEnabled = addLocalMusicEnabled
+        self.hasFirebaseAccess = hasFirebaseAccess
         self.soundcloudLoginEnabled = soundcloudLoginEnabled
         _playerIsPlaying = playerIsPlaying
         _playerProgress = playerProgress
@@ -109,7 +112,7 @@ struct HomePage: View {
                                     )
                                 }
 
-                                if soundcloudLoginEnabled && !songs.contains(where: { $0.streamingSource == .soundcloud }) && songs.allSatisfy({ $0.streamingSource != .local }) {
+                                if soundcloudLoginEnabled && !hasFirebaseAccess && !songs.contains(where: { $0.streamingSource == .soundcloud }) && songs.allSatisfy({ $0.streamingSource != .local }) {
                                     ConnectSoundCloudRow(onTap: onConnectSoundCloud)
                                 }
 

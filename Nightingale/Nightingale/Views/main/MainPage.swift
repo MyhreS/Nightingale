@@ -69,6 +69,7 @@ struct MainPage: View {
                         availableGroups: vm.availableGroups,
                         isLoadingSongs: vm.isLoadingSongs,
                         addLocalMusicEnabled: firebaseAPI.addLocalMusicEnabled,
+                        hasFirebaseAccess: vm.hasFirebaseAccess,
                         soundcloudLoginEnabled: firebaseAPI.soundcloudLoginEnabled,
                         playerIsPlaying: $playerIsPlaying,
                         playerProgress: $playerProgress,
