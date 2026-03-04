@@ -25,6 +25,10 @@ struct HomePage: View {
     let soundcloudLoginEnabled: Bool
     let onConnectSoundCloud: () -> Void
 
+    private var hasSoundCloudSongs: Bool {
+        songs.contains(where: { $0.streamingSource == .soundcloud })
+    }
+
     var hasGoalGroup: Bool {
         availableGroups.contains { $0.lowercased() == "goal" }
     }
@@ -73,17 +77,17 @@ struct HomePage: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             PageLayout(title: "Music", trailing: {
-                if songs.contains(where: { $0.streamingSource == .soundcloud }) {
-                    HStack(spacing: 4) {
-                        Text("powered by ")
-                            .foregroundStyle(Color(white: 0.4))
-                        + Text("SoundCloud")
-                            .foregroundStyle(Color(red: 1.0, green: 0.33, blue: 0.0))
-                        Image(systemName: "cloud.fill")
-                            .foregroundStyle(Color(red: 1.0, green: 0.33, blue: 0.0))
-                    }
-                    .font(.system(size: 11, weight: .medium))
+                HStack(spacing: 4) {
+                    Text("powered by ")
+                        .foregroundStyle(Color(white: 0.4))
+                    + Text("SoundCloud")
+                        .foregroundStyle(Color(red: 1.0, green: 0.33, blue: 0.0))
+                    Image(systemName: "cloud.fill")
+                        .foregroundStyle(Color(red: 1.0, green: 0.33, blue: 0.0))
                 }
+                .font(.system(size: 11, weight: .medium))
+                .opacity(hasSoundCloudSongs ? 1 : 0)
+                .accessibilityHidden(!hasSoundCloudSongs)
             }) {
                 VStack(spacing: 16) {
                     SongGroupSelector(groups: availableGroups, selectedGroup: $selectedGroup, isLoading: isLoadingSongs)
@@ -115,7 +119,7 @@ struct HomePage: View {
                             }
                         }
                         .padding(.vertical, 6)
-                        .padding(.bottom, 160)
+                        .padding(.bottom, 20)
                     }
                 }
             }
@@ -142,7 +146,7 @@ struct HomePage: View {
             if hasGoalGroup && !isLoadingSongs {
                 GoalButton(action: { playGoalSong() })
                     .padding(.trailing, 20)
-                    .padding(.bottom, 100)
+                    .padding(.bottom, 20)
                     .zIndex(900)
             }
         }
@@ -272,9 +276,19 @@ struct HomePage: View {
     }
 
     func syncPlayerState() {
-        playerIsPlaying = player.isPlaying
-        playerProgress = player.progressFraction
-        playerHasSong = player.currentSong != nil
+        let isPlaying = player.isPlaying
+        let hasSong = player.currentSong != nil
+        let progress = player.progressFraction
+
+        if playerIsPlaying != isPlaying {
+            playerIsPlaying = isPlaying
+        }
+        if playerHasSong != hasSong {
+            playerHasSong = hasSong
+        }
+        if abs(playerProgress - progress) >= 0.02 || progress == 0 || progress == 1 {
+            playerProgress = progress
+        }
     }
 
     func handleSongFinished(_ song: Song) {

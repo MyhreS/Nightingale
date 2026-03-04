@@ -19,7 +19,7 @@ struct PageLayout<Content: View, Trailing: View>: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .lastTextBaseline) {
+            HStack(alignment: .center) {
                 Text(title)
                     .font(.title2)
                     .fontWeight(.semibold)
@@ -30,6 +30,7 @@ struct PageLayout<Content: View, Trailing: View>: View {
                     trailing
                 }
             }
+            .frame(minHeight: 32)
             
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)

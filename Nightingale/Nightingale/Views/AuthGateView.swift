@@ -5,12 +5,10 @@ struct AuthGateView: View {
     let sc: SoundCloud
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.black
-                    .ignoresSafeArea()
-                MainPage(sc: sc)
-            }
+        ZStack {
+            Color.black
+                .ignoresSafeArea()
+            MainPage(sc: sc)
         }
     }
 }

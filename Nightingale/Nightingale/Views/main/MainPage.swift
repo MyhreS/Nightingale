@@ -17,12 +17,11 @@ struct MainPage: View {
     @State private var togglePlayPauseTrigger = false
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            tabContent
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            footer
-        }
+        tabContent
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                footer
+            }
         .task {
             await firebaseAPI.fetchFeatureFlags()
             await tryRefreshSCAuth()
@@ -56,7 +55,6 @@ struct MainPage: View {
                 disconnectSoundCloud()
             }
         }
-        .ignoresSafeArea(edges: .bottom)
     }
 
     private var tabContent: some View {
@@ -132,7 +130,7 @@ struct MainPage: View {
         }
         .padding(.horizontal, 32)
         .padding(.top, 12)
-        .padding(.bottom, 20)
+        .padding(.bottom, 12)
         .frame(maxWidth: .infinity)
         .background(Color(white: 0.08))
         .overlay(
