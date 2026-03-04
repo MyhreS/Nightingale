@@ -65,3 +65,4 @@ Nightingale/Nightingale/FirebaseConfig.swift
 
 Secrets.xcconfig
 *.xcconfig
+Nightingale/Secrets.xcconfig
