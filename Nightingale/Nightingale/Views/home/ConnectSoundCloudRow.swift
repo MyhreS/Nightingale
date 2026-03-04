@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ConnectSoundCloudRow: View {
+    let isOnline: Bool
     let onTap: () -> Void
 
     private let scOrange = Color(red: 1.0, green: 0.33, blue: 0.0)
@@ -18,12 +19,18 @@ struct ConnectSoundCloudRow: View {
 
                 Spacer()
 
-                Text("Get ready-to-play songs")
+                Text(isOnline ? "Get ready-to-play songs" : "Internet required")
                     .font(.system(size: 13))
                     .foregroundStyle(Color(white: 0.5))
             }
 
             SoundCloudInfoDropdown()
+
+            if !isOnline {
+                Text("Connect requires internet access.")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color(white: 0.6))
+            }
 
             HapticButton(action: onTap) {
                 HStack(spacing: 8) {
@@ -43,6 +50,7 @@ struct ConnectSoundCloudRow: View {
                 )
             }
             .buttonStyle(.plain)
+            .disabled(!isOnline)
         }
         .padding(16)
         .background(Color(white: 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))

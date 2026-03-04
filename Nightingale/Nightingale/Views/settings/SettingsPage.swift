@@ -9,6 +9,7 @@ struct SettingsPage: View {
     let onDisconnectSoundCloud: () -> Void
 
     @EnvironmentObject var firebaseAPI: FirebaseAPI
+    @EnvironmentObject var connectivity: Connectivity
     @AppStorage("userEmail") private var email = ""
     @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
     @State private var isEditingEmail = false
@@ -132,7 +133,7 @@ struct SettingsPage: View {
 
                     Spacer()
 
-                    Text("Add")
+                    Text(connectivity.isOnline ? "Add" : "Requires internet")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Color(white: 0.5))
                         .padding(.horizontal, 12)
@@ -148,6 +149,7 @@ struct SettingsPage: View {
                 )
             }
             .buttonStyle(.plain)
+            .disabled(!connectivity.isOnline)
         } else {
             let verified = hasFirebaseAccess
             let accentColor = verified ? Color(red: 0.3, green: 0.7, blue: 0.4) : Color(white: 0.5)
@@ -167,7 +169,7 @@ struct SettingsPage: View {
                     Spacer()
 
                     HapticButton(action: beginEditingEmail) {
-                        Text("Change")
+                        Text(connectivity.isOnline ? "Change" : "Requires internet")
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(Color(white: 0.5))
                             .padding(.horizontal, 12)
@@ -175,6 +177,7 @@ struct SettingsPage: View {
                             .background(Color(white: 0.15), in: Capsule())
                     }
                     .buttonStyle(.plain)
+                    .disabled(!connectivity.isOnline)
 
                     HapticButton(action: clearEmail) {
                         Image(systemName: "xmark.circle.fill")
@@ -262,6 +265,12 @@ struct SettingsPage: View {
                         .foregroundStyle(.white)
                 }
 
+                if !connectivity.isOnline {
+                    Text("Disconnected. Internet is required to load SoundCloud songs.")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color(white: 0.6))
+                }
+
                 HapticButton(action: onDisconnectSoundCloud) {
                     HStack(spacing: 8) {
                         Image(systemName: "xmark.circle")
@@ -283,6 +292,12 @@ struct SettingsPage: View {
             } else {
                 SoundCloudInfoDropdown()
 
+                if !connectivity.isOnline {
+                    Text("Internet is required to connect SoundCloud.")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color(white: 0.6))
+                }
+
                 HapticButton(action: onConnectSoundCloud) {
                     HStack(spacing: 8) {
                         Image(systemName: "link.badge.plus")
@@ -301,6 +316,7 @@ struct SettingsPage: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .disabled(!connectivity.isOnline)
             }
         }
         .padding(16)
@@ -313,12 +329,16 @@ struct SettingsPage: View {
     }
 
     private func beginEditingEmail() {
+        guard connectivity.isOnline else { return }
         emailDraft = email
         isEditingEmail = true
     }
 
     private func saveEmail() {
         let trimmed = emailDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !connectivity.isOnline && !trimmed.isEmpty {
+            return
+        }
         email = trimmed
         isEditingEmail = false
     }

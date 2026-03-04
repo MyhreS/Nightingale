@@ -6,6 +6,7 @@ struct MainPage: View {
 
     let sc: SoundCloud
     @EnvironmentObject var firebaseAPI: FirebaseAPI
+    @EnvironmentObject var connectivity: Connectivity
     @AppStorage("userEmail") private var email = ""
 
     @StateObject private var vm = MainViewModel()
@@ -70,6 +71,7 @@ struct MainPage: View {
                         isLoadingSongs: vm.isLoadingSongs,
                         addLocalMusicEnabled: firebaseAPI.addLocalMusicEnabled,
                         hasFirebaseAccess: vm.hasFirebaseAccess,
+                        isSoundCloudConnected: scUser != nil,
                         soundcloudLoginEnabled: firebaseAPI.soundcloudLoginEnabled,
                         playerIsPlaying: $playerIsPlaying,
                         playerProgress: $playerProgress,
@@ -151,6 +153,7 @@ struct MainPage: View {
     }
 
     private func connectSoundCloud() {
+        guard connectivity.isOnline else { return }
         Task {
             do {
                 try await sc.authenticate()

@@ -6,14 +6,7 @@ struct RootGateView: View {
     @StateObject private var connectivity = Connectivity()
     
     var body: some View {
-        Group {
-            if connectivity.isOnline {
-                AuthGateView(sc: sc)
-            } else {
-                NoInternetView()
-            }
-        }
-        .environmentObject(connectivity)
+        AuthGateView(sc: sc)
+            .environmentObject(connectivity)
     }
 }
-

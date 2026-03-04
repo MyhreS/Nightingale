@@ -15,6 +15,7 @@ struct HomePage: View {
     @Binding var playerHasSong: Bool
     @Binding var togglePlayPauseTrigger: Bool
     @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
+    @EnvironmentObject private var connectivity: Connectivity
     let songs: [Song]
     let availableGroups: [SongGroup]
     let isLoadingSongs: Bool
@@ -23,6 +24,7 @@ struct HomePage: View {
     let onUpdateStartTime: (Song, Int) -> Void
     let onEditSong: (Song, String, String) -> Void
     let hasFirebaseAccess: Bool
+    let isSoundCloudConnected: Bool
     let soundcloudLoginEnabled: Bool
     let onConnectSoundCloud: () -> Void
 
@@ -38,6 +40,16 @@ struct HomePage: View {
         songs.filter { $0.group == selectedGroup }
     }
 
+    private var visibleSongs: [Song] {
+        filteredSongs.filter { song in
+            connectivity.isOnline || song.streamingSource != .soundcloud
+        }
+    }
+
+    private var hasHiddenSoundCloudSongsOffline: Bool {
+        !connectivity.isOnline && filteredSongs.contains { $0.streamingSource == .soundcloud }
+    }
+
     let addLocalMusicEnabled: Bool
 
     init(
@@ -48,6 +60,7 @@ struct HomePage: View {
         isLoadingSongs: Bool,
         addLocalMusicEnabled: Bool,
         hasFirebaseAccess: Bool,
+        isSoundCloudConnected: Bool,
         soundcloudLoginEnabled: Bool,
         playerIsPlaying: Binding<Bool>,
         playerProgress: Binding<Double>,
@@ -65,6 +78,7 @@ struct HomePage: View {
         self.isLoadingSongs = isLoadingSongs
         self.addLocalMusicEnabled = addLocalMusicEnabled
         self.hasFirebaseAccess = hasFirebaseAccess
+        self.isSoundCloudConnected = isSoundCloudConnected
         self.soundcloudLoginEnabled = soundcloudLoginEnabled
         _playerIsPlaying = playerIsPlaying
         _playerProgress = playerProgress
@@ -95,6 +109,14 @@ struct HomePage: View {
                 VStack(spacing: 16) {
                     SongGroupSelector(groups: availableGroups, selectedGroup: $selectedGroup, isLoading: isLoadingSongs)
 
+                    if hasHiddenSoundCloudSongsOffline && isSoundCloudConnected {
+                        offlineInfoCard(
+                            icon: "wifi.slash",
+                            title: "SoundCloud disconnected",
+                            message: "Internet is required to load SoundCloud songs."
+                        )
+                    }
+
                     ScrollView {
                         LazyVStack(spacing: 10) {
                             if isLoadingSongs {
@@ -102,18 +124,35 @@ struct HomePage: View {
                                     SongRowSkeleton()
                                 }
                             } else {
-                                ForEach(filteredSongs) { song in
+                                ForEach(visibleSongs) { song in
+                                    let requiresInternet = requiresInternetForPlayback(song)
                                     SongRow(
                                         song: song,
                                         isSelected: isSongSelected(song),
                                         isPlayed: isSongRecentlyPlayed(song),
-                                        onTap: { handleSongTap(song) },
+                                        isDisabled: requiresInternet,
+                                        statusLabel: requiresInternet ? "Internet required" : nil,
+                                        onTap: {
+                                            guard !requiresInternet else { return }
+                                            handleSongTap(song)
+                                        },
                                         onLongPress: { selectedPreviewSong = song }
                                     )
                                 }
 
+                                if !connectivity.isOnline && visibleSongs.isEmpty {
+                                    offlineInfoCard(
+                                        icon: "wifi.slash",
+                                        title: "Internet required",
+                                        message: "No offline songs found."
+                                    )
+                                }
+
                                 if soundcloudLoginEnabled && !hasFirebaseAccess && !songs.contains(where: { $0.streamingSource == .soundcloud }) && songs.allSatisfy({ $0.streamingSource != .local }) {
-                                    ConnectSoundCloudRow(onTap: onConnectSoundCloud)
+                                    ConnectSoundCloudRow(
+                                        isOnline: connectivity.isOnline,
+                                        onTap: onConnectSoundCloud
+                                    )
                                 }
 
                                 if addLocalMusicEnabled {
@@ -198,6 +237,42 @@ struct HomePage: View {
         .onDisappear {
             player.onSongFinished = nil
         }
+    }
+
+    private func requiresInternetForPlayback(_ song: Song) -> Bool {
+        guard !connectivity.isOnline else { return false }
+        switch song.streamingSource {
+        case .local:
+            return false
+        case .soundcloud:
+            return true
+        case .firebase:
+            return !MP3Cache.shared.hasCachedSong(song)
+        }
+    }
+
+    private func offlineInfoCard(icon: String, title: String, message: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(Color(white: 0.7))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                Text(message)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color(white: 0.6))
+            }
+            Spacer()
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity)
+        .background(Color(white: 0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(Color(white: 0.18), lineWidth: 1)
+        )
     }
 
     func playGoalSong() {

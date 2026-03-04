@@ -1,11 +1,15 @@
 import Foundation
 
 private let defaultGroups: [SongGroup] = [
-    "faceoff", "penalty", "goal", "crowd", "intro"
+    "intro", "faceoff", "penalty", "goal", "crowd"
 ]
 
 private let firebaseGroups: [SongGroup] = [
-    "warmup", "faceoff", "break", "goal", "penalty", "crowd", "intro", "victory"
+    "warmup", "intro", "faceoff", "penalty", "goal", "crowd", "break", "victory"
+]
+
+private let preferredGroupOrder: [SongGroup] = [
+    "warmup", "intro", "faceoff", "penalty", "goal", "crowd", "break", "victory"
 ]
 
 @MainActor
@@ -15,6 +19,7 @@ final class MainViewModel: ObservableObject {
     @Published var isLoadingSongs = true
     @Published var errorWhenLoadingSongs = false
     @Published var hasFirebaseAccess = false
+    private let remoteSongsCacheKey = "cachedRemoteSongs.v1"
 
     func loadSongs(firebaseAPI: FirebaseAPI, email: String, scAuthenticated: Bool) async {
         isLoadingSongs = true
@@ -43,15 +48,29 @@ final class MainViewModel: ObservableObject {
                 }
             }
 
+            cacheRemoteSongs(serverSongs)
             invalidateStaleArtwork(songs: serverSongs)
             songs = deduplicateById(serverSongs + localSongs)
-            availableGroups = emailIsAllowed ? firebaseGroups : defaultGroups
+            availableGroups = mergedGroups(
+                base: emailIsAllowed ? firebaseGroups : defaultGroups,
+                songs: songs
+            )
         } catch {
             let localSongs = LocalSongStore.shared.allSongs()
-            if !localSongs.isEmpty {
-                songs = localSongs
+            let cachedRemote = cachedRemoteSongs()
+            let merged = deduplicateById(cachedRemote + localSongs)
+
+            if !merged.isEmpty {
+                songs = merged
+                let hasCachedFirebase = merged.contains { $0.streamingSource == .firebase }
+                hasFirebaseAccess = !email.isEmpty && hasCachedFirebase
+                availableGroups = mergedGroups(
+                    base: hasFirebaseAccess ? firebaseGroups : defaultGroups,
+                    songs: merged
+                )
             } else {
                 errorWhenLoadingSongs = true
+                hasFirebaseAccess = false
             }
             print("Failed to fetch songs: \(error)")
         }
@@ -115,6 +134,43 @@ final class MainViewModel: ObservableObject {
                 await MP3Cache.shared.removeSongsNotInList(songs: firebaseSongs)
                 await MP3Cache.shared.preloadSongs(songs: firebaseSongs)
             }
+        }
+    }
+
+    private func cacheRemoteSongs(_ songs: [Song]) {
+        guard let data = try? JSONEncoder().encode(songs) else { return }
+        UserDefaults.standard.set(data, forKey: remoteSongsCacheKey)
+    }
+
+    private func cachedRemoteSongs() -> [Song] {
+        guard let data = UserDefaults.standard.data(forKey: remoteSongsCacheKey),
+              let decoded = try? JSONDecoder().decode([Song].self, from: data) else {
+            return []
+        }
+        return decoded
+    }
+
+    private func mergedGroups(base: [SongGroup], songs: [Song]) -> [SongGroup] {
+        var groups = base
+        for group in songs.uniqueGroups where !groups.contains(group) {
+            groups.append(group)
+        }
+        return sortGroups(groups)
+    }
+
+    private func sortGroups(_ groups: [SongGroup]) -> [SongGroup] {
+        let rank = Dictionary(uniqueKeysWithValues: preferredGroupOrder.enumerated().map { ($1, $0) })
+        return Array(Set(groups)).sorted { lhs, rhs in
+            let lhsKey = lhs.lowercased() == "facoff" ? "faceoff" : lhs.lowercased()
+            let rhsKey = rhs.lowercased() == "facoff" ? "faceoff" : rhs.lowercased()
+
+            let lhsRank = rank[lhsKey] ?? Int.max
+            let rhsRank = rank[rhsKey] ?? Int.max
+
+            if lhsRank != rhsRank {
+                return lhsRank < rhsRank
+            }
+            return lhs.localizedCaseInsensitiveCompare(rhs) == .orderedAscending
         }
     }
 }

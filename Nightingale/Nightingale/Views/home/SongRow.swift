@@ -4,6 +4,8 @@ struct SongRow: View {
     let song: Song
     let isSelected: Bool
     let isPlayed: Bool
+    let isDisabled: Bool
+    let statusLabel: String?
     let onTap: () -> Void
     let onLongPress: () -> Void
 
@@ -38,7 +40,11 @@ struct SongRow: View {
             
             Spacer(minLength: 12)
             
-            if isPlayed && !isSelected {
+            if let statusLabel {
+                Text(statusLabel)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color(white: 0.55))
+            } else if isPlayed && !isSelected {
                 Text("Played")
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)
@@ -61,11 +67,14 @@ struct SongRow: View {
                 )
         )
         .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+        .opacity(isDisabled ? 0.7 : 1.0)
         .contentShape(Rectangle())
         .onTapGesture {
+            guard !isDisabled else { return }
             onTap()
         }
         .onLongPressGesture {
+            guard !isDisabled else { return }
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             onLongPress()
         }
