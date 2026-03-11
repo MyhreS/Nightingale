@@ -15,6 +15,7 @@ struct MainPage: View {
     @State private var playerIsPlaying = false
     @State private var playerProgress: Double = 0
     @State private var playerHasSong = false
+    @State private var playerIsLoading = false
     @State private var togglePlayPauseTrigger = false
 
     var body: some View {
@@ -76,6 +77,7 @@ struct MainPage: View {
                         playerIsPlaying: $playerIsPlaying,
                         playerProgress: $playerProgress,
                         playerHasSong: $playerHasSong,
+                        playerIsLoading: $playerIsLoading,
                         togglePlayPauseTrigger: $togglePlayPauseTrigger,
                         onAddLocalSong: { url, group in
                             Task { await vm.addLocalSong(from: url, group: group) }
@@ -120,6 +122,7 @@ struct MainPage: View {
                 MiniPlayerButton(
                     isPlaying: playerIsPlaying,
                     progress: playerProgress,
+                    isLoading: playerIsLoading,
                     isEnabled: playerHasSong,
                     action: { togglePlayPauseTrigger = true }
                 )
@@ -135,6 +138,7 @@ struct MainPage: View {
         .padding(.top, 12)
         .padding(.bottom, 12)
         .frame(maxWidth: .infinity)
+        .frame(height: 82)
         .background(Color(white: 0.08))
         .overlay(
             Rectangle()
@@ -142,6 +146,7 @@ struct MainPage: View {
                 .foregroundStyle(Color(white: 0.2)),
             alignment: .top
         )
+        .ignoresSafeArea(edges: .bottom)
     }
 
     private func tryRefreshSCAuth() async {

@@ -4,11 +4,14 @@ import SwiftUI
 struct MiniPlayerButton: View {
     let isPlaying: Bool
     let progress: Double
+    let isLoading: Bool
     let isEnabled: Bool
     let action: () -> Void
     
     private var clampedProgress: Double {
-        min(max(progress, 0), 1)
+        let safeProgress = min(max(progress, 0), 1)
+        if !isEnabled { return 0 }
+        return safeProgress
     }
 
     var body: some View {
@@ -28,7 +31,7 @@ struct MiniPlayerButton: View {
                         Color.white.opacity(isEnabled ? 1 : 0.3),
                         style: StrokeStyle(lineWidth: 3, lineCap: .round)
                     )
-                    .frame(width: 58, height: 58)
+                    .frame(width: 54, height: 54)
                     .rotationEffect(.degrees(-90))
                 
                 Image(systemName: isPlaying ? "pause.fill" : "play.fill")
@@ -36,6 +39,7 @@ struct MiniPlayerButton: View {
                     .foregroundStyle(.white.opacity(isEnabled ? 1 : 0.3))
             }
             .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 2)
+            .frame(width: 58, height: 58)
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)

@@ -13,6 +13,7 @@ struct HomePage: View {
     @Binding var playerIsPlaying: Bool
     @Binding var playerProgress: Double
     @Binding var playerHasSong: Bool
+    @Binding var playerIsLoading: Bool
     @Binding var togglePlayPauseTrigger: Bool
     @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
     @EnvironmentObject private var connectivity: Connectivity
@@ -65,6 +66,7 @@ struct HomePage: View {
         playerIsPlaying: Binding<Bool>,
         playerProgress: Binding<Double>,
         playerHasSong: Binding<Bool>,
+        playerIsLoading: Binding<Bool>,
         togglePlayPauseTrigger: Binding<Bool>,
         onAddLocalSong: @escaping (URL, SongGroup) -> Void,
         onDeleteSong: @escaping (Song) -> Void,
@@ -83,6 +85,7 @@ struct HomePage: View {
         _playerIsPlaying = playerIsPlaying
         _playerProgress = playerProgress
         _playerHasSong = playerHasSong
+        _playerIsLoading = playerIsLoading
         _togglePlayPauseTrigger = togglePlayPauseTrigger
         self.onAddLocalSong = onAddLocalSong
         self.onDeleteSong = onDeleteSong
@@ -161,7 +164,7 @@ struct HomePage: View {
                             }
                         }
                         .padding(.vertical, 6)
-                        .padding(.bottom, 20)
+                        .padding(.bottom, 0)
                     }
                 }
             }
@@ -227,6 +230,7 @@ struct HomePage: View {
         }
         .onChange(of: player.isPlaying) { _, _ in syncPlayerState() }
         .onChange(of: player.progressFraction) { _, _ in syncPlayerState() }
+        .onChange(of: player.isLoading) { _, isLoading in playerIsLoading = isLoading }
         .onChange(of: player.currentSong) { _, _ in syncPlayerState() }
         .onChange(of: togglePlayPauseTrigger) { _, triggered in
             if triggered {
@@ -364,9 +368,7 @@ struct HomePage: View {
         if playerHasSong != hasSong {
             playerHasSong = hasSong
         }
-        if abs(playerProgress - progress) >= 0.02 || progress == 0 || progress == 1 {
-            playerProgress = progress
-        }
+        playerProgress = progress
     }
 
     func handleSongFinished(_ song: Song) {

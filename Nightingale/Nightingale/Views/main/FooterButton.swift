@@ -14,7 +14,7 @@ struct FooterButton: View {
                 Text(title)
                     .font(.system(size: 11, weight: .medium))
             }
-            .frame(maxWidth: .infinity, minHeight: 44)
+            .frame(maxWidth: .infinity, minHeight: 58)
             .foregroundStyle(isSelected ? .white : Color(white: 0.5))
             .opacity(isSelected ? 1.0 : 0.8)
         }

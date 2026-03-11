@@ -13,6 +13,7 @@ struct StreamDetails {
 @MainActor
 final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
     @Published var isPlaying = false
+    @Published var isLoading = false
     @Published var progressSeconds: Double = 0
     @Published var durationSeconds: Double = 0
     @Published var currentSong: Song?
@@ -20,6 +21,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
     var onSongFinished: ((Song) -> Void)?
     private var progressCancellable: AnyCancellable?
     private var currentEntryId: String?
+    private let progressUpdateInterval: TimeInterval = 0.1
 
     private let player = AudioPlayer()
     private var localPlayer: AVAudioPlayer?
@@ -109,6 +111,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
 
     func play(song: Song) {
         playTask?.cancel()
+        isLoading = true
         stopLocalPlayer()
         player.stop()
         currentEntryId = nil
@@ -124,6 +127,12 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             return
         }
 
+        if song.streamingSource == .firebase && hasCachedFirebaseAsset(song) {
+            if playCachedFirebaseFile(song) {
+                return
+            }
+        }
+
         playTask = Task { [weak self] in
             guard let self else { return }
 
@@ -134,16 +143,19 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
 
                 guard details.url.pathExtension.lowercased() != "m3u8" else {
                     print("HLS (.m3u8) not supported by AudioStreaming. Use AVPlayer for this.")
+                    self.isLoading = false
                     return
                 }
 
                 configureAudioSessionIfNeeded()
                 player.play(url: details.url, headers: details.headers)
                 isPlaying = true
+                self.isLoading = false
                 startProgressUpdates()
                 updateNowPlayingInfo()
             } catch {
                 if Task.isCancelled { return }
+                self.isLoading = false
                 print("Failed to play:", error)
             }
         }
@@ -166,10 +178,50 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             durationSeconds = localPlayer?.duration ?? 0
             pendingStartTime = nil
             isPlaying = true
+            isLoading = false
             startProgressUpdates()
             updateNowPlayingInfo()
         } catch {
+            isLoading = false
             print("Failed to play local file:", error)
+        }
+    }
+
+    private func hasCachedFirebaseAsset(_ song: Song) -> Bool {
+        guard song.streamingSource == .firebase else { return false }
+        let cachedURL = MP3Cache.shared.cachedURL(for: song)
+        return MP3Cache.shared.hasCachedSong(song) || FileManager.default.fileExists(atPath: cachedURL.path)
+    }
+
+    private func playCachedFirebaseFile(_ song: Song) -> Bool {
+        let fileURL = MP3Cache.shared.cachedURL(for: song)
+        return playLocalFileURL(fileURL, source: song.streamingSource == .firebase ? "cached firebase file" : "local file")
+    }
+
+    @discardableResult
+    private func playLocalFileURL(_ fileURL: URL, source: String) -> Bool {
+        do {
+            configureAudioSessionIfNeeded()
+            localPlayer = try AVAudioPlayer(contentsOf: fileURL)
+            localPlayer?.delegate = self
+            localPlayer?.prepareToPlay()
+
+            if effectiveStartTime > 0 {
+                localPlayer?.currentTime = effectiveStartTime
+            }
+
+            localPlayer?.play()
+            durationSeconds = localPlayer?.duration ?? 0
+            pendingStartTime = nil
+            isLoading = false
+            isPlaying = true
+            startProgressUpdates()
+            updateNowPlayingInfo()
+            return true
+        } catch {
+            isLoading = false
+            print("Failed to play \(source):", error)
+            return false
         }
     }
 
@@ -213,6 +265,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
                 player.pause()
             }
             isPlaying = false
+            isLoading = false
             stopProgressUpdates()
         } else {
             if localPlayer != nil {
@@ -221,6 +274,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
                 player.resume()
             }
             isPlaying = true
+            isLoading = false
             startProgressUpdates()
         }
         updateNowPlayingInfo()
@@ -231,6 +285,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
         stopLocalPlayer()
         player.stop()
         isPlaying = false
+        isLoading = false
         stopProgressUpdates()
         progressSeconds = 0
         durationSeconds = 0
@@ -256,7 +311,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
     private func startProgressUpdates() {
         if progressCancellable != nil {return}
         
-        progressCancellable = Timer.publish(every: 0.25, on: .main, in: .common)
+        progressCancellable = Timer.publish(every: progressUpdateInterval, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
                 self?.refreshProgress()
@@ -285,6 +340,7 @@ extension MusicPlayer: AudioPlayerDelegate {
     nonisolated func audioPlayerDidStartPlaying(player: AudioPlayer, with entryId: AudioEntryId) {
         Task { @MainActor [weak self] in
             guard let self else { return }
+            isLoading = false
             currentEntryId = entryId.id
             guard let t = pendingStartTime else { return }
             pendingStartTime = nil
@@ -309,12 +365,14 @@ extension MusicPlayer: AudioPlayerDelegate {
             let minPlaybackDuration: Double = 10.0
             guard progress >= minPlaybackDuration else {
                 isPlaying = false
+                isLoading = false
                 stopProgressUpdates()
                 return
             }
 
             refreshProgress()
             isPlaying = false
+            isLoading = false
             stopProgressUpdates()
 
             guard let finishedSong = currentSong else { return }
@@ -326,9 +384,19 @@ extension MusicPlayer: AudioPlayerDelegate {
 
     nonisolated func audioPlayerDidReadMetadata(player: AudioPlayer, metadata: [String : String]) {}
 
-    nonisolated func audioPlayerDidCancel(player: AudioPlayer, queuedItems: [AudioEntryId]) {}
+    nonisolated func audioPlayerDidCancel(player: AudioPlayer, queuedItems: [AudioEntryId]) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            isLoading = false
+        }
+    }
 
-    nonisolated func audioPlayerUnexpectedError(player: AudioPlayer, error: AudioPlayerError) {}
+    nonisolated func audioPlayerUnexpectedError(player: AudioPlayer, error: AudioPlayerError) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            isLoading = false
+        }
+    }
 }
 
 extension MusicPlayer: AVAudioPlayerDelegate {
@@ -337,6 +405,7 @@ extension MusicPlayer: AVAudioPlayerDelegate {
             guard let self else { return }
             guard flag else { return }
             isPlaying = false
+            isLoading = false
             stopProgressUpdates()
             guard let finishedSong = currentSong else { return }
             onSongFinished?(finishedSong)
