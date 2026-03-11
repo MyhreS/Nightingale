@@ -8,7 +8,7 @@ struct MiniPlayerButton: View {
     let isErrorVisible: Bool
     let errorMessage: String?
     let action: () -> Void
-    @State private var glowPhaseIndex = 0
+    @State private var iconGlowPhase = false
     
     private var hasError: Bool {
         isErrorVisible && !(errorMessage ?? "").isEmpty
@@ -19,34 +19,13 @@ struct MiniPlayerButton: View {
     }
 
     private let activeGlowColor = Color(red: 0.35, green: 0.75, blue: 0.45)
-    private let warmGlowColor = Color(red: 1.0, green: 0.82, blue: 0.60)
-    private let coolGlowColor = Color(red: 0.72, green: 0.86, blue: 1.0)
-    private let subtleGlowColor = Color(red: 0.70, green: 0.92, blue: 0.70)
 
     private var iconColor: Color {
-        switch glowPhaseIndex {
-        case 1:
-            return warmGlowColor
-        case 2:
-            return coolGlowColor
-        case 3:
-            return subtleGlowColor
-        default:
-            return .white.opacity(0.78)
-        }
+        activeGlowColor.opacity(iconGlowPhase ? 1 : 0.88)
     }
 
     private var iconShadowColor: Color {
-        switch glowPhaseIndex {
-        case 1:
-            return Color.orange.opacity(0.09)
-        case 2:
-            return Color.blue.opacity(0.10)
-        case 3:
-            return activeGlowColor.opacity(0.12)
-        default:
-            return .white.opacity(0.04)
-        }
+        activeGlowColor.opacity(iconGlowPhase ? 0.28 : 0.16)
     }
 
     var body: some View {
@@ -61,8 +40,8 @@ struct MiniPlayerButton: View {
                         Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                             .font(.system(size: 28, weight: .semibold))
                             .foregroundStyle(iconColor)
-                            .shadow(color: iconShadowColor, radius: 6, x: 0, y: 0)
-                            .animation(.easeInOut(duration: 0.9), value: glowPhaseIndex)
+                            .shadow(color: iconShadowColor, radius: 9, x: 0, y: 0)
+                            .animation(.easeInOut(duration: 1.1).repeatForever(autoreverses: true), value: iconGlowPhase)
                     }
                 }
 
@@ -78,18 +57,7 @@ struct MiniPlayerButton: View {
         }
         .buttonStyle(.plain)
         .onAppear {
-            startGlowCycle()
-        }
-    }
-
-    private func startGlowCycle() {
-        guard glowPhaseIndex == 0 else { return }
-
-        Task { @MainActor in
-            while true {
-                try? await Task.sleep(nanoseconds: 900_000_000)
-                glowPhaseIndex = (glowPhaseIndex + 1) % 4
-            }
+            iconGlowPhase = true
         }
     }
 }

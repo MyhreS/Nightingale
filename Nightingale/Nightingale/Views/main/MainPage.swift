@@ -30,7 +30,7 @@ struct MainPage: View {
     var body: some View {
         tabContent
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .safeAreaInset(edge: .bottom, spacing: 0) {
+            .overlay(alignment: .bottom) {
                 footer
             }
         .task {
@@ -163,6 +163,11 @@ struct MainPage: View {
                     isSelected: selectedTab == .settings,
                     isEnabled: true
                 ) { selectedTab = .settings }
+
+                Rectangle()
+                    .fill(Color.white.opacity(0.14))
+                    .frame(width: 1, height: 34)
+                    .padding(.horizontal, 4)
 
                 FooterButton(
                     title: "Goal!",

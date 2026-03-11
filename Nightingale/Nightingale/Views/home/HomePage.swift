@@ -187,6 +187,9 @@ struct HomePage: View {
                                         AddSongRow(onTap: { showFilePicker = true })
                                     }
                                 }
+
+                                Color.clear
+                                    .frame(height: 96)
                             }
                             .onAppear {
                                 scrollToPendingSong(with: proxy)
