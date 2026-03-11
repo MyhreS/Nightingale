@@ -14,6 +14,7 @@ struct HomePage: View {
     @Binding var playerProgress: Double
     @Binding var playerHasSong: Bool
     @Binding var playerIsLoading: Bool
+    @Binding var playerErrorMessage: String?
     @Binding var togglePlayPauseTrigger: Bool
     @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
     @EnvironmentObject private var connectivity: Connectivity
@@ -67,6 +68,7 @@ struct HomePage: View {
         playerProgress: Binding<Double>,
         playerHasSong: Binding<Bool>,
         playerIsLoading: Binding<Bool>,
+        playerErrorMessage: Binding<String?>,
         togglePlayPauseTrigger: Binding<Bool>,
         onAddLocalSong: @escaping (URL, SongGroup) -> Void,
         onDeleteSong: @escaping (Song) -> Void,
@@ -86,6 +88,7 @@ struct HomePage: View {
         _playerProgress = playerProgress
         _playerHasSong = playerHasSong
         _playerIsLoading = playerIsLoading
+        _playerErrorMessage = playerErrorMessage
         _togglePlayPauseTrigger = togglePlayPauseTrigger
         self.onAddLocalSong = onAddLocalSong
         self.onDeleteSong = onDeleteSong
@@ -129,6 +132,7 @@ struct HomePage: View {
                             } else {
                                 ForEach(visibleSongs) { song in
                                     let requiresInternet = requiresInternetForPlayback(song)
+                                    let isSongPlaying = player.currentSong == song && player.isPlaying
                                     SongRow(
                                         song: song,
                                         isSelected: isSongSelected(song),
@@ -136,6 +140,7 @@ struct HomePage: View {
                                         isDisabled: requiresInternet,
                                         statusLabel: requiresInternet ? "Internet required" : nil,
                                         overlayLabel: requiresInternet && song.streamingSource == .firebase ? "No internet connection" : nil,
+                                        isPlaying: isSongPlaying,
                                         onTap: {
                                             guard !requiresInternet else { return }
                                             handleSongTap(song)
@@ -217,6 +222,9 @@ struct HomePage: View {
             player.onSongFinished = { finished in
                 finishedSong = finished
             }
+            player.onPlaybackError = { message in
+                playerErrorMessage = message
+            }
             syncPlayerState()
         }
         .onChange(of: finishedSong) { _, song in
@@ -233,6 +241,9 @@ struct HomePage: View {
         .onChange(of: player.progressFraction) { _, _ in syncPlayerState() }
         .onChange(of: player.isLoading) { _, isLoading in playerIsLoading = isLoading }
         .onChange(of: player.currentSong) { _, _ in syncPlayerState() }
+        .onChange(of: player.playbackError) { _, errorMessage in
+            playerErrorMessage = errorMessage
+        }
         .onChange(of: togglePlayPauseTrigger) { _, triggered in
             if triggered {
                 player.togglePlayPause()
@@ -241,6 +252,7 @@ struct HomePage: View {
         }
         .onDisappear {
             player.onSongFinished = nil
+            player.onPlaybackError = nil
         }
     }
 

@@ -7,8 +7,10 @@ struct SongRow: View {
     let isDisabled: Bool
     let statusLabel: String?
     let overlayLabel: String?
+    let isPlaying: Bool
     let onTap: () -> Void
     let onLongPress: () -> Void
+    @State private var isPlayingPulse = false
 
     private var resolvedArtist: String {
         let base = song.artistName.trimmingCharacters(in: .whitespaces)
@@ -80,18 +82,39 @@ struct SongRow: View {
             onLongPress()
         }
         .overlay(alignment: .center) {
-            if let overlayLabel {
-                VStack(spacing: 0) {
-                    Spacer()
-                    Text(overlayLabel)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(.black.opacity(0.72), in: Capsule())
-                        .padding(.bottom, 8)
+            Group {
+                if isPlaying {
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(
+                            Color(red: 0.35, green: 0.75, blue: 0.45).opacity(isPlayingPulse ? 0.55 : 0.25),
+                            lineWidth: isPlayingPulse ? 2 : 1
+                        )
+                        .scaleEffect(isPlayingPulse ? 1.02 : 1.0)
+                        .allowsHitTesting(false)
+                        .padding(2)
+                        .animation(
+                            .easeInOut(duration: 0.85).repeatForever(autoreverses: true),
+                            value: isPlayingPulse
+                        )
+                }
+
+                if let overlayLabel {
+                    VStack(spacing: 0) {
+                        Spacer()
+                        Text(overlayLabel)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(.black.opacity(0.72), in: Capsule())
+                            .padding(.bottom, 8)
+                    }
                 }
             }
+        }
+        .onAppear { updatePulseAnimation(enabled: isPlaying) }
+        .onChange(of: isPlaying) { _, nowPlaying in
+            updatePulseAnimation(enabled: nowPlaying)
         }
     }
 
@@ -122,6 +145,17 @@ struct SongRow: View {
                             .foregroundStyle(color)
                     )
             }
+        }
+    }
+
+    private func updatePulseAnimation(enabled: Bool) {
+        if enabled {
+            isPlayingPulse = false
+            withAnimation(.easeInOut(duration: 0.85).repeatForever(autoreverses: true)) {
+                isPlayingPulse = true
+            }
+        } else {
+            isPlayingPulse = false
         }
     }
 }

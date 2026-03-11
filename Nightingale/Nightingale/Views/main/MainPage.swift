@@ -16,6 +16,7 @@ struct MainPage: View {
     @State private var playerProgress: Double = 0
     @State private var playerHasSong = false
     @State private var playerIsLoading = false
+    @State private var playerErrorMessage: String? = nil
     @State private var togglePlayPauseTrigger = false
 
     var body: some View {
@@ -78,6 +79,7 @@ struct MainPage: View {
                         playerProgress: $playerProgress,
                         playerHasSong: $playerHasSong,
                         playerIsLoading: $playerIsLoading,
+                        playerErrorMessage: $playerErrorMessage,
                         togglePlayPauseTrigger: $togglePlayPauseTrigger,
                         onAddLocalSong: { url, group in
                             Task { await vm.addLocalSong(from: url, group: group) }
@@ -111,7 +113,7 @@ struct MainPage: View {
     }
 
     private var footer: some View {
-        HStack(spacing: 0) {
+                HStack(spacing: 0) {
             FooterButton(
                 title: "Home",
                 systemImage: "house.fill",
@@ -124,6 +126,7 @@ struct MainPage: View {
                     progress: playerProgress,
                     isLoading: playerIsLoading,
                     isEnabled: playerHasSong,
+                    errorMessage: playerErrorMessage,
                     action: { togglePlayPauseTrigger = true }
                 )
             }

@@ -14,11 +14,13 @@ struct StreamDetails {
 final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
     @Published var isPlaying = false
     @Published var isLoading = false
+    @Published var playbackError: String? = nil
     @Published var progressSeconds: Double = 0
     @Published var durationSeconds: Double = 0
     @Published var currentSong: Song?
     
     var onSongFinished: ((Song) -> Void)?
+    var onPlaybackError: ((String?) -> Void)?
     private var progressCancellable: AnyCancellable?
     private var currentEntryId: String?
     private let progressUpdateInterval: TimeInterval = 0.1
@@ -28,12 +30,23 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
 
     private var playTask: Task<Void, Never>?
     private var isAudioSessionConfigured = false
-    
+    private var hasStartedStreamingPlayback = false
+
     private var pendingStartTime: Double?
     private var effectiveStartTime: Double = 0
     
     private var sc: SoundCloud
     private var firebaseAPI: FirebaseAPI
+
+    private func reportError(_ message: String) {
+        playbackError = message
+        onPlaybackError?(message)
+    }
+
+    private func clearPlaybackError() {
+        playbackError = nil
+        onPlaybackError?(nil)
+    }
     
     var adjustedProgressSeconds: Double {
         max(0, progressSeconds - effectiveStartTime)
@@ -112,9 +125,11 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
     func play(song: Song) {
         playTask?.cancel()
         isLoading = true
+        clearPlaybackError()
         stopLocalPlayer()
         player.stop()
         currentEntryId = nil
+        hasStartedStreamingPlayback = false
         
         progressSeconds = 0
         durationSeconds = 0
@@ -138,25 +153,28 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
                 guard details.url.pathExtension.lowercased() != "m3u8" else {
                     print("HLS (.m3u8) not supported by AudioStreaming. Use AVPlayer for this.")
                     self.isLoading = false
+                    self.reportError("Unsupported stream format (.m3u8).")
                     return
                 }
 
                 configureAudioSessionIfNeeded()
                 player.play(url: details.url, headers: details.headers)
                 isPlaying = true
-                self.isLoading = false
                 startProgressUpdates()
                 updateNowPlayingInfo()
             } catch {
                 if Task.isCancelled { return }
                 self.isLoading = false
                 print("Failed to play:", error)
+                self.reportError("Failed to start playback: \(error.localizedDescription)")
             }
         }
     }
 
     private func playLocalFile(_ song: Song) {
         let fileURL = LocalSongStore.shared.fileURL(for: song)
+        isLoading = false
+        clearPlaybackError()
 
         do {
             configureAudioSessionIfNeeded()
@@ -177,6 +195,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             updateNowPlayingInfo()
         } catch {
             isLoading = false
+            reportError("Failed to play local file: \(error.localizedDescription)")
             print("Failed to play local file:", error)
         }
     }
@@ -215,6 +234,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             }
             isPlaying = false
             isLoading = false
+            clearPlaybackError()
             stopProgressUpdates()
         } else {
             if localPlayer != nil {
@@ -224,6 +244,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             }
             isPlaying = true
             isLoading = false
+            clearPlaybackError()
             startProgressUpdates()
         }
         updateNowPlayingInfo()
@@ -235,6 +256,8 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
         player.stop()
         isPlaying = false
         isLoading = false
+        hasStartedStreamingPlayback = false
+        clearPlaybackError()
         stopProgressUpdates()
         progressSeconds = 0
         durationSeconds = 0
@@ -254,6 +277,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             isAudioSessionConfigured = true
         } catch {
             print("Audio session error:", error)
+            reportError("Audio session error: \(error.localizedDescription)")
         }
     }
     
@@ -280,6 +304,11 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             progressSeconds = player.progress
             durationSeconds = player.duration
         }
+
+        if localPlayer == nil && !hasStartedStreamingPlayback && progressSeconds > 0 {
+                hasStartedStreamingPlayback = true
+                isLoading = false
+        }
         updateNowPlayingInfo()
     }
 
@@ -289,8 +318,8 @@ extension MusicPlayer: AudioPlayerDelegate {
     nonisolated func audioPlayerDidStartPlaying(player: AudioPlayer, with entryId: AudioEntryId) {
         Task { @MainActor [weak self] in
             guard let self else { return }
-            isLoading = false
             currentEntryId = entryId.id
+            clearPlaybackError()
             guard let t = pendingStartTime else { return }
             pendingStartTime = nil
             player.seek(to: t)
@@ -337,6 +366,7 @@ extension MusicPlayer: AudioPlayerDelegate {
         Task { @MainActor [weak self] in
             guard let self else { return }
             isLoading = false
+            reportError("Playback was cancelled.")
         }
     }
 
@@ -344,6 +374,7 @@ extension MusicPlayer: AudioPlayerDelegate {
         Task { @MainActor [weak self] in
             guard let self else { return }
             isLoading = false
+            reportError("Unexpected playback error: \(error)")
         }
     }
 }
