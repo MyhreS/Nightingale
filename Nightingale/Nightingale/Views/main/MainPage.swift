@@ -15,6 +15,8 @@ struct MainPage: View {
     @State private var playerIsPlaying = false
     @State private var playerProgress: Double = 0
     @State private var playerHasSong = false
+    @State private var playerHasOfflinePlayback = false
+    @State private var playerCanStartOfflinePlayback = false
     @State private var playerIsLoading = false
     @State private var playerErrorMessage: String? = nil
     @State private var showPlayerErrorForDuration = false
@@ -94,6 +96,8 @@ struct MainPage: View {
                         playerIsPlaying: $playerIsPlaying,
                         playerProgress: $playerProgress,
                         playerHasSong: $playerHasSong,
+                        playerHasOfflinePlayback: $playerHasOfflinePlayback,
+                        playerCanStartOfflinePlayback: $playerCanStartOfflinePlayback,
                         playerIsLoading: $playerIsLoading,
                         playerErrorMessage: $playerErrorMessage,
                         stopPlaybackTrigger: $stopPlaybackTrigger,
@@ -182,7 +186,7 @@ struct MainPage: View {
                 MiniPlayerButton(
                     isPlaying: playerIsPlaying,
                     progress: playerProgress,
-                    isEnabled: true,
+                    isEnabled: connectivity.isOnline || playerHasOfflinePlayback || playerCanStartOfflinePlayback,
                     isErrorVisible: showPlayerErrorForDuration,
                     errorMessage: playerErrorMessage,
                     action: {

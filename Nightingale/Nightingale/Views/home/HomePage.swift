@@ -7,7 +7,6 @@ struct HomePage: View {
     @State private var selectedPreviewSong: Song?
     @State private var selectedGroup: SongGroup = ""
     @State private var pendingScrollSongID: String?
-    @State private var visibleSongIDs = Set<String>()
     @State private var playedTimeStamps: [String: Date] = [:]
     @State private var finishedSong: Song?
     @State private var tapDebounceTask: Task<Void, Never>?
@@ -15,6 +14,8 @@ struct HomePage: View {
     @Binding var playerIsPlaying: Bool
     @Binding var playerProgress: Double
     @Binding var playerHasSong: Bool
+    @Binding var playerHasOfflinePlayback: Bool
+    @Binding var playerCanStartOfflinePlayback: Bool
     @Binding var playerIsLoading: Bool
     @Binding var playerErrorMessage: String?
     @Binding var stopPlaybackTrigger: Bool
@@ -52,6 +53,10 @@ struct HomePage: View {
         }
     }
 
+    private var offlinePlayableSongs: [Song] {
+        filteredSongs.filter { $0.streamingSource == .local }
+    }
+
     private var hasHiddenSoundCloudSongsOffline: Bool {
         !connectivity.isOnline && filteredSongs.contains { $0.streamingSource == .soundcloud }
     }
@@ -71,6 +76,8 @@ struct HomePage: View {
         playerIsPlaying: Binding<Bool>,
         playerProgress: Binding<Double>,
         playerHasSong: Binding<Bool>,
+        playerHasOfflinePlayback: Binding<Bool>,
+        playerCanStartOfflinePlayback: Binding<Bool>,
         playerIsLoading: Binding<Bool>,
         playerErrorMessage: Binding<String?>,
         stopPlaybackTrigger: Binding<Bool>,
@@ -93,6 +100,8 @@ struct HomePage: View {
         _playerIsPlaying = playerIsPlaying
         _playerProgress = playerProgress
         _playerHasSong = playerHasSong
+        _playerHasOfflinePlayback = playerHasOfflinePlayback
+        _playerCanStartOfflinePlayback = playerCanStartOfflinePlayback
         _playerIsLoading = playerIsLoading
         _playerErrorMessage = playerErrorMessage
         _stopPlaybackTrigger = stopPlaybackTrigger
@@ -149,7 +158,7 @@ struct HomePage: View {
                                             isPlayed: isSongRecentlyPlayed(song),
                                             isDisabled: requiresInternet,
                                             statusLabel: requiresInternet ? "Internet required" : nil,
-                                            overlayLabel: requiresInternet && song.streamingSource == .firebase ? "No internet connection" : nil,
+                                            overlayLabel: nil,
                                             isPlaying: isSongPlaying,
                                             isLoading: isSongLoading,
                                             playbackLabel: isSongPlaying ? formattedPlaybackTime() : nil,
@@ -158,12 +167,8 @@ struct HomePage: View {
                                                 handleSongTap(song)
                                             },
                                             onLongPress: { selectedPreviewSong = song },
-                                            onAppearInViewport: {
-                                                visibleSongIDs.insert(song.id)
-                                            },
-                                            onDisappearFromViewport: {
-                                                visibleSongIDs.remove(song.id)
-                                            }
+                                            onAppearInViewport: {},
+                                            onDisappearFromViewport: {}
                                         )
                                         .id(song.id)
                                     }
@@ -262,9 +267,19 @@ struct HomePage: View {
             if selectedGroup.isEmpty || !newGroups.contains(selectedGroup) {
                 selectedGroup = newGroups.first ?? ""
             }
+            syncPlayerState()
         }
-        .onChange(of: visibleSongs.map(\.id)) { _, ids in
-            visibleSongIDs = visibleSongIDs.intersection(Set(ids))
+        .onChange(of: connectivity.isOnline) { _, isOnline in
+            guard !isOnline else { return }
+            guard let currentSong = player.currentSong else { return }
+            guard currentSong.streamingSource != .local else { return }
+            player.stop()
+        }
+        .onChange(of: songs) { _, _ in
+            syncPlayerState()
+        }
+        .onChange(of: visibleSongs.map(\.id)) { _, _ in
+            syncPlayerState()
         }
         .onChange(of: player.isPlaying) { _, _ in syncPlayerState() }
         .onChange(of: player.progressFraction) { _, _ in syncPlayerState() }
@@ -379,7 +394,7 @@ struct HomePage: View {
 
     func handleFooterPlayPauseTap() {
         if player.currentSong == nil {
-            playRandomVisibleSongInSelectedGroup()
+            playRandomSongInSelectedGroup()
             return
         }
 
@@ -424,6 +439,8 @@ struct HomePage: View {
     func syncPlayerState() {
         let isPlaying = player.isPlaying
         let hasSong = player.currentSong != nil
+        let hasOfflinePlayback = player.currentSong?.streamingSource == .local
+        let canStartOfflinePlayback = !offlinePlayableSongs.isEmpty
         let progress = player.progressFraction
 
         if playerIsPlaying != isPlaying {
@@ -431,6 +448,12 @@ struct HomePage: View {
         }
         if playerHasSong != hasSong {
             playerHasSong = hasSong
+        }
+        if playerHasOfflinePlayback != hasOfflinePlayback {
+            playerHasOfflinePlayback = hasOfflinePlayback
+        }
+        if playerCanStartOfflinePlayback != canStartOfflinePlayback {
+            playerCanStartOfflinePlayback = canStartOfflinePlayback
         }
         playerProgress = progress
     }
@@ -441,9 +464,9 @@ struct HomePage: View {
         }
     }
 
-    func playRandomVisibleSongInSelectedGroup() {
-        let candidates = visibleSongs.filter { visibleSongIDs.contains($0.id) }
-        guard let song = (candidates.isEmpty ? visibleSongs : candidates).randomElement() else { return }
+    func playRandomSongInSelectedGroup() {
+        let candidates = connectivity.isOnline ? visibleSongs : offlinePlayableSongs
+        guard let song = candidates.randomElement() else { return }
         handleSongTap(song)
     }
 
