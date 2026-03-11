@@ -15,6 +15,7 @@ struct HomePage: View {
     @Binding var playerHasSong: Bool
     @Binding var playerIsLoading: Bool
     @Binding var playerErrorMessage: String?
+    @Binding var stopPlaybackTrigger: Bool
     @Binding var togglePlayPauseTrigger: Bool
     @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
     @EnvironmentObject private var connectivity: Connectivity
@@ -69,6 +70,7 @@ struct HomePage: View {
         playerHasSong: Binding<Bool>,
         playerIsLoading: Binding<Bool>,
         playerErrorMessage: Binding<String?>,
+        stopPlaybackTrigger: Binding<Bool>,
         togglePlayPauseTrigger: Binding<Bool>,
         onAddLocalSong: @escaping (URL, SongGroup) -> Void,
         onDeleteSong: @escaping (Song) -> Void,
@@ -89,6 +91,7 @@ struct HomePage: View {
         _playerHasSong = playerHasSong
         _playerIsLoading = playerIsLoading
         _playerErrorMessage = playerErrorMessage
+        _stopPlaybackTrigger = stopPlaybackTrigger
         _togglePlayPauseTrigger = togglePlayPauseTrigger
         self.onAddLocalSong = onAddLocalSong
         self.onDeleteSong = onDeleteSong
@@ -244,6 +247,11 @@ struct HomePage: View {
         .onChange(of: player.playbackError) { _, errorMessage in
             playerErrorMessage = errorMessage
         }
+        .onChange(of: stopPlaybackTrigger) { _, triggered in
+            guard triggered else { return }
+            player.stop()
+            stopPlaybackTrigger = false
+        }
         .onChange(of: togglePlayPauseTrigger) { _, triggered in
             if triggered {
                 player.togglePlayPause()
@@ -389,6 +397,7 @@ struct HomePage: View {
             advanceToNextSong(after: song)
         }
     }
+
 }
 
 

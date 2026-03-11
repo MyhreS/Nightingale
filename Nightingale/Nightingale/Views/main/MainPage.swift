@@ -17,7 +17,10 @@ struct MainPage: View {
     @State private var playerHasSong = false
     @State private var playerIsLoading = false
     @State private var playerErrorMessage: String? = nil
+    @State private var showPlayerErrorForDuration = false
+    @State private var errorFlashTask: Task<Void, Never>?
     @State private var togglePlayPauseTrigger = false
+    @State private var stopPlaybackTrigger = false
 
     var body: some View {
         tabContent
@@ -58,6 +61,15 @@ struct MainPage: View {
                 disconnectSoundCloud()
             }
         }
+        .onAppear {
+            triggerPlayerErrorFlash(for: playerErrorMessage)
+        }
+        .onChange(of: playerErrorMessage) { _, message in
+            triggerPlayerErrorFlash(for: message)
+        }
+        .onDisappear {
+            errorFlashTask?.cancel()
+        }
     }
 
     private var tabContent: some View {
@@ -80,6 +92,7 @@ struct MainPage: View {
                         playerHasSong: $playerHasSong,
                         playerIsLoading: $playerIsLoading,
                         playerErrorMessage: $playerErrorMessage,
+                        stopPlaybackTrigger: $stopPlaybackTrigger,
                         togglePlayPauseTrigger: $togglePlayPauseTrigger,
                         onAddLocalSong: { url, group in
                             Task { await vm.addLocalSong(from: url, group: group) }
@@ -121,14 +134,23 @@ struct MainPage: View {
             ) { selectedTab = .home }
 
             if selectedTab == .home {
-                MiniPlayerButton(
-                    isPlaying: playerIsPlaying,
-                    progress: playerProgress,
-                    isLoading: playerIsLoading,
-                    isEnabled: playerHasSong,
-                    errorMessage: playerErrorMessage,
-                    action: { togglePlayPauseTrigger = true }
-                )
+                ZStack {
+                    MiniPlayerButton(
+                        isPlaying: playerIsPlaying,
+                        progress: playerProgress,
+                        isLoading: playerIsLoading,
+                        isEnabled: playerHasSong,
+                        isErrorVisible: showPlayerErrorForDuration,
+                        errorMessage: playerErrorMessage,
+                        action: {
+                            if playerIsLoading {
+                                stopPlaybackTrigger = true
+                            } else {
+                                togglePlayPauseTrigger = true
+                            }
+                        }
+                    )
+                }
             }
 
             FooterButton(
@@ -186,6 +208,26 @@ struct MainPage: View {
                 email: email,
                 scAuthenticated: false
             )
+        }
+    }
+
+    private func triggerPlayerErrorFlash(for message: String?) {
+        errorFlashTask?.cancel()
+        errorFlashTask = nil
+
+        guard let message, !message.isEmpty else {
+            showPlayerErrorForDuration = false
+            return
+        }
+
+        showPlayerErrorForDuration = true
+        let snapshot = message
+        errorFlashTask = Task {
+            try? await Task.sleep(nanoseconds: 1_800_000_000)
+            if Task.isCancelled { return }
+            if playerErrorMessage == snapshot {
+                showPlayerErrorForDuration = false
+            }
         }
     }
 }

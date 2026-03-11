@@ -39,6 +39,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
     private var firebaseAPI: FirebaseAPI
 
     private func reportError(_ message: String) {
+        stop(shouldClearPlaybackError: false)
         playbackError = message
         onPlaybackError?(message)
     }
@@ -250,14 +251,16 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
         updateNowPlayingInfo()
     }
 
-    func stop() {
+    func stop(shouldClearPlaybackError: Bool = true) {
         playTask?.cancel()
         stopLocalPlayer()
         player.stop()
         isPlaying = false
         isLoading = false
         hasStartedStreamingPlayback = false
-        clearPlaybackError()
+        if shouldClearPlaybackError {
+            clearPlaybackError()
+        }
         stopProgressUpdates()
         progressSeconds = 0
         durationSeconds = 0

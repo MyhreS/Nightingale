@@ -6,12 +6,13 @@ struct MiniPlayerButton: View {
     let progress: Double
     let isLoading: Bool
     let isEnabled: Bool
+    let isErrorVisible: Bool
     let errorMessage: String?
     let action: () -> Void
     @State private var loadingRotation: Double = 0
     
     private var hasError: Bool {
-        !(errorMessage ?? "").isEmpty
+        isErrorVisible && !(errorMessage ?? "").isEmpty
     }
     
     private var clampedProgress: Double {
@@ -40,9 +41,9 @@ struct MiniPlayerButton: View {
                         .frame(width: 66, height: 66)
                         .rotationEffect(.degrees(-90))
 
-                    Text("!")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(.white)
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(Color.red.opacity(isEnabled ? 0.95 : 0.5))
                 } else if isLoading {
                     Circle()
                         .trim(from: 0.2, to: 0.85)
@@ -65,8 +66,12 @@ struct MiniPlayerButton: View {
                         .rotationEffect(.degrees(-90))
                 }
                 
-                if isLoading || hasError {
+                if hasError {
                     EmptyView()
+                } else if isLoading {
+                    Image(systemName: "pause.fill")
+                        .font(.system(size: 31, weight: .bold))
+                        .foregroundStyle(.white.opacity(isEnabled ? 0.95 : 0.5))
                 } else {
                     Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                         .font(.system(size: 31, weight: .bold))
