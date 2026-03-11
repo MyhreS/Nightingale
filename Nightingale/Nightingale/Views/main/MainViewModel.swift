@@ -12,6 +12,9 @@ private let preferredGroupOrder: [SongGroup] = [
     "warmup", "intro", "faceoff", "penalty", "goal", "crowd", "break", "victory"
 ]
 
+// Toggle screenshot filler songs on/off before release.
+private let screenshotModeAddsDummySongs = true
+
 @MainActor
 final class MainViewModel: ObservableObject {
     @Published var songs: [Song] = []
@@ -49,24 +52,27 @@ final class MainViewModel: ObservableObject {
 
             cacheRemoteSongs(serverSongs)
             invalidateStaleArtwork(songs: serverSongs)
-            songs = deduplicateById(serverSongs + localSongs)
-            availableGroups = mergedGroups(
+            let merged = deduplicateById(serverSongs + localSongs)
+            let groups = mergedGroups(
                 base: emailIsAllowed ? firebaseGroups : defaultGroups,
-                songs: songs
+                songs: merged
             )
+            songs = screenshotModeAddsDummySongs ? addScreenshotDummySongs(to: merged, groups: groups) : merged
+            availableGroups = groups
         } catch {
             let localSongs = LocalSongStore.shared.allSongs()
             let cachedRemote = cachedRemoteSongs()
             let merged = deduplicateById(cachedRemote + localSongs)
 
             if !merged.isEmpty {
-                songs = merged
                 let hasCachedFirebase = merged.contains { $0.streamingSource == .firebase }
                 hasFirebaseAccess = !email.isEmpty && hasCachedFirebase
-                availableGroups = mergedGroups(
+                let groups = mergedGroups(
                     base: hasFirebaseAccess ? firebaseGroups : defaultGroups,
                     songs: merged
                 )
+                songs = screenshotModeAddsDummySongs ? addScreenshotDummySongs(to: merged, groups: groups) : merged
+                availableGroups = groups
             } else {
                 errorWhenLoadingSongs = true
                 hasFirebaseAccess = false
@@ -160,6 +166,61 @@ final class MainViewModel: ObservableObject {
             }
             return lhs.localizedCaseInsensitiveCompare(rhs) == .orderedAscending
         }
+    }
+
+    private func addScreenshotDummySongs(to songs: [Song], groups: [SongGroup]) -> [Song] {
+        let targetCountPerGroup = 20
+        var result = songs
+        var usedIds = Set(result.map(\.id))
+
+        for group in groups {
+            let existingCount = result.filter { $0.group == group }.count
+            guard existingCount < targetCountPerGroup else { continue }
+
+            for index in existingCount..<targetCountPerGroup {
+                let dummy = makeScreenshotDummySong(group: group, index: index)
+                guard !usedIds.contains(dummy.id) else { continue }
+                usedIds.insert(dummy.id)
+                result.append(dummy)
+            }
+        }
+
+        return result
+    }
+
+    private func makeScreenshotDummySong(group: SongGroup, index: Int) -> Song {
+        let titles = [
+            "Neon Breakaway", "Static Parade", "Turbo Lantern", "Polar Anthem", "Glass Velocity",
+            "Afterglow", "Northstar", "Rushlight", "Nightfall", "Everwave",
+            "Echo Harbor", "Signal Bloom", "Night Circuit", "Silver Rival", "Voltage Dream",
+            "Laser Arcade", "Prism Takedown", "Midnight Sprint", "Nova Chant", "Frost Relay",
+            "Pulse Theory", "Chrome Horizon", "Rocket Opera", "Shadow Jukebox", "Stellar Roar",
+            "Midnight Over Center Ice", "Static Hearts in Bloom", "Racing Through the Floodlights",
+            "Echoes From the Upper Deck", "Velvet Noise After Sundown", "Signals Under Northern Skies",
+            "Bright Lights and Empty Streets", "Running Wild Through Winter", "The Last Chorus Tonight",
+            "Shadows in a Golden Arcade"
+        ]
+        let artists = [
+            "Auralite", "Velora", "Kintaro Kid", "Mosaic Youth", "Static Vale",
+            "Luma Choir", "Pixel Motel", "North Arcade", "Saturn Twins", "Echo Season",
+            "Glass Cast", "Mono Harbor", "Blue Static", "Nova Parade", "Cinder Club",
+            "Fable Relay", "Jet Lagoon", "Silver Theory", "Prism Coast", "Night Foyer"
+        ]
+
+        return Song(
+            songId: "screenshot-\(group)-\(index)",
+            name: titles[index % titles.count],
+            artistName: artists[(index + group.count) % artists.count],
+            artworkURL: "",
+            duration: 180_000,
+            playbackUrl: "",
+            linkToSong: "",
+            linkToArtist: "",
+            group: group,
+            startSeconds: 0,
+            streamingSource: .firebase,
+            updatedAt: 0
+        )
     }
 }
 
