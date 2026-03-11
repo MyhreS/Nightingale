@@ -13,7 +13,7 @@ private let preferredGroupOrder: [SongGroup] = [
 ]
 
 // Toggle screenshot filler songs on/off before release.
-private let screenshotModeAddsDummySongs = true
+private let screenshotModeAddsDummySongs = false
 
 @MainActor
 final class MainViewModel: ObservableObject {
