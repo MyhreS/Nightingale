@@ -35,6 +35,7 @@ struct PageLayout<Content: View, Trailing: View>: View {
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
-        .padding()
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
     }
 }

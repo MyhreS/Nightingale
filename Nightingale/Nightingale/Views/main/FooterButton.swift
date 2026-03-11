@@ -8,13 +8,14 @@ struct FooterButton: View {
 
     var body: some View {
         HapticButton(action: action) {
-            VStack(spacing: 6) {
+            VStack(spacing: 5) {
                 Image(systemName: systemImage)
                     .font(.system(size: 22, weight: .semibold))
                 Text(title)
                     .font(.system(size: 11, weight: .medium))
             }
-            .frame(maxWidth: .infinity, minHeight: 58)
+            .padding(.top, 30)
+            .frame(maxWidth: .infinity, minHeight: 50)
             .foregroundStyle(isSelected ? .white : Color(white: 0.5))
             .opacity(isSelected ? 1.0 : 0.8)
         }

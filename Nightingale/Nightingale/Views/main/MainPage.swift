@@ -135,10 +135,10 @@ struct MainPage: View {
             ) { selectedTab = .settings }
         }
         .padding(.horizontal, 32)
-        .padding(.top, 12)
-        .padding(.bottom, 12)
+        .padding(.top, 6)
+        .padding(.bottom, 6)
         .frame(maxWidth: .infinity)
-        .frame(height: 82)
+        .frame(height: 64)
         .background(Color(white: 0.08))
         .overlay(
             Rectangle()
