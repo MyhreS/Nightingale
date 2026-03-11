@@ -8,8 +8,12 @@ struct SongRow: View {
     let statusLabel: String?
     let overlayLabel: String?
     let isPlaying: Bool
+    let isLoading: Bool
+    let playbackLabel: String?
     let onTap: () -> Void
     let onLongPress: () -> Void
+    let onAppearInViewport: () -> Void
+    let onDisappearFromViewport: () -> Void
     @State private var isPlayingPulse = false
 
     private var resolvedArtist: String {
@@ -43,7 +47,17 @@ struct SongRow: View {
             
             Spacer(minLength: 12)
             
-            if let statusLabel {
+            if isLoading {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.82))
+                    .rotationEffect(.degrees(isPlayingPulse ? 360 : 0))
+                    .animation(.linear(duration: 0.9).repeatForever(autoreverses: false), value: isPlayingPulse)
+            } else if let playbackLabel, isPlaying {
+                Text(playbackLabel)
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(.white.opacity(0.82))
+            } else if let statusLabel {
                 Text(statusLabel)
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Color(white: 0.55))
@@ -112,9 +126,18 @@ struct SongRow: View {
                 }
             }
         }
-        .onAppear { updatePulseAnimation(enabled: isPlaying) }
+        .onAppear {
+            updatePulseAnimation(enabled: isPlaying || isLoading)
+            onAppearInViewport()
+        }
+        .onDisappear {
+            onDisappearFromViewport()
+        }
         .onChange(of: isPlaying) { _, nowPlaying in
-            updatePulseAnimation(enabled: nowPlaying)
+            updatePulseAnimation(enabled: nowPlaying || isLoading)
+        }
+        .onChange(of: isLoading) { _, nowLoading in
+            updatePulseAnimation(enabled: isPlaying || nowLoading)
         }
     }
 

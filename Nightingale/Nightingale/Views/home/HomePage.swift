@@ -6,6 +6,8 @@ struct HomePage: View {
     @StateObject private var player: MusicPlayer
     @State private var selectedPreviewSong: Song?
     @State private var selectedGroup: SongGroup = ""
+    @State private var pendingScrollSongID: String?
+    @State private var visibleSongIDs = Set<String>()
     @State private var playedTimeStamps: [String: Date] = [:]
     @State private var finishedSong: Song?
     @State private var tapDebounceTask: Task<Void, Never>?
@@ -16,6 +18,7 @@ struct HomePage: View {
     @Binding var playerIsLoading: Bool
     @Binding var playerErrorMessage: String?
     @Binding var stopPlaybackTrigger: Bool
+    @Binding var playGoalTrigger: Bool
     @Binding var togglePlayPauseTrigger: Bool
     @AppStorage("isAutoPlayEnabled") private var isAutoPlayEnabled = true
     @EnvironmentObject private var connectivity: Connectivity
@@ -71,6 +74,7 @@ struct HomePage: View {
         playerIsLoading: Binding<Bool>,
         playerErrorMessage: Binding<String?>,
         stopPlaybackTrigger: Binding<Bool>,
+        playGoalTrigger: Binding<Bool>,
         togglePlayPauseTrigger: Binding<Bool>,
         onAddLocalSong: @escaping (URL, SongGroup) -> Void,
         onDeleteSong: @escaping (Song) -> Void,
@@ -92,6 +96,7 @@ struct HomePage: View {
         _playerIsLoading = playerIsLoading
         _playerErrorMessage = playerErrorMessage
         _stopPlaybackTrigger = stopPlaybackTrigger
+        _playGoalTrigger = playGoalTrigger
         _togglePlayPauseTrigger = togglePlayPauseTrigger
         self.onAddLocalSong = onAddLocalSong
         self.onDeleteSong = onDeleteSong
@@ -126,50 +131,74 @@ struct HomePage: View {
                         )
                     }
 
-                    ScrollView {
-                        LazyVStack(spacing: 10) {
-                            if isLoadingSongs {
-                                ForEach (0..<10, id: \.self) { _ in
-                                    SongRowSkeleton()
-                                }
-                            } else {
-                                ForEach(visibleSongs) { song in
-                                    let requiresInternet = requiresInternetForPlayback(song)
-                                    let isSongPlaying = player.currentSong == song && player.isPlaying
-                                    SongRow(
-                                        song: song,
-                                        isSelected: isSongSelected(song),
-                                        isPlayed: isSongRecentlyPlayed(song),
-                                        isDisabled: requiresInternet,
-                                        statusLabel: requiresInternet ? "Internet required" : nil,
-                                        overlayLabel: requiresInternet && song.streamingSource == .firebase ? "No internet connection" : nil,
-                                        isPlaying: isSongPlaying,
-                                        onTap: {
-                                            guard !requiresInternet else { return }
-                                            handleSongTap(song)
-                                        },
-                                        onLongPress: { selectedPreviewSong = song }
-                                    )
-                                }
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            LazyVStack(spacing: 10) {
+                                if isLoadingSongs {
+                                    ForEach (0..<10, id: \.self) { _ in
+                                        SongRowSkeleton()
+                                    }
+                                } else {
+                                    ForEach(visibleSongs) { song in
+                                        let requiresInternet = requiresInternetForPlayback(song)
+                                        let isSongPlaying = player.currentSong == song && player.isPlaying
+                                        let isSongLoading = player.currentSong == song && player.isLoading
+                                        SongRow(
+                                            song: song,
+                                            isSelected: isSongSelected(song),
+                                            isPlayed: isSongRecentlyPlayed(song),
+                                            isDisabled: requiresInternet,
+                                            statusLabel: requiresInternet ? "Internet required" : nil,
+                                            overlayLabel: requiresInternet && song.streamingSource == .firebase ? "No internet connection" : nil,
+                                            isPlaying: isSongPlaying,
+                                            isLoading: isSongLoading,
+                                            playbackLabel: isSongPlaying ? formattedPlaybackTime() : nil,
+                                            onTap: {
+                                                guard !requiresInternet else { return }
+                                                handleSongTap(song)
+                                            },
+                                            onLongPress: { selectedPreviewSong = song },
+                                            onAppearInViewport: {
+                                                visibleSongIDs.insert(song.id)
+                                            },
+                                            onDisappearFromViewport: {
+                                                visibleSongIDs.remove(song.id)
+                                            }
+                                        )
+                                        .id(song.id)
+                                    }
 
-                                if !connectivity.isOnline && visibleSongs.isEmpty {
-                                    offlineInfoCard(
-                                        icon: "wifi.slash",
-                                        title: "Internet required",
-                                        message: "No offline songs found."
-                                    )
-                                }
+                                    if !connectivity.isOnline && visibleSongs.isEmpty {
+                                        offlineInfoCard(
+                                            icon: "wifi.slash",
+                                            title: "Internet required",
+                                            message: "No offline songs found."
+                                        )
+                                    }
 
-                                if soundcloudLoginEnabled && !hasFirebaseAccess && !songs.contains(where: { $0.streamingSource == .soundcloud }) && songs.allSatisfy({ $0.streamingSource != .local }) {
-                                    ConnectSoundCloudRow(
-                                        isOnline: connectivity.isOnline,
-                                        onTap: onConnectSoundCloud
-                                    )
-                                }
+                                    if soundcloudLoginEnabled && !hasFirebaseAccess && !songs.contains(where: { $0.streamingSource == .soundcloud }) && songs.allSatisfy({ $0.streamingSource != .local }) {
+                                        ConnectSoundCloudRow(
+                                            isOnline: connectivity.isOnline,
+                                            onTap: onConnectSoundCloud
+                                        )
+                                    }
 
-                                if addLocalMusicEnabled {
-                                    AddSongRow(onTap: { showFilePicker = true })
+                                    if addLocalMusicEnabled {
+                                        AddSongRow(onTap: { showFilePicker = true })
+                                    }
                                 }
+                            }
+                            .onAppear {
+                                scrollToPendingSong(with: proxy)
+                            }
+                            .onChange(of: pendingScrollSongID) { _, _ in
+                                scrollToPendingSong(with: proxy)
+                            }
+                            .onChange(of: selectedGroup) { _, _ in
+                                scrollToPendingSong(with: proxy)
+                            }
+                            .onChange(of: visibleSongs.map(\.id)) { _, _ in
+                                scrollToPendingSong(with: proxy)
                             }
                         }
                         .padding(.vertical, 6)
@@ -193,15 +222,6 @@ struct HomePage: View {
                 )
                 .transition(.scale.combined(with: .opacity))
                 .zIndex(1000)
-            }
-
-        }
-        .overlay(alignment: .bottomTrailing) {
-            if hasGoalGroup && !isLoadingSongs {
-                GoalButton(action: { playGoalSong() })
-                    .padding(.trailing, 20)
-                    .padding(.bottom, 20)
-                    .zIndex(900)
             }
         }
         .fileImporter(
@@ -240,6 +260,9 @@ struct HomePage: View {
                 selectedGroup = newGroups.first ?? ""
             }
         }
+        .onChange(of: visibleSongs.map(\.id)) { _, ids in
+            visibleSongIDs = visibleSongIDs.intersection(Set(ids))
+        }
         .onChange(of: player.isPlaying) { _, _ in syncPlayerState() }
         .onChange(of: player.progressFraction) { _, _ in syncPlayerState() }
         .onChange(of: player.isLoading) { _, isLoading in playerIsLoading = isLoading }
@@ -252,9 +275,14 @@ struct HomePage: View {
             player.stop()
             stopPlaybackTrigger = false
         }
+        .onChange(of: playGoalTrigger) { _, triggered in
+            guard triggered else { return }
+            playGoalTrigger = false
+            playGoalSong()
+        }
         .onChange(of: togglePlayPauseTrigger) { _, triggered in
             if triggered {
-                player.togglePlayPause()
+                handleFooterPlayPauseTap()
                 togglePlayPauseTrigger = false
             }
         }
@@ -311,6 +339,7 @@ struct HomePage: View {
         if let goalGroup = availableGroups.first(where: { $0.lowercased() == "goal" }) {
             selectedGroup = goalGroup
         }
+        pendingScrollSongID = song.id
 
         let wasPlaying = player.isPlaying
         if wasPlaying {
@@ -329,6 +358,7 @@ struct HomePage: View {
     func handleSongTap(_ song: Song) {
         tapDebounceTask?.cancel()
         playedTimeStamps[song.id] = Date()
+        pendingScrollSongID = song.id
 
         let wasPlaying = player.isPlaying
         if wasPlaying {
@@ -342,6 +372,15 @@ struct HomePage: View {
             guard !Task.isCancelled else { return }
             player.play(song: song)
         }
+    }
+
+    func handleFooterPlayPauseTap() {
+        if player.currentSong == nil {
+            playRandomVisibleSongInSelectedGroup()
+            return
+        }
+
+        player.togglePlayPause()
     }
 
     func isSongSelected(_ song: Song) -> Bool {
@@ -370,6 +409,7 @@ struct HomePage: View {
 
         selectedGroup = song.group
         playedTimeStamps[nextSong.id] = Date()
+        pendingScrollSongID = nextSong.id
 
         tapDebounceTask = Task {
             try? await Task.sleep(nanoseconds: 2_000_000_000)
@@ -395,6 +435,35 @@ struct HomePage: View {
     func handleSongFinished(_ song: Song) {
         if isAutoPlayEnabled {
             advanceToNextSong(after: song)
+        }
+    }
+
+    func playRandomVisibleSongInSelectedGroup() {
+        let candidates = visibleSongs.filter { visibleSongIDs.contains($0.id) }
+        guard let song = (candidates.isEmpty ? visibleSongs : candidates).randomElement() else { return }
+        handleSongTap(song)
+    }
+
+    private func formattedPlaybackTime() -> String {
+        formatTime(player.adjustedProgressSeconds)
+    }
+
+    private func formatTime(_ seconds: Double) -> String {
+        let totalSeconds = max(0, Int(seconds.rounded(.down)))
+        let minutes = totalSeconds / 60
+        let remainingSeconds = totalSeconds % 60
+        return String(format: "%d:%02d", minutes, remainingSeconds)
+    }
+
+    private func scrollToPendingSong(with proxy: ScrollViewProxy) {
+        guard let pendingScrollSongID else { return }
+        guard visibleSongs.contains(where: { $0.id == pendingScrollSongID }) else { return }
+
+        DispatchQueue.main.async {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                proxy.scrollTo(pendingScrollSongID, anchor: .center)
+            }
+            self.pendingScrollSongID = nil
         }
     }
 

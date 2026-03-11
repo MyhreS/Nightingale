@@ -21,6 +21,11 @@ struct MainPage: View {
     @State private var errorFlashTask: Task<Void, Never>?
     @State private var togglePlayPauseTrigger = false
     @State private var stopPlaybackTrigger = false
+    @State private var playGoalTrigger = false
+
+    private var hasGoalGroup: Bool {
+        vm.availableGroups.contains { $0.lowercased() == "goal" }
+    }
 
     var body: some View {
         tabContent
@@ -73,9 +78,8 @@ struct MainPage: View {
     }
 
     private var tabContent: some View {
-        Group {
-            switch selectedTab {
-            case .home:
+        ZStack {
+            Group {
                 if !vm.errorWhenLoadingSongs {
                     HomePage(
                         firebaseAPI: firebaseAPI,
@@ -93,6 +97,7 @@ struct MainPage: View {
                         playerIsLoading: $playerIsLoading,
                         playerErrorMessage: $playerErrorMessage,
                         stopPlaybackTrigger: $stopPlaybackTrigger,
+                        playGoalTrigger: $playGoalTrigger,
                         togglePlayPauseTrigger: $togglePlayPauseTrigger,
                         onAddLocalSong: { url, group in
                             Task { await vm.addLocalSong(from: url, group: group) }
@@ -112,65 +117,87 @@ struct MainPage: View {
                 } else {
                     ErrorLoadingSongsView()
                 }
-            case .settings:
-                SettingsPage(
-                    sc: sc,
-                    scUser: scUser,
-                    hasFirebaseAccess: vm.hasFirebaseAccess,
-                    onConnectSoundCloud: connectSoundCloud,
-                    onDisconnectSoundCloud: disconnectSoundCloud
-                )
             }
+            .opacity(selectedTab == .home ? 1 : 0)
+            .allowsHitTesting(selectedTab == .home)
+
+            SettingsPage(
+                sc: sc,
+                scUser: scUser,
+                hasFirebaseAccess: vm.hasFirebaseAccess,
+                onConnectSoundCloud: connectSoundCloud,
+                onDisconnectSoundCloud: disconnectSoundCloud
+            )
+            .opacity(selectedTab == .settings ? 1 : 0)
+            .allowsHitTesting(selectedTab == .settings)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var footer: some View {
-                HStack(spacing: 0) {
-            FooterButton(
-                title: "Home",
-                systemImage: "house.fill",
-                isSelected: selectedTab == .home
-            ) { selectedTab = .home }
+        ZStack {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .background(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .fill(Color.white.opacity(0.04))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.28), radius: 22, x: 0, y: 12)
+                .shadow(color: .white.opacity(0.06), radius: 10, x: 0, y: -1)
 
-            if selectedTab == .home {
-                ZStack {
-                    MiniPlayerButton(
-                        isPlaying: playerIsPlaying,
-                        progress: playerProgress,
-                        isLoading: playerIsLoading,
-                        isEnabled: playerHasSong,
-                        isErrorVisible: showPlayerErrorForDuration,
-                        errorMessage: playerErrorMessage,
-                        action: {
-                            if playerIsLoading {
-                                stopPlaybackTrigger = true
-                            } else {
-                                togglePlayPauseTrigger = true
-                            }
-                        }
-                    )
+            HStack(spacing: 4) {
+                FooterButton(
+                    title: "Home",
+                    systemImage: "house.fill",
+                    isSelected: selectedTab == .home,
+                    isEnabled: true
+                ) { selectedTab = .home }
+
+                FooterButton(
+                    title: "Settings",
+                    systemImage: "gearshape.fill",
+                    isSelected: selectedTab == .settings,
+                    isEnabled: true
+                ) { selectedTab = .settings }
+
+                FooterButton(
+                    title: "Goal!",
+                    systemImage: "soccerball",
+                    isSelected: false,
+                    isEnabled: hasGoalGroup
+                ) {
+                    selectedTab = .home
+                    playGoalTrigger = true
                 }
-            }
 
-            FooterButton(
-                title: "Settings",
-                systemImage: "gearshape.fill",
-                isSelected: selectedTab == .settings
-            ) { selectedTab = .settings }
+                MiniPlayerButton(
+                    isPlaying: playerIsPlaying,
+                    progress: playerProgress,
+                    isEnabled: true,
+                    isErrorVisible: showPlayerErrorForDuration,
+                    errorMessage: playerErrorMessage,
+                    action: {
+                        if playerIsLoading {
+                            stopPlaybackTrigger = true
+                        } else {
+                            togglePlayPauseTrigger = true
+                        }
+                    }
+                )
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
         }
-        .padding(.horizontal, 32)
-        .padding(.top, 6)
-        .padding(.bottom, 6)
         .frame(maxWidth: .infinity)
-        .frame(height: 64)
-        .background(Color(white: 0.08))
-        .overlay(
-            Rectangle()
-                .frame(height: 1)
-                .foregroundStyle(Color(white: 0.2)),
-            alignment: .top
-        )
+        .frame(height: 70)
+        .padding(.horizontal, 14)
+        .padding(.top, 8)
+        .padding(.bottom, 6)
+        .background(Color.clear)
         .ignoresSafeArea(edges: .bottom)
     }
 
