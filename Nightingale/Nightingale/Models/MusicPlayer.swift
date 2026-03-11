@@ -127,12 +127,6 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             return
         }
 
-        if song.streamingSource == .firebase && hasCachedFirebaseAsset(song) {
-            if playCachedFirebaseFile(song) {
-                return
-            }
-        }
-
         playTask = Task { [weak self] in
             guard let self else { return }
 
@@ -187,44 +181,6 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
         }
     }
 
-    private func hasCachedFirebaseAsset(_ song: Song) -> Bool {
-        guard song.streamingSource == .firebase else { return false }
-        let cachedURL = MP3Cache.shared.cachedURL(for: song)
-        return MP3Cache.shared.hasCachedSong(song) || FileManager.default.fileExists(atPath: cachedURL.path)
-    }
-
-    private func playCachedFirebaseFile(_ song: Song) -> Bool {
-        let fileURL = MP3Cache.shared.cachedURL(for: song)
-        return playLocalFileURL(fileURL, source: song.streamingSource == .firebase ? "cached firebase file" : "local file")
-    }
-
-    @discardableResult
-    private func playLocalFileURL(_ fileURL: URL, source: String) -> Bool {
-        do {
-            configureAudioSessionIfNeeded()
-            localPlayer = try AVAudioPlayer(contentsOf: fileURL)
-            localPlayer?.delegate = self
-            localPlayer?.prepareToPlay()
-
-            if effectiveStartTime > 0 {
-                localPlayer?.currentTime = effectiveStartTime
-            }
-
-            localPlayer?.play()
-            durationSeconds = localPlayer?.duration ?? 0
-            pendingStartTime = nil
-            isLoading = false
-            isPlaying = true
-            startProgressUpdates()
-            updateNowPlayingInfo()
-            return true
-        } catch {
-            isLoading = false
-            print("Failed to play \(source):", error)
-            return false
-        }
-    }
-
     private func stopLocalPlayer() {
         localPlayer?.stop()
         localPlayer = nil
@@ -242,13 +198,6 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             return StreamDetails(url: url, headers: headers)
             
         case .firebase:
-            let cache = MP3Cache.shared
-            let localURL = cache.cachedURL(for: song)
-            
-            if cache.hasCachedSong(song) {
-                return StreamDetails(url: localURL, headers: [:])
-            }
-            
             let url = try await firebaseAPI.fetchStorageDownloadURL(path: song.songId)
             return StreamDetails(url: url, headers: [:])
 

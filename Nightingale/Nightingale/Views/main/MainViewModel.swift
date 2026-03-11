@@ -40,7 +40,6 @@ final class MainViewModel: ObservableObject {
                 let firebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
                 serverSongs = firebaseSongs
                 hasFirebaseAccess = true
-                startCacheWork(firebaseSongs: firebaseSongs)
             } else {
                 hasFirebaseAccess = false
                 if scAuthenticated {
@@ -124,17 +123,6 @@ final class MainViewModel: ObservableObject {
         }
 
         UserDefaults.standard.set(updated, forKey: key)
-    }
-
-    private func startCacheWork(firebaseSongs: [Song]) {
-        Task {
-            if firebaseSongs.isEmpty {
-                await MP3Cache.shared.removeAllSongs()
-            } else {
-                await MP3Cache.shared.removeSongsNotInList(songs: firebaseSongs)
-                await MP3Cache.shared.preloadSongs(songs: firebaseSongs)
-            }
-        }
     }
 
     private func cacheRemoteSongs(_ songs: [Song]) {

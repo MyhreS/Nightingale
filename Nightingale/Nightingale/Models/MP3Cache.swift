@@ -81,40 +81,53 @@ final class MP3Cache {
     }
     
     func preloadSongs(songs: [Song]) async {
+        let firebaseSongs = songs.filter { $0.streamingSource == .firebase }
+        print("📦 preloadSongs() totalSongs=\(songs.count) firebaseSongs=\(firebaseSongs.count)")
         let meta = loadMeta()
 
-        let songsToDownload = songs.filter { song in
-            guard song.streamingSource == .firebase else { return false }
+        let songsToDownload = firebaseSongs.filter { song in
             let localURL = getPreloadedSongPath(song: song)
-            if !isCached(at: localURL) { return true }
-            return meta[song.songId] != song.updatedAt
+            if !isCached(at: localURL) {
+                print("📦 preloadSongs() queue reason=no file id=\(song.id)")
+                return true
+            }
+            if meta[song.songId] != song.updatedAt {
+                print("📦 preloadSongs() queue reason=stale metadata id=\(song.id) old=\(meta[song.songId] ?? -1) new=\(song.updatedAt)")
+                return true
+            }
+            print("📦 preloadSongs() skip cached id=\(song.id)")
+            return false
         }
         
-        guard !songsToDownload.isEmpty else { return }
-
-        await withTaskGroup(of: (String, Int)?.self) { group in
-            for song in songsToDownload {
-                group.addTask {
-                    do {
-                        let localURL = self.getPreloadedSongPath(song: song)
-                        if self.isCached(at: localURL) {
-                            try FileManager.default.removeItem(at: localURL)
-                        }
-                        _ = try await self.downloadMP3(from: song.songId, to: localURL)
-                        return (song.songId, song.updatedAt)
-                    } catch {
-                        return nil
-                    }
-                }
-            }
-
-            var updatedMeta = loadMeta()
-            for await result in group {
-                guard let (songId, updatedAt) = result else { continue }
-                updatedMeta[songId] = updatedAt
-            }
-            saveMeta(updatedMeta)
+        guard !songsToDownload.isEmpty else {
+            print("📦 preloadSongs() nothing to download")
+            return
         }
+
+        print("📦 preloadSongs() will download \(songsToDownload.count) songs")
+
+        var downloadedCount = 0
+        var failedCount = 0
+
+        var updatedMeta = loadMeta()
+        for song in songsToDownload {
+            do {
+                let localURL = getPreloadedSongPath(song: song)
+                if isCached(at: localURL) {
+                    print("📦 preloadSongs() removing stale local file id=\(song.id)")
+                    try FileManager.default.removeItem(at: localURL)
+                }
+                _ = try await downloadMP3(from: song.songId, to: localURL)
+                print("📦 preloadSongs() downloaded id=\(song.id) -> \(localURL.lastPathComponent)")
+                updatedMeta[song.songId] = song.updatedAt
+                downloadedCount += 1
+            } catch {
+                print("📦 preloadSongs() failed download id=\(song.id): \(error)")
+                failedCount += 1
+            }
+        }
+        saveMeta(updatedMeta)
+        print("📦 preloadSongs() complete downloaded=\(downloadedCount) failed=\(failedCount)")
     }
     
     func cachedURL(for song: Song) -> URL {

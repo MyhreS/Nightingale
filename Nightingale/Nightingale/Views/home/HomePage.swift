@@ -135,6 +135,7 @@ struct HomePage: View {
                                         isPlayed: isSongRecentlyPlayed(song),
                                         isDisabled: requiresInternet,
                                         statusLabel: requiresInternet ? "Internet required" : nil,
+                                        overlayLabel: requiresInternet && song.streamingSource == .firebase ? "No internet connection" : nil,
                                         onTap: {
                                             guard !requiresInternet else { return }
                                             handleSongTap(song)
@@ -251,7 +252,7 @@ struct HomePage: View {
         case .soundcloud:
             return true
         case .firebase:
-            return !MP3Cache.shared.hasCachedSong(song)
+            return true
         }
     }
 

@@ -6,6 +6,7 @@ struct SongRow: View {
     let isPlayed: Bool
     let isDisabled: Bool
     let statusLabel: String?
+    let overlayLabel: String?
     let onTap: () -> Void
     let onLongPress: () -> Void
 
@@ -77,6 +78,20 @@ struct SongRow: View {
             guard !isDisabled else { return }
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             onLongPress()
+        }
+        .overlay(alignment: .center) {
+            if let overlayLabel {
+                VStack(spacing: 0) {
+                    Spacer()
+                    Text(overlayLabel)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(.black.opacity(0.72), in: Capsule())
+                        .padding(.bottom, 8)
+                }
+            }
         }
     }
 
