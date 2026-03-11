@@ -6,25 +6,47 @@ struct SongGroupSelector: View {
     let isLoading: Bool
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                if isLoading {
-                    ForEach(0..<8, id: \.self) { _ in
-                        GroupChipSkeleton()
-                    }
-                } else {
-                    ForEach(groups, id: \.self) { group in
-                        GroupChip(
-                            title: group.displayName,
-                            isSelected: group == selectedGroup
-                        ) {
-                            selectedGroup = group
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    if isLoading {
+                        ForEach(0..<8, id: \.self) { _ in
+                            GroupChipSkeleton()
+                        }
+                    } else {
+                        ForEach(groups, id: \.self) { group in
+                            GroupChip(
+                                title: group.displayName,
+                                isSelected: group == selectedGroup
+                            ) {
+                                selectedGroup = group
+                            }
+                            .id(group)
                         }
                     }
                 }
+                .padding(.vertical, 6)
+                .padding(.horizontal, 2)
             }
-            .padding(.vertical, 6)
-            .padding(.horizontal, 2)
+            .onAppear {
+                scrollToSelectedGroup(with: proxy)
+            }
+            .onChange(of: selectedGroup) { _, _ in
+                scrollToSelectedGroup(with: proxy)
+            }
+            .onChange(of: groups) { _, _ in
+                scrollToSelectedGroup(with: proxy)
+            }
+        }
+    }
+
+    private func scrollToSelectedGroup(with proxy: ScrollViewProxy) {
+        guard !selectedGroup.isEmpty else { return }
+
+        DispatchQueue.main.async {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                proxy.scrollTo(selectedGroup, anchor: .center)
+            }
         }
     }
 }
