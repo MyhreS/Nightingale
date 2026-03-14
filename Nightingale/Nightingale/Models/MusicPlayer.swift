@@ -4,6 +4,7 @@ import AVFoundation
 import AudioStreaming
 import SoundCloud
 import MediaPlayer
+import SwiftUI
 
 struct StreamDetails {
     let url: URL
@@ -14,6 +15,7 @@ struct StreamDetails {
 final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
     @Published var isPlaying = false
     @Published var isLoading = false
+    @Published var loadingProgress: Double = 0
     @Published var playbackError: String? = nil
     @Published var progressSeconds: Double = 0
     @Published var durationSeconds: Double = 0
@@ -29,6 +31,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
     private var localPlayer: AVAudioPlayer?
 
     private var playTask: Task<Void, Never>?
+    private var loadingProgressTask: Task<Void, Never>?
     private var isAudioSessionConfigured = false
     private var hasStartedStreamingPlayback = false
 
@@ -125,18 +128,14 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
 
     func play(song: Song) {
         playTask?.cancel()
-        isLoading = true
-        clearPlaybackError()
+        let shouldPreserveLoadingState = isLoading && currentSong == song
+        if !shouldPreserveLoadingState {
+            beginLoadingIndicator(for: song)
+        }
         stopLocalPlayer()
         player.stop()
         currentEntryId = nil
         hasStartedStreamingPlayback = false
-        
-        progressSeconds = 0
-        durationSeconds = 0
-        currentSong = song
-        effectiveStartTime = max(0, Double(song.startSeconds))
-        pendingStartTime = effectiveStartTime
 
         if song.streamingSource == .local {
             playLocalFile(song)
@@ -166,6 +165,9 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             } catch {
                 if Task.isCancelled { return }
                 self.isLoading = false
+                if let accessError = error as? FirebaseAccessError {
+                    self.firebaseAPI.presentAccessAlert(for: accessError)
+                }
                 print("Failed to play:", error)
                 self.reportError("Failed to start playback: \(error.localizedDescription)")
             }
@@ -175,6 +177,8 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
     private func playLocalFile(_ song: Song) {
         let fileURL = LocalSongStore.shared.fileURL(for: song)
         isLoading = false
+        stopLoadingProgressAnimation()
+        loadingProgress = 0
         clearPlaybackError()
 
         do {
@@ -192,10 +196,13 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             pendingStartTime = nil
             isPlaying = true
             isLoading = false
+            stopLoadingProgressAnimation()
             startProgressUpdates()
             updateNowPlayingInfo()
         } catch {
             isLoading = false
+            stopLoadingProgressAnimation()
+            loadingProgress = 0
             reportError("Failed to play local file: \(error.localizedDescription)")
             print("Failed to play local file:", error)
         }
@@ -253,10 +260,12 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
 
     func stop(shouldClearPlaybackError: Bool = true) {
         playTask?.cancel()
+        stopLoadingProgressAnimation()
         stopLocalPlayer()
         player.stop()
         isPlaying = false
         isLoading = false
+        loadingProgress = 0
         hasStartedStreamingPlayback = false
         if shouldClearPlaybackError {
             clearPlaybackError()
@@ -268,6 +277,20 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
         currentSong = nil
         currentEntryId = nil
         updateNowPlayingInfo()
+    }
+
+    func beginLoadingIndicator(for song: Song) {
+        stopLoadingProgressAnimation()
+        isPlaying = false
+        isLoading = true
+        loadingProgress = 0.08
+        clearPlaybackError()
+        progressSeconds = 0
+        durationSeconds = 0
+        currentSong = song
+        effectiveStartTime = max(0, Double(song.startSeconds))
+        pendingStartTime = effectiveStartTime
+        startLoadingProgressAnimation()
     }
 
     private func configureAudioSessionIfNeeded() {
@@ -298,6 +321,52 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
         progressCancellable?.cancel()
         progressCancellable = nil
     }
+
+    private func startLoadingProgressAnimation() {
+        loadingProgressTask?.cancel()
+        loadingProgressTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            let milestones: [(target: Double, delay: UInt64)] = [
+                (0.18, 160_000_000),
+                (0.30, 180_000_000),
+                (0.42, 220_000_000),
+                (0.54, 260_000_000),
+                (0.63, 320_000_000),
+                (0.70, 420_000_000),
+            ]
+
+            for milestone in milestones {
+                while isLoading && loadingProgress < milestone.target {
+                    try? await Task.sleep(nanoseconds: milestone.delay)
+                    guard !Task.isCancelled, isLoading else { return }
+                    let step = max(0.018, (milestone.target - loadingProgress) * 0.6)
+                    withAnimation(.easeOut(duration: 0.22)) {
+                        self.loadingProgress = min(milestone.target, self.loadingProgress + step)
+                    }
+                }
+            }
+        }
+    }
+
+    private func stopLoadingProgressAnimation() {
+        loadingProgressTask?.cancel()
+        loadingProgressTask = nil
+    }
+
+    private func completeLoadingIndicatorQuickly() {
+        stopLoadingProgressAnimation()
+        withAnimation(.easeOut(duration: 0.14)) {
+            self.loadingProgress = 1
+        }
+
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 150_000_000)
+            guard let self else { return }
+            guard hasStartedStreamingPlayback else { return }
+            isLoading = false
+        }
+    }
     
     private func refreshProgress() {
         if let lp = localPlayer {
@@ -310,7 +379,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
 
         if localPlayer == nil && !hasStartedStreamingPlayback && progressSeconds > 0 {
                 hasStartedStreamingPlayback = true
-                isLoading = false
+                completeLoadingIndicatorQuickly()
         }
         updateNowPlayingInfo()
     }
@@ -347,6 +416,8 @@ extension MusicPlayer: AudioPlayerDelegate {
             guard progress >= minPlaybackDuration else {
                 isPlaying = false
                 isLoading = false
+                stopLoadingProgressAnimation()
+                loadingProgress = 0
                 stopProgressUpdates()
                 return
             }
@@ -354,6 +425,8 @@ extension MusicPlayer: AudioPlayerDelegate {
             refreshProgress()
             isPlaying = false
             isLoading = false
+            stopLoadingProgressAnimation()
+            loadingProgress = 0
             stopProgressUpdates()
 
             guard let finishedSong = currentSong else { return }

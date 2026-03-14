@@ -161,6 +161,7 @@ struct HomePage: View {
                                             overlayLabel: nil,
                                             isPlaying: isSongPlaying,
                                             isLoading: isSongLoading,
+                                            loadingProgress: isSongLoading ? player.loadingProgress : 0,
                                             playbackLabel: isSongPlaying ? formattedPlaybackTime() : nil,
                                             onTap: {
                                                 guard !requiresInternet else { return }
@@ -363,6 +364,7 @@ struct HomePage: View {
         if wasPlaying {
             player.stop()
         }
+        player.beginLoadingIndicator(for: song)
 
         tapDebounceTask = Task {
             if wasPlaying {
@@ -382,6 +384,7 @@ struct HomePage: View {
         if wasPlaying {
             player.stop()
         }
+        player.beginLoadingIndicator(for: song)
 
         tapDebounceTask = Task {
             if wasPlaying {
@@ -428,6 +431,7 @@ struct HomePage: View {
         selectedGroup = song.group
         playedTimeStamps[nextSong.id] = Date()
         pendingScrollSongID = nextSong.id
+        player.beginLoadingIndicator(for: nextSong)
 
         tapDebounceTask = Task {
             try? await Task.sleep(nanoseconds: 2_000_000_000)

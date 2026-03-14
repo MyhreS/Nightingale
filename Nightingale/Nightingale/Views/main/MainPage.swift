@@ -77,6 +77,15 @@ struct MainPage: View {
         .onDisappear {
             errorFlashTask?.cancel()
         }
+        .alert(item: $firebaseAPI.accessAlert) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .default(Text("OK")) {
+                    firebaseAPI.clearAccessAlert()
+                }
+            )
+        }
     }
 
     private var tabContent: some View {

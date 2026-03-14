@@ -34,27 +34,33 @@ final class MainViewModel: ObservableObject {
 
             let localSongs = LocalSongStore.shared.allSongs()
             var serverSongs: [Song] = []
+            let accessIdentifier = email.trimmingCharacters(in: .whitespacesAndNewlines)
+            var firebaseAccessGranted = false
 
-            let emailLower = email.lowercased()
-            let allowedEmails = emailLower.isEmpty ? [] : try await firebaseAPI.fetchAllowedFirebaseSongsEmails()
-            let emailIsAllowed = !emailLower.isEmpty && allowedEmails.contains(where: { $0.lowercased() == emailLower })
-
-            if emailIsAllowed {
-                let firebaseSongs = try await firebaseAPI.fetchFirebaseSongs()
-                serverSongs = firebaseSongs
-                hasFirebaseAccess = true
-            } else {
-                hasFirebaseAccess = false
-                if scAuthenticated {
-                    serverSongs = try await firebaseAPI.fetchSoundcloudSongs()
+            if !accessIdentifier.isEmpty {
+                do {
+                    serverSongs = try await firebaseAPI.fetchFirebaseSongs(accessIdentifier: accessIdentifier)
+                    firebaseAccessGranted = true
+                } catch let accessError as FirebaseAccessError {
+                    if case .accessDenied = accessError {
+                        firebaseAPI.presentAccessAlert(for: accessError)
+                    } else {
+                        throw accessError
+                    }
                 }
             }
+
+            if !firebaseAccessGranted && scAuthenticated {
+                serverSongs = try await firebaseAPI.fetchSoundcloudSongs()
+            }
+
+            hasFirebaseAccess = firebaseAccessGranted
 
             cacheRemoteSongs(serverSongs)
             invalidateStaleArtwork(songs: serverSongs)
             let merged = deduplicateById(serverSongs + localSongs)
             let groups = mergedGroups(
-                base: emailIsAllowed ? firebaseGroups : defaultGroups,
+                base: firebaseAccessGranted ? firebaseGroups : defaultGroups,
                 songs: merged
             )
             songs = screenshotModeAddsDummySongs ? addScreenshotDummySongs(to: merged, groups: groups) : merged
@@ -63,6 +69,10 @@ final class MainViewModel: ObservableObject {
             let localSongs = LocalSongStore.shared.allSongs()
             let cachedRemote = cachedRemoteSongs()
             let merged = deduplicateById(cachedRemote + localSongs)
+
+            if let accessError = error as? FirebaseAccessError {
+                firebaseAPI.presentAccessAlert(for: accessError)
+            }
 
             if !merged.isEmpty {
                 let hasCachedFirebase = merged.contains { $0.streamingSource == .firebase }
