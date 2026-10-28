@@ -7,6 +7,10 @@ set -euo pipefail
 #   scripts/release/ios-testflight.sh                  # upload
 #   scripts/release/ios-testflight.sh --validate-only  # sign + let Apple validate, no delivery
 #   scripts/release/ios-testflight.sh --no-upload      # sign + export a local .ipa
+#   scripts/release/ios-testflight.sh --bundle-id sm.puckbeats --name "PuckBeats X"
+#       ship the same code as a separate App Store Connect app (its app record
+#       must already exist). Without these flags the project's sm.Nightingale /
+#       PuckBeats is used, so the original app is never affected.
 #
 # Signing, chosen automatically:
 #   portable  APPLE_DISTRIBUTION_P12_* is in Doppler: archive unsigned, sign with
@@ -37,15 +41,28 @@ readonly scheme="Nightingale"
 readonly target="Nightingale"
 
 usage() {
-	echo "usage: ios-testflight.sh [--allow-stale] [--no-upload | --validate-only]" >&2
+	echo "usage: ios-testflight.sh [--allow-stale] [--no-upload | --validate-only] [--bundle-id ID] [--name NAME]" >&2
 	exit 1
 }
 
 allow_stale=0
 mode=upload
+# Only the app target reads these (see PRODUCT_BUNDLE_IDENTIFIER in the project),
+# so package targets keep their own bundle identifiers.
+variant_settings=()
 while (($# > 0)); do
 	case "$1" in
 	--allow-stale) allow_stale=1 ;;
+	--bundle-id)
+		[[ $# -ge 2 ]] || usage
+		variant_settings+=("NIGHTINGALE_BUNDLE_ID=$2")
+		shift
+		;;
+	--name)
+		[[ $# -ge 2 ]] || usage
+		variant_settings+=("NIGHTINGALE_APP_NAME=$2")
+		shift
+		;;
 	--no-upload) mode='export' ;;
 	--validate-only) mode=validate ;;
 	*) usage ;;
@@ -127,7 +144,7 @@ readonly log_path="${work_dir}/altool.log"
 cd "${project_dir}"
 
 settings="$(xcodebuild -showBuildSettings -json -project "${project}" -scheme "${scheme}" \
-	-configuration Release -sdk iphoneos 2>/dev/null |
+	-configuration Release -sdk iphoneos "${variant_settings[@]+"${variant_settings[@]}"}" 2>/dev/null |
 	python3 -c '
 import json, sys
 entry = next(e for e in json.load(sys.stdin) if e["target"] == sys.argv[1])["buildSettings"]
@@ -141,7 +158,7 @@ readonly bundle_id team marketing_version entitlements
 	exit 1
 }
 
-echo "Releasing PuckBeats ${marketing_version} (build ${build_number}) from $(git -C "${repo_root}" rev-parse --short HEAD) [${signing} signing]"
+echo "Releasing ${bundle_id} ${marketing_version} (build ${build_number}) from $(git -C "${repo_root}" rev-parse --short HEAD) [${signing} signing]"
 
 xcodebuild -resolvePackageDependencies -project "${project}" -scheme "${scheme}" \
 	-onlyUsePackageVersionsFromResolvedFile >"${work_dir}/resolve.log" 2>&1 || {
@@ -174,7 +191,7 @@ if [[ "${signing}" == portable ]]; then
 		-destination 'generic/platform=iOS' -archivePath "${archive_path}" \
 		-onlyUsePackageVersionsFromResolvedFile -skipPackagePluginValidation -skipMacroValidation \
 		CODE_SIGNING_ALLOWED=NO AppIdentifierPrefix="${team}." TeamIdentifierPrefix="${team}." \
-		CURRENT_PROJECT_VERSION="${build_number}"
+		CURRENT_PROJECT_VERSION="${build_number}" "${variant_settings[@]+"${variant_settings[@]}"}"
 
 	archived_app="$(find "${archive_path}/Products/Applications" -maxdepth 1 -name '*.app' -print -quit)"
 	python3 "${repo_root}/scripts/release/ios_sign_archive.py" \
@@ -192,7 +209,7 @@ else
 	xcodebuild archive -project "${project}" -scheme "${scheme}" -configuration Release \
 		-destination 'generic/platform=iOS' -archivePath "${archive_path}" \
 		-onlyUsePackageVersionsFromResolvedFile -allowProvisioningUpdates \
-		CURRENT_PROJECT_VERSION="${build_number}"
+		CURRENT_PROJECT_VERSION="${build_number}" "${variant_settings[@]+"${variant_settings[@]}"}"
 	export_signing="<key>signingStyle</key><string>automatic</string>"
 	provisioning_args=(-allowProvisioningUpdates)
 fi

@@ -465,7 +465,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Nightingale/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = PuckBeats;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(NIGHTINGALE_APP_NAME:default=PuckBeats)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -477,7 +477,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.7;
-				PRODUCT_BUNDLE_IDENTIFIER = sm.Nightingale;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(NIGHTINGALE_BUNDLE_ID:default=sm.Nightingale)";
 				PRODUCT_NAME = PuckBeats;
 				REDIRECT_URI = "nightingale://callback";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -499,7 +499,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Nightingale/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = PuckBeats;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(NIGHTINGALE_APP_NAME:default=PuckBeats)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -511,7 +511,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.7;
-				PRODUCT_BUNDLE_IDENTIFIER = sm.Nightingale;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(NIGHTINGALE_BUNDLE_ID:default=sm.Nightingale)";
 				PRODUCT_NAME = PuckBeats;
 				REDIRECT_URI = "nightingale://callback";
 				SWIFT_EMIT_LOC_STRINGS = YES;
