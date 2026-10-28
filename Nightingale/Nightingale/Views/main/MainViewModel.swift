@@ -56,6 +56,11 @@ final class MainViewModel: ObservableObject {
 
             hasFirebaseAccess = firebaseAccessGranted
 
+            if firebaseAccessGranted {
+                let firebaseSongs = serverSongs.filter { $0.streamingSource == .firebase }
+                Task.detached { await MP3Cache.shared.removeSongsNotInList(songs: firebaseSongs) }
+            }
+
             cacheRemoteSongs(serverSongs)
             invalidateStaleArtwork(songs: serverSongs)
             let merged = deduplicateById(serverSongs + localSongs)
@@ -86,6 +91,13 @@ final class MainViewModel: ObservableObject {
             } else {
                 errorWhenLoadingSongs = true
                 hasFirebaseAccess = false
+            }
+            if !(error is FirebaseAccessError) {
+                ErrorReporter.shared.report(
+                    merged.isEmpty ? "Failed to load songs" : "Failed to load songs, showing cached list",
+                    context: "loadSongs",
+                    error: error
+                )
             }
             print("Failed to fetch songs: \(error)")
         }

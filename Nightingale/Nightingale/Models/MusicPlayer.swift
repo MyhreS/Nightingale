@@ -37,11 +37,16 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
 
     private var pendingStartTime: Double?
     private var effectiveStartTime: Double = 0
+
+    private var fadeTask: Task<Void, Never>?
+    private let fadeInDuration: TimeInterval = 0.15
+    private var cachingSongIds = Set<String>()
     
     private var sc: SoundCloud
     private var firebaseAPI: FirebaseAPI
 
-    private func reportError(_ message: String) {
+    private func reportError(_ message: String, error: Error? = nil) {
+        ErrorReporter.shared.report(message, context: "playback", song: currentSong, error: error)
         stop(shouldClearPlaybackError: false)
         playbackError = message
         onPlaybackError?(message)
@@ -128,6 +133,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
 
     func play(song: Song) {
         playTask?.cancel()
+        cancelFade()
         let shouldPreserveLoadingState = isLoading && currentSong == song
         if !shouldPreserveLoadingState {
             beginLoadingIndicator(for: song)
@@ -138,7 +144,12 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
         hasStartedStreamingPlayback = false
 
         if song.streamingSource == .local {
-            playLocalFile(song)
+            playFile(at: LocalSongStore.shared.fileURL(for: song))
+            return
+        }
+
+        if song.streamingSource == .firebase && MP3Cache.shared.hasCachedSong(song) {
+            playFile(at: MP3Cache.shared.cachedURL(for: song))
             return
         }
 
@@ -157,7 +168,13 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
                     return
                 }
 
+                if song.streamingSource == .firebase {
+                    cacheInBackground(song, from: details.url)
+                }
+
                 configureAudioSessionIfNeeded()
+                // Muted until the seek to startSeconds lands; audioPlayerDidStartPlaying fades it in.
+                player.volume = 0
                 player.play(url: details.url, headers: details.headers)
                 isPlaying = true
                 startProgressUpdates()
@@ -169,13 +186,12 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
                     self.firebaseAPI.presentAccessAlert(for: accessError)
                 }
                 print("Failed to play:", error)
-                self.reportError("Failed to start playback: \(error.localizedDescription)")
+                self.reportError("Failed to start playback: \(error.localizedDescription)", error: error)
             }
         }
     }
 
-    private func playLocalFile(_ song: Song) {
-        let fileURL = LocalSongStore.shared.fileURL(for: song)
+    private func playFile(at fileURL: URL) {
         isLoading = false
         stopLoadingProgressAnimation()
         loadingProgress = 0
@@ -191,7 +207,9 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
                 localPlayer?.currentTime = effectiveStartTime
             }
 
+            localPlayer?.volume = 0
             localPlayer?.play()
+            localPlayer?.setVolume(1, fadeDuration: fadeInDuration)
             durationSeconds = localPlayer?.duration ?? 0
             pendingStartTime = nil
             isPlaying = true
@@ -203,7 +221,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             isLoading = false
             stopLoadingProgressAnimation()
             loadingProgress = 0
-            reportError("Failed to play local file: \(error.localizedDescription)")
+            reportError("Failed to play file: \(error.localizedDescription)", error: error)
             print("Failed to play local file:", error)
         }
     }
@@ -211,6 +229,50 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
     private func stopLocalPlayer() {
         localPlayer?.stop()
         localPlayer = nil
+    }
+
+    private func cacheInBackground(_ song: Song, from remoteURL: URL) {
+        guard !cachingSongIds.contains(song.songId) else { return }
+        cachingSongIds.insert(song.songId)
+
+        Task { [weak self] in
+            do {
+                try await MP3Cache.shared.cacheSong(song, from: remoteURL)
+            } catch {
+                print("Failed to cache song \(song.id):", error)
+                ErrorReporter.shared.report("Failed to cache song", context: "cache", song: song, error: error)
+            }
+            self?.cachingSongIds.remove(song.songId)
+        }
+    }
+
+    /// Fades the streaming player in once playback has reached `startTime`, so neither the
+    /// pre-seek audio nor the hard cut into the waveform is audible.
+    private func fadeInStreamingPlayer(after startTime: Double?) {
+        fadeTask?.cancel()
+        fadeTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            if let startTime, startTime > 0 {
+                let deadline = Date().addingTimeInterval(1.5)
+                while player.progress < startTime - 0.25 && Date() < deadline {
+                    try? await Task.sleep(nanoseconds: 20_000_000)
+                    if Task.isCancelled { return }
+                }
+            }
+
+            let steps = 15
+            for step in 1...steps {
+                try? await Task.sleep(nanoseconds: UInt64(fadeInDuration / Double(steps) * 1_000_000_000))
+                if Task.isCancelled { return }
+                player.volume = Float(step) / Float(steps)
+            }
+        }
+    }
+
+    private func cancelFade() {
+        fadeTask?.cancel()
+        fadeTask = nil
     }
     
     private func fetchStreamDetails(song: Song) async throws -> StreamDetails {
@@ -235,6 +297,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
 
     func togglePlayPause() {
         if isPlaying {
+            cancelFade()
             if localPlayer != nil {
                 localPlayer?.pause()
             } else {
@@ -246,9 +309,13 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             stopProgressUpdates()
         } else {
             if localPlayer != nil {
+                localPlayer?.volume = 0
                 localPlayer?.play()
+                localPlayer?.setVolume(1, fadeDuration: fadeInDuration)
             } else {
+                player.volume = 0
                 player.resume()
+                fadeInStreamingPlayer(after: nil)
             }
             isPlaying = true
             isLoading = false
@@ -260,6 +327,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
 
     func stop(shouldClearPlaybackError: Bool = true) {
         playTask?.cancel()
+        cancelFade()
         stopLoadingProgressAnimation()
         stopLocalPlayer()
         player.stop()
@@ -303,7 +371,7 @@ final class MusicPlayer: NSObject, ObservableObject, @unchecked Sendable {
             isAudioSessionConfigured = true
         } catch {
             print("Audio session error:", error)
-            reportError("Audio session error: \(error.localizedDescription)")
+            reportError("Audio session error: \(error.localizedDescription)", error: error)
         }
     }
     
@@ -392,9 +460,12 @@ extension MusicPlayer: AudioPlayerDelegate {
             guard let self else { return }
             currentEntryId = entryId.id
             clearPlaybackError()
-            guard let t = pendingStartTime else { return }
+            let startTime = pendingStartTime
             pendingStartTime = nil
-            player.seek(to: t)
+            if let startTime, startTime > 0 {
+                player.seek(to: startTime)
+            }
+            fadeInStreamingPlayer(after: startTime)
         }
     }
 

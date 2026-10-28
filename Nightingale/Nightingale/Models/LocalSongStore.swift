@@ -41,6 +41,7 @@ final class LocalSongStore {
             try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
         } catch {
             print("Failed to copy audio file: \(error)")
+            ErrorReporter.shared.report("Failed to import local audio file", context: "localImport", error: error)
             return nil
         }
 

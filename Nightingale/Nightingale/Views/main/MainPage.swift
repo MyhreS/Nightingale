@@ -240,6 +240,7 @@ struct MainPage: View {
                 )
             } catch {
                 print("SoundCloud auth failed: \(error)")
+                ErrorReporter.shared.report("SoundCloud auth failed", context: "soundcloudAuth", error: error)
             }
         }
     }

@@ -84,6 +84,10 @@ private struct StorageURLResponse: Decodable {
     let url: String
 }
 
+private struct ReportErrorsResponse: Decodable {
+    let accepted: Int
+}
+
 @MainActor
 final class FirebaseAPI: ObservableObject {
     static let shared = FirebaseAPI()
@@ -108,6 +112,8 @@ final class FirebaseAPI: ObservableObject {
         } catch {
             if let accessError = error as? FirebaseAccessError {
                 presentAccessAlert(for: accessError)
+            } else {
+                ErrorReporter.shared.report("Failed to fetch feature flags", context: "featureFlags", error: error)
             }
             print("Failed to fetch feature flags: \(error)")
         }
@@ -134,7 +140,14 @@ final class FirebaseAPI: ObservableObject {
         return url
     }
 
+    /// Uploads app errors. The backend handles this action without consuming the user's quota.
+    func reportErrors(_ reports: [ErrorReport]) async throws {
+        let payload = try JSONSerialization.jsonObject(with: JSONEncoder().encode(reports))
+        let _: ReportErrorsResponse = try await gateData(action: "reportErrors", extraPayload: ["reports": payload])
+    }
+
     func presentAccessAlert(for error: FirebaseAccessError) {
+        ErrorReporter.shared.report("\(error.title): \(error.localizedDescription)", context: "access")
         accessAlert = AccessAlert(title: error.title, message: error.localizedDescription)
     }
 

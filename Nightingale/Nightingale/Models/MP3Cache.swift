@@ -75,9 +75,11 @@ final class MP3Cache {
             return
         }
 
-        var meta = loadMeta()
-        meta = meta.filter { allowedIds.contains($0.key) }
-        saveMeta(meta)
+        await MainActor.run {
+            var meta = loadMeta()
+            meta = meta.filter { allowedIds.contains($0.key) }
+            saveMeta(meta)
+        }
     }
     
     func preloadSongs(songs: [Song]) async {
@@ -174,6 +176,24 @@ final class MP3Cache {
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
     }
     
+    /// Caches a song from an already-resolved download URL, so playback and caching share one storageURL request.
+    func cacheSong(_ song: Song, from remoteURL: URL) async throws {
+        let localURL = getPreloadedSongPath(song: song)
+        let (tempURL, response) = try await URLSession.shared.download(from: remoteURL)
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200..<300).contains(httpResponse.statusCode) else {
+            try? FileManager.default.removeItem(at: tempURL)
+            throw URLError(.badServerResponse)
+        }
+        try store(tempURL: tempURL, at: localURL)
+        await MainActor.run {
+            var meta = loadMeta()
+            meta[song.songId] = song.updatedAt
+            saveMeta(meta)
+        }
+        print("📦 cacheSong() cached id=\(song.id) -> \(localURL.lastPathComponent)")
+    }
+
     func downloadMP3(from storagePath: String, to localURL: URL) async throws -> URL {
         let remoteURL = try await firebaseAPI.fetchStorageDownloadURL(path: storagePath)
         let (tempURL, _) = try await URLSession.shared.download(from: remoteURL)

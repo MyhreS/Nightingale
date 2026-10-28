@@ -5,6 +5,7 @@ import SoundCloud
 @main
 struct NightingaleApp: App {
     @StateObject private var firebaseAPI = FirebaseAPI.shared
+    @Environment(\.scenePhase) private var scenePhase
     private let sc: SoundCloud
     
     init() {
@@ -26,6 +27,11 @@ struct NightingaleApp: App {
             ContentView(sc: sc)
                 .preferredColorScheme(.dark)
                 .environmentObject(firebaseAPI)
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                ErrorReporter.shared.flush()
+            }
         }
     }
 }
