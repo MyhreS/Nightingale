@@ -275,7 +275,7 @@ if ((validate_status != 0)); then
 fi
 
 if [[ "${mode}" == validate ]]; then
-	echo "Validated (not uploaded): PuckBeats ${marketing_version} (build ${build_number})."
+	echo "Validated (not uploaded): ${bundle_id} ${marketing_version} (build ${build_number})."
 	exit 0
 fi
 
@@ -297,5 +297,5 @@ grep -qiE 'UPLOAD SUCCEEDED|No errors uploading' "${log_path}" || {
 	exit 1
 }
 
-echo "Delivered PuckBeats ${marketing_version} (build ${build_number}) to TestFlight."
+echo "Delivered ${bundle_id} ${marketing_version} (build ${build_number}) to TestFlight."
 echo "It appears in App Store Connect once Apple finishes processing."
