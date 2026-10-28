@@ -7,10 +7,11 @@ set -euo pipefail
 #   scripts/release/ios-testflight.sh                  # upload
 #   scripts/release/ios-testflight.sh --validate-only  # sign + let Apple validate, no delivery
 #   scripts/release/ios-testflight.sh --no-upload      # sign + export a local .ipa
-#   scripts/release/ios-testflight.sh --bundle-id sm.puckbeats --name "PuckBeats X"
-#       ship the same code as a separate App Store Connect app (its app record
-#       must already exist). Without these flags the project's sm.Nightingale /
-#       PuckBeats is used, so the original app is never affected.
+#   scripts/release/ios-testflight.sh --original        # ship to the App Store app instead
+#
+# By default builds go to the TestFlight-only app "Hockey Secretary Music"
+# (sm.puckbeats). --original ships the project's own sm.Nightingale / PuckBeats
+# (the App Store app); --bundle-id/--name target any other existing app record.
 #
 # Signing, chosen automatically:
 #   portable  APPLE_DISTRIBUTION_P12_* is in Doppler: archive unsigned, sign with
@@ -41,7 +42,7 @@ readonly scheme="Nightingale"
 readonly target="Nightingale"
 
 usage() {
-	echo "usage: ios-testflight.sh [--allow-stale] [--no-upload | --validate-only] [--bundle-id ID] [--name NAME]" >&2
+	echo "usage: ios-testflight.sh [--allow-stale] [--no-upload | --validate-only] [--original | --bundle-id ID [--name NAME]]" >&2
 	exit 1
 }
 
@@ -49,18 +50,24 @@ allow_stale=0
 mode=upload
 # Only the app target reads these (see PRODUCT_BUNDLE_IDENTIFIER in the project),
 # so package targets keep their own bundle identifiers.
-variant_settings=()
+variant_bundle_id=sm.puckbeats
+variant_name="Hockey Secretary Music"
 while (($# > 0)); do
 	case "$1" in
 	--allow-stale) allow_stale=1 ;;
+	--original)
+		variant_bundle_id=""
+		variant_name=""
+		;;
 	--bundle-id)
 		[[ $# -ge 2 ]] || usage
-		variant_settings+=("NIGHTINGALE_BUNDLE_ID=$2")
+		variant_bundle_id="$2"
+		variant_name=""
 		shift
 		;;
 	--name)
 		[[ $# -ge 2 ]] || usage
-		variant_settings+=("NIGHTINGALE_APP_NAME=$2")
+		variant_name="$2"
 		shift
 		;;
 	--no-upload) mode='export' ;;
@@ -69,6 +76,11 @@ while (($# > 0)); do
 	esac
 	shift
 done
+
+variant_settings=()
+[[ -n "${variant_bundle_id}" ]] && variant_settings+=("NIGHTINGALE_BUNDLE_ID=${variant_bundle_id}")
+[[ -n "${variant_name}" ]] && variant_settings+=("NIGHTINGALE_APP_NAME=${variant_name}")
+readonly variant_settings
 
 # Refuse to ship a tree that is not exactly origin/main: a build from other code
 # burns a build number that can never be reused for this version.
